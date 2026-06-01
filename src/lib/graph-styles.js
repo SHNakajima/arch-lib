@@ -38,6 +38,41 @@ export const NODE_ICONS = {
   ml:       '🧠',
 };
 
+/** High-resolution brand logo URLs for microservices & databases */
+export const TECH_LOGOS = {
+  // Netflix
+  client: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg',
+  zuul: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg',
+  eureka: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg',
+  'api-services': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg',
+  evcache: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/redis/redis-original.svg',
+  cassandra: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/cassandra/cassandra-original.svg',
+  kafka: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/apachekafka/apachekafka-original.svg',
+  recommendation: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tensorflow/tensorflow-original.svg',
+  titus: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/kubernetes/kubernetes-plain.svg',
+  cdn: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nginx/nginx-original.svg',
+
+  // Amazon
+  elb: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/amazonwebservices/amazonwebservices-plain-wordmark.svg',
+  'api-gateway': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/amazonwebservices/amazonwebservices-plain-wordmark.svg',
+  'product-service': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg',
+  'order-service': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg',
+  search: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/elasticsearch/elasticsearch-original.svg',
+  dynamodb: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/amazonwebservices/amazonwebservices-plain-wordmark.svg',
+  'sqs-sns': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/amazonwebservices/amazonwebservices-plain-wordmark.svg',
+  elasticache: 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/redis/redis-original.svg',
+
+  // Twitter/X
+  'load-balancer': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/googlecloud/googlecloud-original.svg',
+  'api-service': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/scala/scala-original.svg',
+  'tweet-service': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/scala/scala-original.svg',
+  'fanout-service': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/scala/scala-original.svg',
+  'timeline-service': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/scala/scala-original.svg',
+  'redis-cache': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/redis/redis-original.svg',
+  'tweet-store': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/cassandra/cassandra-original.svg',
+  'social-graph': 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg',
+};
+
 /** Edge type styles */
 const EDGE_STYLES = {
   sync:      { lineStyle: 'solid',  color: 'hsl(190, 80%, 55%)',  width: 2 },
@@ -55,23 +90,31 @@ export function getCytoscapeStyles() {
       selector: 'node',
       style: {
         'shape': 'round-rectangle',
-        'width': 170,
-        'height': 60,
+        'width': 190,
+        'height': 75,
         'background-color': 'data(color)',
-        'background-opacity': 0.15,
+        'background-opacity': 0.12,
         'border-width': 2,
         'border-color': 'data(color)',
-        'border-opacity': 0.7,
+        'border-opacity': 0.85,
         'label': 'data(label)',
         'text-valign': 'center',
         'text-halign': 'center',
         'font-family': "'Inter', sans-serif",
-        'font-size': 12,
+        'font-size': 11,
         'font-weight': 600,
-        'color': 'data(color)',
+        'color': 'hsl(220, 20%, 95%)',
         'text-wrap': 'wrap',
-        'text-max-width': 150,
-        'padding': '12px',
+        'text-max-width': 140,
+        'padding': '10px',
+        // Real tech logo background image configurations
+        'background-image': 'data(bgImage)',
+        'background-fit': 'contain',
+        'background-width': '22px',
+        'background-height': '22px',
+        'background-position-x': '12px',
+        'background-position-y': '50%',
+        'text-margin-x': '14px', // Shift text right to avoid overlapping with logo
         'transition-property': 'background-opacity, border-opacity, opacity, border-width',
         'transition-duration': '0.3s',
         'transition-timing-function': 'ease-out',
@@ -193,20 +236,29 @@ export function getCytoscapeStyles() {
  * Convert architecture data to Cytoscape elements
  */
 export function toElements(nodes, edges) {
-  const cyNodes = nodes.map(node => ({
-    data: {
-      id: node.id,
-      label: node.label,
-      type: node.type,
-      color: NODE_COLORS[node.type] || NODE_COLORS.service,
-      // Store full node data for sidebar
-      _nodeData: node,
-    },
-    position: {
-      x: node.position.x * 1.5,
-      y: node.position.y * 1.2,
-    },
-  }));
+  const cyNodes = nodes.map(node => {
+    const icon = NODE_ICONS[node.type] || '⚙️';
+    const typeJa = NODE_TYPE_JA[node.type] || node.type;
+    // Format: "Zuul API Gateway\n[APIゲートウェイ]" (Icon is now displayed as a graphic logo!)
+    const displayLabel = `${node.label}\n[${typeJa}]`;
+    const bgImage = TECH_LOGOS[node.id] || '';
+
+    return {
+      data: {
+        id: node.id,
+        label: displayLabel,
+        type: node.type,
+        color: NODE_COLORS[node.type] || NODE_COLORS.service,
+        bgImage: bgImage,
+        // Store full node data for sidebar
+        _nodeData: node,
+      },
+      position: {
+        x: node.position.x * 1.5,
+        y: node.position.y * 1.2,
+      },
+    };
+  });
 
   const cyEdges = edges.map((edge, i) => ({
     data: {
