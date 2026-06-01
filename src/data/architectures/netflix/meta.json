@@ -1,0 +1,9 @@
+{
+  "id": "netflix",
+  "name": "Netflix",
+  "description": "Global video streaming platform serving 250M+ subscribers with a sophisticated microservices architecture designed for massive scale, high availability, and resilience.",
+  "category": "Entertainment & Streaming",
+  "tags": ["microservices", "cdn", "distributed-cache", "ml-pipeline", "chaos-engineering", "event-streaming"],
+  "color": "#E50914",
+  "accentGradient": "linear-gradient(135deg, #E50914, #B20710)"
+}

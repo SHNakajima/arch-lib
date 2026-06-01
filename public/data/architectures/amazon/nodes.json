@@ -1,0 +1,183 @@
+[
+  {
+    "id": "client",
+    "label": "Client (Web/Mobile)",
+    "type": "client",
+    "description": "Web browsers and mobile apps through which customers browse, search, and purchase products.",
+    "techStack": "React (Web), Native Apps (iOS/Android), A/B Testing Framework",
+    "role": "Renders the storefront, product pages, and checkout flow. Each page is optimized for conversion through continuous experimentation.",
+    "whyChosen": "React enables rapid iteration on the web storefront. Native mobile apps provide smoother shopping experiences with push notification and offline catalog support.",
+    "tradeoffs": {
+      "pros": ["Platform-optimized UX", "Rich experimentation framework", "Progressive loading for fast Time-to-Interactive"],
+      "cons": ["Multiple codebases increase maintenance", "Feature parity across platforms is challenging"]
+    },
+    "alternatives": [
+      { "name": "Next.js SSR", "context": "Server-rendered React for faster initial loads" },
+      { "name": "Flutter", "context": "Single codebase for mobile platforms" }
+    ],
+    "position": { "x": 100, "y": 300 }
+  },
+  {
+    "id": "elb",
+    "label": "Elastic Load Balancer",
+    "type": "gateway",
+    "description": "AWS-native load balancer distributing incoming traffic across multiple availability zones.",
+    "techStack": "AWS ALB/NLB, Auto Scaling Groups",
+    "role": "Distributes millions of requests per second across healthy service instances, performs SSL termination, and integrates with AWS auto-scaling for elastic capacity.",
+    "whyChosen": "As the creators of AWS, Amazon leverages their own infrastructure. ALB provides L7 routing, sticky sessions, and seamless integration with ECS/EKS.",
+    "tradeoffs": {
+      "pros": ["Fully managed, zero operational overhead", "Deep AWS integration", "Automatic cross-AZ failover"],
+      "cons": ["AWS lock-in", "Cost at extreme scale", "Less customizable than software load balancers"]
+    },
+    "alternatives": [
+      { "name": "nginx / HAProxy", "context": "Self-managed, highly configurable" },
+      { "name": "Envoy Proxy", "context": "Service mesh L7 proxy" }
+    ],
+    "position": { "x": 300, "y": 300 }
+  },
+  {
+    "id": "api-gateway",
+    "label": "API Gateway Services",
+    "type": "gateway",
+    "description": "Microservice gateway handling authentication, rate limiting, and request routing to hundreds of backend services.",
+    "techStack": "Custom Java services, AWS API Gateway",
+    "role": "Authenticates requests, applies rate limits, transforms payloads, and routes to the correct domain services. Handles versioning and backward compatibility.",
+    "whyChosen": "Amazon's scale requires custom gateway logic for complex routing rules (marketplace vs retail, regional regulations, seller APIs).",
+    "tradeoffs": {
+      "pros": ["Custom routing for complex multi-tenant scenarios", "Per-service rate limiting and throttling"],
+      "cons": ["Custom solution requires dedicated team", "Single point of failure risk without proper redundancy"]
+    },
+    "alternatives": [
+      { "name": "Kong", "context": "Open-source API gateway with plugin ecosystem" },
+      { "name": "Apigee", "context": "Google Cloud managed API platform" }
+    ],
+    "position": { "x": 500, "y": 300 }
+  },
+  {
+    "id": "product-service",
+    "label": "Product Catalog Service",
+    "type": "service",
+    "description": "Manages the catalog of hundreds of millions of products with real-time pricing, availability, and attribute data.",
+    "techStack": "Java/Kotlin microservices, gRPC",
+    "role": "Central source of truth for product information. Serves product details, pricing, and inventory status to all consumer-facing and internal services.",
+    "whyChosen": "A dedicated product service allows independent scaling and data model evolution for the massive catalog without impacting other services.",
+    "tradeoffs": {
+      "pros": ["Independent scaling for catalog workloads", "Consistent product data across all channels"],
+      "cons": ["Must handle extreme read throughput", "Cross-region consistency for global catalog"]
+    },
+    "alternatives": [
+      { "name": "Commercetools", "context": "Headless commerce platform" },
+      { "name": "Shopify Plus Backend", "context": "Managed e-commerce platform" }
+    ],
+    "position": { "x": 700, "y": 150 }
+  },
+  {
+    "id": "order-service",
+    "label": "Order Processing Service",
+    "type": "service",
+    "description": "Manages the order lifecycle from cart to delivery, orchestrating payment, inventory, and fulfillment workflows.",
+    "techStack": "Java, Step Functions, SQS",
+    "role": "Coordinates the complex multi-step purchase flow: inventory reservation, payment processing, fraud detection, and fulfillment routing.",
+    "whyChosen": "Order processing requires strong consistency guarantees and saga-pattern orchestration across multiple bounded contexts (payment, inventory, shipping).",
+    "tradeoffs": {
+      "pros": ["Reliable saga orchestration for distributed transactions", "Idempotent operations prevent double-charges"],
+      "cons": ["Complex compensating transactions on failure", "High operational criticality — downtime = lost revenue"]
+    },
+    "alternatives": [
+      { "name": "Temporal", "context": "Open-source durable workflow engine" },
+      { "name": "Camunda", "context": "BPMN-based process orchestration" }
+    ],
+    "position": { "x": 700, "y": 450 }
+  },
+  {
+    "id": "search",
+    "label": "Search Engine",
+    "type": "service",
+    "description": "Powers product search across hundreds of millions of listings with sub-second response times.",
+    "techStack": "Custom search (A9), OpenSearch/Elasticsearch, ML Ranking",
+    "role": "Processes search queries, applies ML-based ranking, handles typo correction, synonyms, and personalized result ordering based on purchase history.",
+    "whyChosen": "Amazon's A9 search is a competitive differentiator. Custom search allows integration of purchase intent signals and advertiser-bid ranking that generic engines can't provide.",
+    "tradeoffs": {
+      "pros": ["Purchase-intent-optimized ranking", "Real-time index updates for price/availability changes", "Sponsored product integration"],
+      "cons": ["Massive index size requires sharding", "Balancing organic vs paid results transparency"]
+    },
+    "alternatives": [
+      { "name": "Elasticsearch / OpenSearch", "context": "Open-source full-text search" },
+      { "name": "Algolia", "context": "Managed search-as-a-service" }
+    ],
+    "position": { "x": 500, "y": 100 }
+  },
+  {
+    "id": "dynamodb",
+    "label": "DynamoDB",
+    "type": "database",
+    "description": "Fully managed NoSQL database providing single-digit millisecond performance at any scale.",
+    "techStack": "Amazon DynamoDB, Global Tables, DAX Cache",
+    "role": "Primary database for high-throughput workloads: shopping carts, session state, user preferences. Global Tables provide multi-region active-active replication.",
+    "whyChosen": "Born from Amazon's Dynamo paper. Provides predictable performance with automatic scaling — critical for Black Friday-scale traffic spikes.",
+    "tradeoffs": {
+      "pros": ["Predictable single-digit ms latency", "Fully managed with auto-scaling", "Global tables for multi-region"],
+      "cons": ["Limited query patterns (must design for access patterns)", "Cost can spike with high throughput", "25-item transaction limit"]
+    },
+    "alternatives": [
+      { "name": "Cassandra", "context": "Open-source, avoid vendor lock-in" },
+      { "name": "MongoDB Atlas", "context": "Document DB with flexible queries" },
+      { "name": "CockroachDB", "context": "Distributed SQL with strong consistency" }
+    ],
+    "position": { "x": 900, "y": 300 }
+  },
+  {
+    "id": "sqs-sns",
+    "label": "SQS / SNS / EventBridge",
+    "type": "queue",
+    "description": "Managed messaging services for asynchronous event-driven communication between microservices.",
+    "techStack": "Amazon SQS, SNS, EventBridge",
+    "role": "Decouples services through message queues (SQS) and pub/sub topics (SNS). EventBridge provides event routing with content-based filtering for complex workflows.",
+    "whyChosen": "Managed messaging eliminates the operational overhead of running Kafka/RabbitMQ clusters while providing at-least-once delivery guarantees.",
+    "tradeoffs": {
+      "pros": ["Fully managed, zero ops", "SQS provides dead-letter queues for error handling", "EventBridge enables event-driven architectures"],
+      "cons": ["Higher per-message cost than self-hosted Kafka", "SQS max message size 256KB", "Less control over partitioning and ordering"]
+    },
+    "alternatives": [
+      { "name": "Apache Kafka (MSK)", "context": "Event streaming with replay capability" },
+      { "name": "RabbitMQ", "context": "Feature-rich message broker" }
+    ],
+    "position": { "x": 700, "y": 300 }
+  },
+  {
+    "id": "elasticache",
+    "label": "ElastiCache (Redis)",
+    "type": "cache",
+    "description": "In-memory caching layer providing microsecond read latency for frequently accessed data.",
+    "techStack": "Amazon ElastiCache for Redis, cluster mode",
+    "role": "Caches product details, session state, and search results. Reduces database load and speeds up page rendering for high-traffic product pages.",
+    "whyChosen": "Redis provides rich data structures (sorted sets for rankings, hashes for session data) beyond simple key-value caching, with managed cluster mode for scaling.",
+    "tradeoffs": {
+      "pros": ["Sub-millisecond read latency", "Rich data structures", "Managed with automatic failover"],
+      "cons": ["Memory-bound (expensive at scale)", "Cache invalidation complexity", "Data loss risk on node failure without persistence"]
+    },
+    "alternatives": [
+      { "name": "Memcached", "context": "Simpler, multi-threaded for pure caching" },
+      { "name": "Momento", "context": "Serverless caching, pay-per-request" }
+    ],
+    "position": { "x": 500, "y": 500 }
+  },
+  {
+    "id": "recommendation",
+    "label": "Recommendation Engine",
+    "type": "ml",
+    "description": "ML-powered personalization engine generating 'Customers who bought...' and personalized homepage recommendations.",
+    "techStack": "Custom ML, SageMaker, Collaborative Filtering, Deep Learning",
+    "role": "Analyzes purchase history, browsing behavior, and contextual signals to generate real-time product recommendations that drive 35%+ of revenue.",
+    "whyChosen": "Personalized recommendations are a massive revenue driver. Custom models allow optimization for conversion and basket size rather than generic engagement metrics.",
+    "tradeoffs": {
+      "pros": ["Drives 35%+ of total revenue", "Real-time personalization based on session behavior", "Continuously improving with more data"],
+      "cons": ["Cold start for new users/products", "Massive compute for training at catalog scale", "Bias amplification risk"]
+    },
+    "alternatives": [
+      { "name": "Amazon Personalize", "context": "Managed version of their own tech" },
+      { "name": "Google Recommendations AI", "context": "GCP managed recommendations" }
+    ],
+    "position": { "x": 300, "y": 500 }
+  }
+]

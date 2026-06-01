@@ -1,0 +1,5014 @@
+This file is a merged representation of the entire codebase, combined into a single document by Repomix.
+
+<file_summary>
+This section contains a summary of this file.
+
+<purpose>
+This file contains a packed representation of the entire repository's contents.
+It is designed to be easily consumable by AI systems for analysis, code review,
+or other automated processes.
+</purpose>
+
+<file_format>
+The content is organized as follows:
+1. This summary section
+2. Repository information
+3. Directory structure
+4. Repository files (if enabled)
+5. Multiple file entries, each consisting of:
+  - File path as an attribute
+  - Full contents of the file
+</file_format>
+
+<usage_guidelines>
+- This file should be treated as read-only. Any changes should be made to the
+  original repository files, not this packed version.
+- When processing this file, use the file path to distinguish
+  between different files in the repository.
+- Be aware that this file may contain sensitive information. Handle it with
+  the same level of security as you would the original repository.
+</usage_guidelines>
+
+<notes>
+- Some files may have been excluded based on .gitignore rules and Repomix's configuration
+- Binary files are not included in this packed representation. Please refer to the Repository Structure section for a complete list of file paths, including binary files
+- Files matching patterns in .gitignore are excluded
+- Files matching default ignore patterns are excluded
+- Files are sorted by Git change count (files with more changes are at the bottom)
+</notes>
+
+</file_summary>
+
+<directory_structure>
+.github/
+  workflows/
+    deploy.yml
+public/
+  data/
+    architectures/
+      amazon/
+        edges.json
+        meta.json
+        nodes.json
+        scenarios.json
+      netflix/
+        edges.json
+        meta.json
+        nodes.json
+        scenarios.json
+      twitter/
+        edges.json
+        meta.json
+        nodes.json
+        scenarios.json
+src/
+  components/
+    catalog.js
+    diagram.js
+    header.js
+    sidebar.js
+  data/
+    architectures/
+      amazon/
+        edges.json
+        meta.json
+        nodes.json
+        scenarios.json
+      netflix/
+        edges.json
+        meta.json
+        nodes.json
+        scenarios.json
+      twitter/
+        edges.json
+        meta.json
+        nodes.json
+        scenarios.json
+  lib/
+    animations.js
+    data-loader.js
+    graph-styles.js
+  styles/
+    catalog.css
+    diagram.css
+    index.css
+    panel.css
+  main.js
+.gitignore
+CONTRIBUTING.md
+index.html
+package.json
+README.md
+vite.config.js
+</directory_structure>
+
+<files>
+This section contains the contents of the repository's files.
+
+<file path=".github/workflows/deploy.yml">
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: 'dist'
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+</file>
+
+<file path="public/data/architectures/amazon/edges.json">
+[
+  {
+    "source": "client",
+    "target": "elb",
+    "label": "HTTPS Requests",
+    "type": "sync",
+    "scenarios": ["global", "purchase", "search"]
+  },
+  {
+    "source": "elb",
+    "target": "api-gateway",
+    "label": "Load-Balanced Traffic",
+    "type": "sync",
+    "scenarios": ["global", "purchase", "search"]
+  },
+  {
+    "source": "api-gateway",
+    "target": "product-service",
+    "label": "Product Queries",
+    "type": "sync",
+    "scenarios": ["global", "purchase", "search"]
+  },
+  {
+    "source": "api-gateway",
+    "target": "order-service",
+    "label": "Order Requests",
+    "type": "sync",
+    "scenarios": ["global", "purchase"]
+  },
+  {
+    "source": "api-gateway",
+    "target": "search",
+    "label": "Search Queries",
+    "type": "sync",
+    "scenarios": ["global", "search"]
+  },
+  {
+    "source": "api-gateway",
+    "target": "recommendation",
+    "label": "Get Recommendations",
+    "type": "sync",
+    "scenarios": ["global", "search"]
+  },
+  {
+    "source": "product-service",
+    "target": "dynamodb",
+    "label": "Product Data R/W",
+    "type": "sync",
+    "scenarios": ["global", "purchase", "search"]
+  },
+  {
+    "source": "product-service",
+    "target": "elasticache",
+    "label": "Cache Product Details",
+    "type": "sync",
+    "scenarios": ["global", "purchase", "search"]
+  },
+  {
+    "source": "order-service",
+    "target": "dynamodb",
+    "label": "Order Data R/W",
+    "type": "sync",
+    "scenarios": ["global", "purchase"]
+  },
+  {
+    "source": "order-service",
+    "target": "sqs-sns",
+    "label": "Order Events",
+    "type": "async",
+    "scenarios": ["global", "purchase"]
+  },
+  {
+    "source": "search",
+    "target": "elasticache",
+    "label": "Cached Results",
+    "type": "sync",
+    "scenarios": ["global", "search"]
+  },
+  {
+    "source": "search",
+    "target": "dynamodb",
+    "label": "Index Data",
+    "type": "sync",
+    "scenarios": ["global", "search"]
+  },
+  {
+    "source": "sqs-sns",
+    "target": "recommendation",
+    "label": "Purchase Events",
+    "type": "async",
+    "scenarios": ["global", "purchase"]
+  },
+  {
+    "source": "recommendation",
+    "target": "elasticache",
+    "label": "Cache Recommendations",
+    "type": "sync",
+    "scenarios": ["global"]
+  }
+]
+</file>
+
+<file path="public/data/architectures/amazon/meta.json">
+{
+  "id": "amazon",
+  "name": "Amazon",
+  "description": "The world's largest e-commerce platform and cloud provider, pioneering microservices, distributed databases, and the two-pizza team philosophy.",
+  "category": "E-Commerce & Cloud",
+  "tags": ["microservices", "distributed-database", "event-driven", "serverless", "search", "recommendation"],
+  "color": "#FF9900",
+  "accentGradient": "linear-gradient(135deg, #FF9900, #E68A00)"
+}
+</file>
+
+<file path="public/data/architectures/amazon/nodes.json">
+[
+  {
+    "id": "client",
+    "label": "Client (Web/Mobile)",
+    "type": "client",
+    "description": "Web browsers and mobile apps through which customers browse, search, and purchase products.",
+    "techStack": "React (Web), Native Apps (iOS/Android), A/B Testing Framework",
+    "role": "Renders the storefront, product pages, and checkout flow. Each page is optimized for conversion through continuous experimentation.",
+    "whyChosen": "React enables rapid iteration on the web storefront. Native mobile apps provide smoother shopping experiences with push notification and offline catalog support.",
+    "tradeoffs": {
+      "pros": ["Platform-optimized UX", "Rich experimentation framework", "Progressive loading for fast Time-to-Interactive"],
+      "cons": ["Multiple codebases increase maintenance", "Feature parity across platforms is challenging"]
+    },
+    "alternatives": [
+      { "name": "Next.js SSR", "context": "Server-rendered React for faster initial loads" },
+      { "name": "Flutter", "context": "Single codebase for mobile platforms" }
+    ],
+    "position": { "x": 100, "y": 300 }
+  },
+  {
+    "id": "elb",
+    "label": "Elastic Load Balancer",
+    "type": "gateway",
+    "description": "AWS-native load balancer distributing incoming traffic across multiple availability zones.",
+    "techStack": "AWS ALB/NLB, Auto Scaling Groups",
+    "role": "Distributes millions of requests per second across healthy service instances, performs SSL termination, and integrates with AWS auto-scaling for elastic capacity.",
+    "whyChosen": "As the creators of AWS, Amazon leverages their own infrastructure. ALB provides L7 routing, sticky sessions, and seamless integration with ECS/EKS.",
+    "tradeoffs": {
+      "pros": ["Fully managed, zero operational overhead", "Deep AWS integration", "Automatic cross-AZ failover"],
+      "cons": ["AWS lock-in", "Cost at extreme scale", "Less customizable than software load balancers"]
+    },
+    "alternatives": [
+      { "name": "nginx / HAProxy", "context": "Self-managed, highly configurable" },
+      { "name": "Envoy Proxy", "context": "Service mesh L7 proxy" }
+    ],
+    "position": { "x": 300, "y": 300 }
+  },
+  {
+    "id": "api-gateway",
+    "label": "API Gateway Services",
+    "type": "gateway",
+    "description": "Microservice gateway handling authentication, rate limiting, and request routing to hundreds of backend services.",
+    "techStack": "Custom Java services, AWS API Gateway",
+    "role": "Authenticates requests, applies rate limits, transforms payloads, and routes to the correct domain services. Handles versioning and backward compatibility.",
+    "whyChosen": "Amazon's scale requires custom gateway logic for complex routing rules (marketplace vs retail, regional regulations, seller APIs).",
+    "tradeoffs": {
+      "pros": ["Custom routing for complex multi-tenant scenarios", "Per-service rate limiting and throttling"],
+      "cons": ["Custom solution requires dedicated team", "Single point of failure risk without proper redundancy"]
+    },
+    "alternatives": [
+      { "name": "Kong", "context": "Open-source API gateway with plugin ecosystem" },
+      { "name": "Apigee", "context": "Google Cloud managed API platform" }
+    ],
+    "position": { "x": 500, "y": 300 }
+  },
+  {
+    "id": "product-service",
+    "label": "Product Catalog Service",
+    "type": "service",
+    "description": "Manages the catalog of hundreds of millions of products with real-time pricing, availability, and attribute data.",
+    "techStack": "Java/Kotlin microservices, gRPC",
+    "role": "Central source of truth for product information. Serves product details, pricing, and inventory status to all consumer-facing and internal services.",
+    "whyChosen": "A dedicated product service allows independent scaling and data model evolution for the massive catalog without impacting other services.",
+    "tradeoffs": {
+      "pros": ["Independent scaling for catalog workloads", "Consistent product data across all channels"],
+      "cons": ["Must handle extreme read throughput", "Cross-region consistency for global catalog"]
+    },
+    "alternatives": [
+      { "name": "Commercetools", "context": "Headless commerce platform" },
+      { "name": "Shopify Plus Backend", "context": "Managed e-commerce platform" }
+    ],
+    "position": { "x": 700, "y": 150 }
+  },
+  {
+    "id": "order-service",
+    "label": "Order Processing Service",
+    "type": "service",
+    "description": "Manages the order lifecycle from cart to delivery, orchestrating payment, inventory, and fulfillment workflows.",
+    "techStack": "Java, Step Functions, SQS",
+    "role": "Coordinates the complex multi-step purchase flow: inventory reservation, payment processing, fraud detection, and fulfillment routing.",
+    "whyChosen": "Order processing requires strong consistency guarantees and saga-pattern orchestration across multiple bounded contexts (payment, inventory, shipping).",
+    "tradeoffs": {
+      "pros": ["Reliable saga orchestration for distributed transactions", "Idempotent operations prevent double-charges"],
+      "cons": ["Complex compensating transactions on failure", "High operational criticality — downtime = lost revenue"]
+    },
+    "alternatives": [
+      { "name": "Temporal", "context": "Open-source durable workflow engine" },
+      { "name": "Camunda", "context": "BPMN-based process orchestration" }
+    ],
+    "position": { "x": 700, "y": 450 }
+  },
+  {
+    "id": "search",
+    "label": "Search Engine",
+    "type": "service",
+    "description": "Powers product search across hundreds of millions of listings with sub-second response times.",
+    "techStack": "Custom search (A9), OpenSearch/Elasticsearch, ML Ranking",
+    "role": "Processes search queries, applies ML-based ranking, handles typo correction, synonyms, and personalized result ordering based on purchase history.",
+    "whyChosen": "Amazon's A9 search is a competitive differentiator. Custom search allows integration of purchase intent signals and advertiser-bid ranking that generic engines can't provide.",
+    "tradeoffs": {
+      "pros": ["Purchase-intent-optimized ranking", "Real-time index updates for price/availability changes", "Sponsored product integration"],
+      "cons": ["Massive index size requires sharding", "Balancing organic vs paid results transparency"]
+    },
+    "alternatives": [
+      { "name": "Elasticsearch / OpenSearch", "context": "Open-source full-text search" },
+      { "name": "Algolia", "context": "Managed search-as-a-service" }
+    ],
+    "position": { "x": 500, "y": 100 }
+  },
+  {
+    "id": "dynamodb",
+    "label": "DynamoDB",
+    "type": "database",
+    "description": "Fully managed NoSQL database providing single-digit millisecond performance at any scale.",
+    "techStack": "Amazon DynamoDB, Global Tables, DAX Cache",
+    "role": "Primary database for high-throughput workloads: shopping carts, session state, user preferences. Global Tables provide multi-region active-active replication.",
+    "whyChosen": "Born from Amazon's Dynamo paper. Provides predictable performance with automatic scaling — critical for Black Friday-scale traffic spikes.",
+    "tradeoffs": {
+      "pros": ["Predictable single-digit ms latency", "Fully managed with auto-scaling", "Global tables for multi-region"],
+      "cons": ["Limited query patterns (must design for access patterns)", "Cost can spike with high throughput", "25-item transaction limit"]
+    },
+    "alternatives": [
+      { "name": "Cassandra", "context": "Open-source, avoid vendor lock-in" },
+      { "name": "MongoDB Atlas", "context": "Document DB with flexible queries" },
+      { "name": "CockroachDB", "context": "Distributed SQL with strong consistency" }
+    ],
+    "position": { "x": 900, "y": 300 }
+  },
+  {
+    "id": "sqs-sns",
+    "label": "SQS / SNS / EventBridge",
+    "type": "queue",
+    "description": "Managed messaging services for asynchronous event-driven communication between microservices.",
+    "techStack": "Amazon SQS, SNS, EventBridge",
+    "role": "Decouples services through message queues (SQS) and pub/sub topics (SNS). EventBridge provides event routing with content-based filtering for complex workflows.",
+    "whyChosen": "Managed messaging eliminates the operational overhead of running Kafka/RabbitMQ clusters while providing at-least-once delivery guarantees.",
+    "tradeoffs": {
+      "pros": ["Fully managed, zero ops", "SQS provides dead-letter queues for error handling", "EventBridge enables event-driven architectures"],
+      "cons": ["Higher per-message cost than self-hosted Kafka", "SQS max message size 256KB", "Less control over partitioning and ordering"]
+    },
+    "alternatives": [
+      { "name": "Apache Kafka (MSK)", "context": "Event streaming with replay capability" },
+      { "name": "RabbitMQ", "context": "Feature-rich message broker" }
+    ],
+    "position": { "x": 700, "y": 300 }
+  },
+  {
+    "id": "elasticache",
+    "label": "ElastiCache (Redis)",
+    "type": "cache",
+    "description": "In-memory caching layer providing microsecond read latency for frequently accessed data.",
+    "techStack": "Amazon ElastiCache for Redis, cluster mode",
+    "role": "Caches product details, session state, and search results. Reduces database load and speeds up page rendering for high-traffic product pages.",
+    "whyChosen": "Redis provides rich data structures (sorted sets for rankings, hashes for session data) beyond simple key-value caching, with managed cluster mode for scaling.",
+    "tradeoffs": {
+      "pros": ["Sub-millisecond read latency", "Rich data structures", "Managed with automatic failover"],
+      "cons": ["Memory-bound (expensive at scale)", "Cache invalidation complexity", "Data loss risk on node failure without persistence"]
+    },
+    "alternatives": [
+      { "name": "Memcached", "context": "Simpler, multi-threaded for pure caching" },
+      { "name": "Momento", "context": "Serverless caching, pay-per-request" }
+    ],
+    "position": { "x": 500, "y": 500 }
+  },
+  {
+    "id": "recommendation",
+    "label": "Recommendation Engine",
+    "type": "ml",
+    "description": "ML-powered personalization engine generating 'Customers who bought...' and personalized homepage recommendations.",
+    "techStack": "Custom ML, SageMaker, Collaborative Filtering, Deep Learning",
+    "role": "Analyzes purchase history, browsing behavior, and contextual signals to generate real-time product recommendations that drive 35%+ of revenue.",
+    "whyChosen": "Personalized recommendations are a massive revenue driver. Custom models allow optimization for conversion and basket size rather than generic engagement metrics.",
+    "tradeoffs": {
+      "pros": ["Drives 35%+ of total revenue", "Real-time personalization based on session behavior", "Continuously improving with more data"],
+      "cons": ["Cold start for new users/products", "Massive compute for training at catalog scale", "Bias amplification risk"]
+    },
+    "alternatives": [
+      { "name": "Amazon Personalize", "context": "Managed version of their own tech" },
+      { "name": "Google Recommendations AI", "context": "GCP managed recommendations" }
+    ],
+    "position": { "x": 300, "y": 500 }
+  }
+]
+</file>
+
+<file path="public/data/architectures/amazon/scenarios.json">
+[
+  {
+    "id": "global",
+    "name": "🌐 Global View",
+    "description": "Full e-commerce platform overview with all components and connections",
+    "highlightNodes": "*",
+    "highlightEdges": "*"
+  },
+  {
+    "id": "purchase",
+    "name": "🛒 Purchase Flow",
+    "description": "Complete journey from 'Add to Cart' through payment to order confirmation",
+    "highlightNodes": ["client", "elb", "api-gateway", "product-service", "order-service", "dynamodb", "sqs-sns", "elasticache", "recommendation"],
+    "highlightEdges": [
+      "client->elb",
+      "elb->api-gateway",
+      "api-gateway->product-service",
+      "api-gateway->order-service",
+      "product-service->dynamodb",
+      "product-service->elasticache",
+      "order-service->dynamodb",
+      "order-service->sqs-sns",
+      "sqs-sns->recommendation"
+    ],
+    "steps": [
+      { "order": 1, "description": "Customer clicks 'Add to Cart' — request flows through ELB to API Gateway", "nodes": ["client", "elb", "api-gateway"] },
+      { "order": 2, "description": "Product service verifies availability and current price from cache/DynamoDB", "nodes": ["api-gateway", "product-service", "elasticache", "dynamodb"] },
+      { "order": 3, "description": "Customer proceeds to checkout — Order service begins the purchase saga", "nodes": ["api-gateway", "order-service"] },
+      { "order": 4, "description": "Order service reserves inventory and processes payment via DynamoDB transactions", "nodes": ["order-service", "dynamodb"] },
+      { "order": 5, "description": "Order confirmation event published to SQS/SNS for downstream processing", "nodes": ["order-service", "sqs-sns"] },
+      { "order": 6, "description": "Purchase event feeds recommendation engine to update 'Frequently Bought Together'", "nodes": ["sqs-sns", "recommendation"] }
+    ]
+  },
+  {
+    "id": "search",
+    "name": "🔍 Search & Discovery",
+    "description": "How product search, autocomplete, and personalized recommendations work together",
+    "highlightNodes": ["client", "elb", "api-gateway", "search", "product-service", "recommendation", "elasticache", "dynamodb"],
+    "highlightEdges": [
+      "client->elb",
+      "elb->api-gateway",
+      "api-gateway->search",
+      "api-gateway->product-service",
+      "api-gateway->recommendation",
+      "search->elasticache",
+      "search->dynamodb",
+      "product-service->elasticache",
+      "recommendation->elasticache"
+    ],
+    "steps": [
+      { "order": 1, "description": "User types search query — request hits API Gateway via ELB", "nodes": ["client", "elb", "api-gateway"] },
+      { "order": 2, "description": "Search service processes query with ML ranking, checks cache for frequent queries", "nodes": ["api-gateway", "search", "elasticache"] },
+      { "order": 3, "description": "On cache miss, search engine queries distributed index backed by DynamoDB", "nodes": ["search", "dynamodb"] },
+      { "order": 4, "description": "Product service enriches search results with real-time pricing and availability", "nodes": ["api-gateway", "product-service", "elasticache"] },
+      { "order": 5, "description": "Recommendation engine injects personalized suggestions based on browsing history", "nodes": ["api-gateway", "recommendation"] }
+    ]
+  }
+]
+</file>
+
+<file path="public/data/architectures/netflix/edges.json">
+[
+  {
+    "source": "client",
+    "target": "zuul",
+    "label": "API Requests (HTTPS)",
+    "type": "sync",
+    "scenarios": ["global", "video-playback", "recommendation"]
+  },
+  {
+    "source": "client",
+    "target": "cdn",
+    "label": "Video Stream (HLS/DASH)",
+    "type": "streaming",
+    "scenarios": ["global", "video-playback"]
+  },
+  {
+    "source": "zuul",
+    "target": "eureka",
+    "label": "Service Lookup",
+    "type": "sync",
+    "scenarios": ["global"]
+  },
+  {
+    "source": "zuul",
+    "target": "api-services",
+    "label": "Routed Requests",
+    "type": "sync",
+    "scenarios": ["global", "video-playback", "recommendation"]
+  },
+  {
+    "source": "api-services",
+    "target": "evcache",
+    "label": "Cache Read/Write",
+    "type": "sync",
+    "scenarios": ["global", "video-playback", "recommendation"]
+  },
+  {
+    "source": "api-services",
+    "target": "cassandra",
+    "label": "Persistent Data",
+    "type": "sync",
+    "scenarios": ["global", "video-playback"]
+  },
+  {
+    "source": "api-services",
+    "target": "kafka",
+    "label": "Publish Events",
+    "type": "async",
+    "scenarios": ["global", "video-playback", "recommendation"]
+  },
+  {
+    "source": "api-services",
+    "target": "recommendation",
+    "label": "Get Recommendations",
+    "type": "sync",
+    "scenarios": ["global", "recommendation"]
+  },
+  {
+    "source": "kafka",
+    "target": "recommendation",
+    "label": "Viewing Events Stream",
+    "type": "async",
+    "scenarios": ["global", "recommendation"]
+  },
+  {
+    "source": "recommendation",
+    "target": "cassandra",
+    "label": "Read User Profiles",
+    "type": "sync",
+    "scenarios": ["global", "recommendation"]
+  },
+  {
+    "source": "recommendation",
+    "target": "evcache",
+    "label": "Cache Model Results",
+    "type": "sync",
+    "scenarios": ["global", "recommendation"]
+  },
+  {
+    "source": "titus",
+    "target": "api-services",
+    "label": "Container Orchestration",
+    "type": "async",
+    "scenarios": ["global"]
+  },
+  {
+    "source": "titus",
+    "target": "eureka",
+    "label": "Register Instances",
+    "type": "sync",
+    "scenarios": ["global"]
+  }
+]
+</file>
+
+<file path="public/data/architectures/netflix/meta.json">
+{
+  "id": "netflix",
+  "name": "Netflix",
+  "description": "Global video streaming platform serving 250M+ subscribers with a sophisticated microservices architecture designed for massive scale, high availability, and resilience.",
+  "category": "Entertainment & Streaming",
+  "tags": ["microservices", "cdn", "distributed-cache", "ml-pipeline", "chaos-engineering", "event-streaming"],
+  "color": "#E50914",
+  "accentGradient": "linear-gradient(135deg, #E50914, #B20710)"
+}
+</file>
+
+<file path="public/data/architectures/netflix/nodes.json">
+[
+  {
+    "id": "client",
+    "label": "Client Apps",
+    "type": "client",
+    "description": "Netflix apps on Smart TVs, mobile devices, web browsers, and gaming consoles.",
+    "techStack": "React (Web), Native SDKs (iOS/Android/TV)",
+    "role": "The user-facing interface that requests content, displays personalized recommendations, and handles video playback via adaptive bitrate streaming.",
+    "whyChosen": "Platform-specific native apps deliver optimal playback performance and device integration, while the web app leverages React for rapid iteration.",
+    "tradeoffs": {
+      "pros": ["Optimal performance per platform", "Deep device integration (DRM, hardware decoding)"],
+      "cons": ["Multiple codebases to maintain", "Slower feature parity across platforms"]
+    },
+    "alternatives": [
+      { "name": "Flutter", "context": "Cross-platform with single codebase" },
+      { "name": "React Native", "context": "Shared code between mobile platforms" }
+    ],
+    "position": { "x": 100, "y": 300 }
+  },
+  {
+    "id": "cdn",
+    "label": "Open Connect CDN",
+    "type": "cdn",
+    "description": "Netflix's custom Content Delivery Network with appliances embedded in ISP networks worldwide.",
+    "techStack": "Open Connect Appliances (OCA), FreeBSD, nginx",
+    "role": "Caches and delivers video content from the network edge, minimizing latency and backbone bandwidth usage. Handles 100% of video streaming traffic.",
+    "whyChosen": "Third-party CDNs couldn't deliver the required quality at Netflix's scale. Building their own CDN allowed fine-grained control over caching, routing, and peering relationships.",
+    "tradeoffs": {
+      "pros": ["Full control over delivery quality", "Reduced bandwidth costs at scale", "Closer to end users via ISP partnerships"],
+      "cons": ["Massive capital and operational investment", "Requires ISP partnership negotiations globally"]
+    },
+    "alternatives": [
+      { "name": "Akamai / CloudFront", "context": "Managed CDN, lower upfront cost" },
+      { "name": "Cloudflare Stream", "context": "Integrated video delivery platform" }
+    ],
+    "position": { "x": 100, "y": 500 }
+  },
+  {
+    "id": "zuul",
+    "label": "Zuul API Gateway",
+    "type": "gateway",
+    "description": "Edge gateway that serves as the front door for all API requests entering the Netflix ecosystem.",
+    "techStack": "Zuul 2 (Netty-based, non-blocking)",
+    "role": "Handles dynamic routing, authentication, rate limiting, load shedding, and security filtering. Provides a single entry point for all backend microservices.",
+    "whyChosen": "Netflix needed a highly programmable, async gateway capable of handling millions of concurrent connections with custom filter chains for canary testing and traffic shaping.",
+    "tradeoffs": {
+      "pros": ["Programmable filter pipeline for dynamic behavior", "Non-blocking I/O for extreme throughput", "Enables canary deployments and A/B testing at the edge"],
+      "cons": ["Complex custom solution requiring deep expertise", "Higher operational burden than managed alternatives"]
+    },
+    "alternatives": [
+      { "name": "AWS API Gateway", "context": "Fully managed, serverless" },
+      { "name": "Kong", "context": "Open-source, plugin-based gateway" },
+      { "name": "Envoy Proxy", "context": "High-performance L7 proxy, CNCF project" }
+    ],
+    "position": { "x": 350, "y": 300 }
+  },
+  {
+    "id": "eureka",
+    "label": "Eureka Service Discovery",
+    "type": "service",
+    "description": "Client-side service discovery registry enabling microservices to find and communicate with each other.",
+    "techStack": "Eureka (Netflix OSS)",
+    "role": "Maintains a real-time registry of all service instances, their locations, and health status. Services register themselves on startup and query Eureka to find dependencies.",
+    "whyChosen": "In a cloud environment where instances are ephemeral, hardcoded addresses are impossible. Eureka provides AP (Available, Partition-tolerant) semantics ideal for Netflix's scale.",
+    "tradeoffs": {
+      "pros": ["High availability over strict consistency (AP system)", "Client-side load balancing", "Self-healing with heartbeat-based eviction"],
+      "cons": ["Eventually consistent — stale data possible", "Requires client-side integration in every service"]
+    },
+    "alternatives": [
+      { "name": "Consul", "context": "HashiCorp, supports health checking + KV store" },
+      { "name": "AWS Cloud Map", "context": "Managed service discovery on AWS" },
+      { "name": "Kubernetes Service Discovery", "context": "Built-in with K8s DNS" }
+    ],
+    "position": { "x": 350, "y": 100 }
+  },
+  {
+    "id": "api-services",
+    "label": "API / BFF Services",
+    "type": "service",
+    "description": "Backend-for-Frontend services that aggregate data from multiple microservices into client-optimized responses.",
+    "techStack": "Java, Spring Boot, gRPC",
+    "role": "Orchestrate calls to downstream domain services, transform and aggregate data, and return tailored payloads for different client types (TV, mobile, web).",
+    "whyChosen": "Decoupling client needs from domain service APIs allows independent evolution. Different clients have different data needs that a single API cannot efficiently serve.",
+    "tradeoffs": {
+      "pros": ["Client-optimized responses reduce over-fetching", "Isolates client changes from domain services"],
+      "cons": ["Additional layer of complexity", "Risk of becoming a monolithic aggregation layer"]
+    },
+    "alternatives": [
+      { "name": "GraphQL Gateway", "context": "Client-driven queries, flexible data fetching" },
+      { "name": "Direct microservice calls", "context": "Simpler but couples clients to internals" }
+    ],
+    "position": { "x": 600, "y": 300 }
+  },
+  {
+    "id": "evcache",
+    "label": "EVCache",
+    "type": "cache",
+    "description": "Netflix's distributed caching solution built on Memcached, optimized for high availability and low latency.",
+    "techStack": "EVCache (Memcached-based), cross-region replication",
+    "role": "Provides sub-millisecond access to frequently requested data (user profiles, viewing history, session data). Reduces load on backend databases by orders of magnitude.",
+    "whyChosen": "Standard Memcached lacked cross-region replication and Netflix-scale operational tooling. EVCache adds automatic failover, zone-aware routing, and data replication.",
+    "tradeoffs": {
+      "pros": ["Sub-millisecond latency", "Cross-region replication for global availability", "Handles millions of ops/sec"],
+      "cons": ["Cache invalidation complexity", "Memory-intensive infrastructure cost", "Data consistency challenges across regions"]
+    },
+    "alternatives": [
+      { "name": "Redis / ElastiCache", "context": "Rich data structures, pub/sub support" },
+      { "name": "Hazelcast", "context": "In-memory data grid with compute" }
+    ],
+    "position": { "x": 600, "y": 100 }
+  },
+  {
+    "id": "cassandra",
+    "label": "Cassandra",
+    "type": "database",
+    "description": "Distributed NoSQL database providing linear scalability and high availability with no single point of failure.",
+    "techStack": "Apache Cassandra, multi-region clusters",
+    "role": "Primary persistent storage for user data, viewing history, and content metadata. Chosen for workloads requiring massive write throughput and global replication.",
+    "whyChosen": "Netflix requires a database that scales horizontally across regions with tunable consistency. Cassandra's masterless architecture eliminates single points of failure.",
+    "tradeoffs": {
+      "pros": ["Linear horizontal scalability", "Multi-region active-active replication", "Tunable consistency per query"],
+      "cons": ["Complex data modeling (denormalization required)", "No ACID transactions across partitions", "Operational complexity at scale"]
+    },
+    "alternatives": [
+      { "name": "DynamoDB", "context": "Managed NoSQL with auto-scaling on AWS" },
+      { "name": "ScyllaDB", "context": "C++ Cassandra-compatible, higher throughput" },
+      { "name": "CockroachDB", "context": "Distributed SQL with strong consistency" }
+    ],
+    "position": { "x": 850, "y": 200 }
+  },
+  {
+    "id": "kafka",
+    "label": "Apache Kafka",
+    "type": "queue",
+    "description": "Distributed event streaming platform acting as the central nervous system for real-time data pipelines.",
+    "techStack": "Apache Kafka, 700+ billion messages/day",
+    "role": "Enables asynchronous communication between services, powers real-time analytics pipelines, and feeds the recommendation engine with viewing events and user interactions.",
+    "whyChosen": "Netflix processes hundreds of billions of events daily. Kafka's log-based architecture provides durable, ordered, replayable event streams — essential for both real-time processing and batch analytics.",
+    "tradeoffs": {
+      "pros": ["Massive throughput with durability", "Decouples producers from consumers", "Event replay capability for debugging and reprocessing"],
+      "cons": ["Operational complexity of large Kafka clusters", "Message ordering only within partitions", "Storage costs for long-retention topics"]
+    },
+    "alternatives": [
+      { "name": "Amazon Kinesis", "context": "Managed streaming, tighter AWS integration" },
+      { "name": "Apache Pulsar", "context": "Multi-tenancy, tiered storage" },
+      { "name": "RabbitMQ", "context": "Simpler message broker for lower-scale needs" }
+    ],
+    "position": { "x": 850, "y": 400 }
+  },
+  {
+    "id": "recommendation",
+    "label": "Recommendation Engine",
+    "type": "ml",
+    "description": "ML pipeline that personalizes the entire Netflix experience — from homepage rows to artwork selection.",
+    "techStack": "Custom ML models, TensorFlow, Spark, Flink",
+    "role": "Analyzes viewing history, ratings, and contextual signals to generate personalized content rankings. Powers the 'Top Picks', genre rows, and even which artwork is shown per title.",
+    "whyChosen": "Personalization is Netflix's core competitive advantage. 80% of content watched is driven by recommendations. Custom models allow optimization for engagement and satisfaction.",
+    "tradeoffs": {
+      "pros": ["Drives 80%+ of content discovery", "Continuously learns from user behavior", "Personalizes beyond just content (artwork, UI layout)"],
+      "cons": ["Filter bubble risk", "Massive compute costs for training and inference", "Cold start problem for new users"]
+    },
+    "alternatives": [
+      { "name": "Amazon Personalize", "context": "Managed recommendation service" },
+      { "name": "Google Recommendations AI", "context": "GCP managed ML recommendations" }
+    ],
+    "position": { "x": 600, "y": 500 }
+  },
+  {
+    "id": "titus",
+    "label": "Titus (Container Platform)",
+    "type": "service",
+    "description": "Netflix's container management platform running hundreds of thousands of containers on AWS.",
+    "techStack": "Titus (custom), runs on AWS EC2",
+    "role": "Manages the lifecycle of all microservice containers — scheduling, scaling, resource isolation, and integration with Netflix's deployment tooling (Spinnaker).",
+    "whyChosen": "Netflix needed deeper integration with their existing AWS infrastructure and custom scheduling policies that Kubernetes didn't provide at the time of development.",
+    "tradeoffs": {
+      "pros": ["Deep AWS integration", "Custom scheduling for Netflix workloads", "Unified platform for batch and service workloads"],
+      "cons": ["Proprietary — not open-source community-driven", "Migration cost if moving away from AWS"]
+    },
+    "alternatives": [
+      { "name": "Kubernetes (EKS)", "context": "Industry standard container orchestration" },
+      { "name": "AWS ECS", "context": "Managed container service, simpler than K8s" }
+    ],
+    "position": { "x": 350, "y": 500 }
+  }
+]
+</file>
+
+<file path="public/data/architectures/netflix/scenarios.json">
+[
+  {
+    "id": "global",
+    "name": "🌐 Global View",
+    "description": "Full system overview showing all components and their connections",
+    "highlightNodes": "*",
+    "highlightEdges": "*"
+  },
+  {
+    "id": "video-playback",
+    "name": "▶️ Video Playback",
+    "description": "What happens when a user presses Play — from API request to video stream delivery",
+    "highlightNodes": ["client", "zuul", "api-services", "evcache", "cassandra", "cdn", "kafka"],
+    "highlightEdges": [
+      "client->zuul",
+      "client->cdn",
+      "zuul->api-services",
+      "api-services->evcache",
+      "api-services->cassandra",
+      "api-services->kafka"
+    ],
+    "steps": [
+      { "order": 1, "description": "Client sends play request to Zuul Gateway", "nodes": ["client", "zuul"] },
+      { "order": 2, "description": "Zuul routes to API/BFF service for content resolution", "nodes": ["zuul", "api-services"] },
+      { "order": 3, "description": "API service checks EVCache for content metadata and DRM license", "nodes": ["api-services", "evcache"] },
+      { "order": 4, "description": "On cache miss, fetches from Cassandra and populates cache", "nodes": ["api-services", "cassandra"] },
+      { "order": 5, "description": "Play event published to Kafka for analytics and recommendations", "nodes": ["api-services", "kafka"] },
+      { "order": 6, "description": "Client receives stream manifest and begins adaptive bitrate playback via Open Connect CDN", "nodes": ["client", "cdn"] }
+    ]
+  },
+  {
+    "id": "recommendation",
+    "name": "🧠 Recommendation Pipeline",
+    "description": "How Netflix generates personalized content recommendations using ML and real-time event data",
+    "highlightNodes": ["client", "zuul", "api-services", "kafka", "recommendation", "evcache", "cassandra"],
+    "highlightEdges": [
+      "client->zuul",
+      "zuul->api-services",
+      "api-services->kafka",
+      "kafka->recommendation",
+      "recommendation->cassandra",
+      "recommendation->evcache",
+      "api-services->recommendation",
+      "api-services->evcache"
+    ],
+    "steps": [
+      { "order": 1, "description": "User interactions (views, ratings, browsing) are captured by client apps", "nodes": ["client"] },
+      { "order": 2, "description": "Events flow through Zuul and API services to Kafka", "nodes": ["zuul", "api-services", "kafka"] },
+      { "order": 3, "description": "Recommendation engine consumes event streams from Kafka in real-time", "nodes": ["kafka", "recommendation"] },
+      { "order": 4, "description": "ML models read user profiles and viewing history from Cassandra", "nodes": ["recommendation", "cassandra"] },
+      { "order": 5, "description": "Generated recommendations are cached in EVCache for fast retrieval", "nodes": ["recommendation", "evcache"] },
+      { "order": 6, "description": "When user opens the app, API services fetch personalized rankings from cache", "nodes": ["api-services", "evcache"] }
+    ]
+  }
+]
+</file>
+
+<file path="public/data/architectures/twitter/edges.json">
+[
+  {
+    "source": "client",
+    "target": "load-balancer",
+    "label": "HTTPS Requests",
+    "type": "sync",
+    "scenarios": ["global", "fanout", "trending"]
+  },
+  {
+    "source": "load-balancer",
+    "target": "api-service",
+    "label": "Routed Traffic",
+    "type": "sync",
+    "scenarios": ["global", "fanout", "trending"]
+  },
+  {
+    "source": "api-service",
+    "target": "tweet-service",
+    "label": "Create Tweet",
+    "type": "sync",
+    "scenarios": ["global", "fanout"]
+  },
+  {
+    "source": "api-service",
+    "target": "timeline-service",
+    "label": "Get Timeline",
+    "type": "sync",
+    "scenarios": ["global", "fanout"]
+  },
+  {
+    "source": "tweet-service",
+    "target": "tweet-store",
+    "label": "Persist Tweet",
+    "type": "sync",
+    "scenarios": ["global", "fanout"]
+  },
+  {
+    "source": "tweet-service",
+    "target": "kafka",
+    "label": "Tweet Created Event",
+    "type": "async",
+    "scenarios": ["global", "fanout", "trending"]
+  },
+  {
+    "source": "kafka",
+    "target": "fanout-service",
+    "label": "New Tweet Events",
+    "type": "async",
+    "scenarios": ["global", "fanout"]
+  },
+  {
+    "source": "fanout-service",
+    "target": "social-graph",
+    "label": "Query Followers",
+    "type": "sync",
+    "scenarios": ["global", "fanout"]
+  },
+  {
+    "source": "fanout-service",
+    "target": "redis-cache",
+    "label": "Push to Timelines",
+    "type": "async",
+    "scenarios": ["global", "fanout"]
+  },
+  {
+    "source": "timeline-service",
+    "target": "redis-cache",
+    "label": "Read Cached Timeline",
+    "type": "sync",
+    "scenarios": ["global", "fanout"]
+  },
+  {
+    "source": "timeline-service",
+    "target": "tweet-store",
+    "label": "Hydrate Tweets",
+    "type": "sync",
+    "scenarios": ["global", "fanout"]
+  },
+  {
+    "source": "timeline-service",
+    "target": "social-graph",
+    "label": "Celebrity Followings",
+    "type": "sync",
+    "scenarios": ["global", "fanout"]
+  },
+  {
+    "source": "kafka",
+    "target": "timeline-service",
+    "label": "Trending Signals",
+    "type": "async",
+    "scenarios": ["global", "trending"]
+  }
+]
+</file>
+
+<file path="public/data/architectures/twitter/meta.json">
+{
+  "id": "twitter",
+  "name": "Twitter / X",
+  "description": "Real-time social media platform handling 500M+ tweets/day with a hybrid fanout architecture for sub-second timeline delivery.",
+  "category": "Social Media",
+  "tags": ["fanout", "real-time", "distributed-cache", "graph-database", "search", "event-streaming"],
+  "color": "#1DA1F2",
+  "accentGradient": "linear-gradient(135deg, #1DA1F2, #0D8BD9)"
+}
+</file>
+
+<file path="public/data/architectures/twitter/nodes.json">
+[
+  {
+    "id": "client",
+    "label": "Client Apps",
+    "type": "client",
+    "description": "Web app (twitter.com/x.com), iOS, and Android native applications.",
+    "techStack": "React (Web), Swift (iOS), Kotlin (Android)",
+    "role": "Renders the timeline, handles tweet composition, real-time notifications, and media uploads. Web app uses progressive loading for timeline updates.",
+    "whyChosen": "React enables rapid iteration on web features. Native mobile apps provide smooth scrolling performance critical for timeline browsing.",
+    "tradeoffs": {
+      "pros": ["Platform-optimized performance", "Real-time push notifications", "Offline reading capability on mobile"],
+      "cons": ["Multiple codebases", "Feature rollout timing varies across platforms"]
+    },
+    "alternatives": [
+      { "name": "React Native", "context": "Shared codebase for mobile" },
+      { "name": "PWA", "context": "Progressive web app for unified experience" }
+    ],
+    "position": { "x": 100, "y": 300 }
+  },
+  {
+    "id": "load-balancer",
+    "label": "Load Balancer",
+    "type": "gateway",
+    "description": "L7 load balancer distributing incoming traffic across the service fleet.",
+    "techStack": "Custom L7 LB, GCP Load Balancer",
+    "role": "Distributes millions of requests per second, handles TLS termination, and routes to appropriate service clusters based on request type.",
+    "whyChosen": "A combination of custom load balancing logic and GCP managed infrastructure provides both flexibility for routing rules and operational simplicity.",
+    "tradeoffs": {
+      "pros": ["Flexible routing rules for different request types", "High availability with GCP infrastructure"],
+      "cons": ["Migration from bare-metal to cloud added complexity", "Custom LB logic requires maintenance"]
+    },
+    "alternatives": [
+      { "name": "AWS ALB/NLB", "context": "Managed AWS load balancing" },
+      { "name": "Envoy", "context": "L7 proxy with advanced traffic management" }
+    ],
+    "position": { "x": 300, "y": 300 }
+  },
+  {
+    "id": "api-service",
+    "label": "API / GraphQL Service",
+    "type": "service",
+    "description": "GraphQL-based API layer that serves as the unified interface between clients and backend microservices.",
+    "techStack": "GraphQL (Strato), Scala/Java",
+    "role": "Provides a single GraphQL endpoint for all client data needs. Aggregates data from multiple backend services (timeline, user, tweet storage) into efficient responses.",
+    "whyChosen": "GraphQL allows clients to request exactly the data they need, reducing over-fetching. Critical for mobile where bandwidth is limited and latency impacts scroll performance.",
+    "tradeoffs": {
+      "pros": ["Eliminates over-fetching and under-fetching", "Single endpoint simplifies client code", "Strong typing with schema evolution"],
+      "cons": ["Query complexity can impact backend performance", "Caching is more complex than REST", "N+1 query problem requires careful resolver design"]
+    },
+    "alternatives": [
+      { "name": "REST API Gateway", "context": "Simpler, widely understood" },
+      { "name": "gRPC", "context": "High-performance binary protocol for internal services" }
+    ],
+    "position": { "x": 500, "y": 300 }
+  },
+  {
+    "id": "tweet-service",
+    "label": "Tweet Ingestion Service",
+    "type": "service",
+    "description": "Handles tweet creation, validation, and persistence with globally unique Snowflake ID assignment.",
+    "techStack": "Scala, Snowflake ID Generator",
+    "role": "Validates tweet content (length, media, policies), assigns a Snowflake ID for time-ordered uniqueness, persists to the tweet store, and triggers the fanout pipeline.",
+    "whyChosen": "Snowflake IDs provide time-sortable, globally unique identifiers without coordination — essential for distributed tweet creation across data centers.",
+    "tradeoffs": {
+      "pros": ["Snowflake IDs enable chronological sorting without DB queries", "Decoupled from downstream processing via async fanout"],
+      "cons": ["Clock synchronization issues can cause ID collisions", "Single point of validation can become a bottleneck"]
+    },
+    "alternatives": [
+      { "name": "UUIDv7", "context": "Time-ordered UUIDs, no custom generator needed" },
+      { "name": "ULID", "context": "Universally Unique Lexicographically Sortable Identifier" }
+    ],
+    "position": { "x": 500, "y": 100 }
+  },
+  {
+    "id": "fanout-service",
+    "label": "Fanout Service",
+    "type": "service",
+    "description": "Distributes new tweets to follower timelines using a hybrid push/pull strategy.",
+    "techStack": "Custom Java/Scala service, Social Graph integration",
+    "role": "The heart of timeline delivery. For regular users (<10K followers), pushes tweet IDs to follower Redis caches. For celebrities, flags for pull-based merge at read time.",
+    "whyChosen": "Pure push (fanout-on-write) would overwhelm the system for celebrity accounts. Pure pull would make timeline reads slow. The hybrid approach optimizes both.",
+    "tradeoffs": {
+      "pros": ["Avoids write amplification storms from celebrity tweets", "Fast timeline reads for most users", "Dynamic threshold tuning based on load"],
+      "cons": ["Complex dual-path logic", "Celebrity tweet delivery has higher read-time latency", "Threshold tuning requires operational monitoring"]
+    },
+    "alternatives": [
+      { "name": "Pure fanout-on-write", "context": "Simpler but doesn't scale for high-follower accounts" },
+      { "name": "Pure fanout-on-read", "context": "Simpler writes but slower reads for everyone" }
+    ],
+    "position": { "x": 700, "y": 200 }
+  },
+  {
+    "id": "timeline-service",
+    "label": "Timeline Service",
+    "type": "service",
+    "description": "Constructs and serves the home timeline by merging precomputed cached timelines with celebrity tweets.",
+    "techStack": "Scala, Redis client, ML Ranking models",
+    "role": "Reads the user's precomputed timeline from Redis, merges in celebrity tweets (pull-based), applies ML-based relevance ranking, and returns the ordered feed.",
+    "whyChosen": "Separating timeline construction from fanout allows independent optimization of read and write paths. ML ranking can be updated without touching the delivery pipeline.",
+    "tradeoffs": {
+      "pros": ["Sub-100ms timeline generation", "ML ranking independent of delivery", "Handles diverse feed compositions (tweets, retweets, ads)"],
+      "cons": ["Merge logic adds read-time complexity", "Ranking model latency directly impacts user experience"]
+    },
+    "alternatives": [
+      { "name": "Pre-ranked timelines", "context": "Rank at write time, simpler reads" },
+      { "name": "Client-side ranking", "context": "Reduce server load, but less consistent" }
+    ],
+    "position": { "x": 700, "y": 400 }
+  },
+  {
+    "id": "redis-cache",
+    "label": "Redis Timeline Cache",
+    "type": "cache",
+    "description": "In-memory cache storing precomputed timelines as sorted sets of tweet IDs for each user.",
+    "techStack": "Redis clusters, ~100TB+ in-memory",
+    "role": "Stores the last ~800 tweet IDs for each user's home timeline. Enables O(1) timeline reads — the single most critical performance path in the entire system.",
+    "whyChosen": "Redis sorted sets are perfect for timelines — naturally ordered by Snowflake ID (timestamp), with O(log N) insertion and O(1) range reads.",
+    "tradeoffs": {
+      "pros": ["Sub-millisecond timeline reads", "Natural ordering via sorted sets", "Well-understood, battle-tested technology"],
+      "cons": ["Enormous memory footprint (~100TB+)", "Data loss on failure (regeneration from tweet store)", "Cost of maintaining hot replicas"]
+    },
+    "alternatives": [
+      { "name": "Memcached", "context": "Simpler caching, no sorted sets" },
+      { "name": "ScyllaDB", "context": "Persistent sorted storage, less memory" }
+    ],
+    "position": { "x": 900, "y": 300 }
+  },
+  {
+    "id": "tweet-store",
+    "label": "Tweet Store",
+    "type": "database",
+    "description": "Persistent storage for all tweets, handling hundreds of billions of records.",
+    "techStack": "Manhattan (custom), migrating to ScyllaDB/Cassandra",
+    "role": "Durable storage for tweet content, metadata, engagement counts, and media references. Handles massive write throughput during peak events.",
+    "whyChosen": "Manhattan was Twitter's custom distributed database optimized for their specific access patterns. ScyllaDB migration provides better performance with lower operational overhead.",
+    "tradeoffs": {
+      "pros": ["Optimized for tweet access patterns", "Handles extreme write throughput", "Multi-datacenter replication"],
+      "cons": ["Custom systems require specialized expertise", "Migration to new stores is complex and risky"]
+    },
+    "alternatives": [
+      { "name": "Cassandra", "context": "Open-source, large community" },
+      { "name": "DynamoDB", "context": "Managed NoSQL, no ops overhead" }
+    ],
+    "position": { "x": 900, "y": 100 }
+  },
+  {
+    "id": "social-graph",
+    "label": "Social Graph Service",
+    "type": "database",
+    "description": "Manages the follower/following relationships — the core social graph with billions of edges.",
+    "techStack": "FlockDB (custom graph DB), MySQL shards",
+    "role": "Stores and queries follow relationships. Answers 'who follows X?' queries needed by the fanout service to determine timeline delivery targets.",
+    "whyChosen": "The social graph requires specialized adjacency list operations (fan-out queries) at extreme scale. FlockDB was built for exactly this access pattern.",
+    "tradeoffs": {
+      "pros": ["Optimized for adjacency queries at billion-edge scale", "Efficient follower list pagination"],
+      "cons": ["Limited query flexibility vs general-purpose graph DB", "Sharding complexity for hot users"]
+    },
+    "alternatives": [
+      { "name": "Neo4j", "context": "Full-featured graph database" },
+      { "name": "Amazon Neptune", "context": "Managed graph database" },
+      { "name": "TigerGraph", "context": "High-performance graph analytics" }
+    ],
+    "position": { "x": 500, "y": 500 }
+  },
+  {
+    "id": "kafka",
+    "label": "Event Bus (Kafka)",
+    "type": "queue",
+    "description": "Distributed event streaming platform connecting all services through asynchronous event pipelines.",
+    "techStack": "Apache Kafka, custom event schemas",
+    "role": "Carries tweet creation events to the fanout service, user activity events to analytics, and engagement signals to the trending topics pipeline.",
+    "whyChosen": "Kafka's durable log provides replay capability essential for rebuilding timelines after failures and feeding multiple consumers from the same event stream.",
+    "tradeoffs": {
+      "pros": ["Durable event log with replay", "Multiple consumers per topic", "High throughput for event streaming"],
+      "cons": ["Operational complexity at scale", "Partition ordering constraints", "Consumer lag monitoring required"]
+    },
+    "alternatives": [
+      { "name": "Amazon Kinesis", "context": "Managed streaming on AWS" },
+      { "name": "Google Pub/Sub", "context": "Managed messaging on GCP" },
+      { "name": "Apache Pulsar", "context": "Multi-tenant, tiered storage" }
+    ],
+    "position": { "x": 300, "y": 100 }
+  }
+]
+</file>
+
+<file path="public/data/architectures/twitter/scenarios.json">
+[
+  {
+    "id": "global",
+    "name": "🌐 Global View",
+    "description": "Full Twitter/X system overview with all components and connections",
+    "highlightNodes": "*",
+    "highlightEdges": "*"
+  },
+  {
+    "id": "fanout",
+    "name": "📢 Tweet Fanout",
+    "description": "How a single tweet reaches millions of follower timelines using the hybrid push/pull strategy",
+    "highlightNodes": ["client", "load-balancer", "api-service", "tweet-service", "tweet-store", "kafka", "fanout-service", "social-graph", "redis-cache", "timeline-service"],
+    "highlightEdges": [
+      "client->load-balancer",
+      "load-balancer->api-service",
+      "api-service->tweet-service",
+      "tweet-service->tweet-store",
+      "tweet-service->kafka",
+      "kafka->fanout-service",
+      "fanout-service->social-graph",
+      "fanout-service->redis-cache",
+      "api-service->timeline-service",
+      "timeline-service->redis-cache",
+      "timeline-service->tweet-store",
+      "timeline-service->social-graph"
+    ],
+    "steps": [
+      { "order": 1, "description": "User composes tweet — request flows through LB to API service", "nodes": ["client", "load-balancer", "api-service"] },
+      { "order": 2, "description": "Tweet service validates content and assigns a Snowflake ID", "nodes": ["api-service", "tweet-service"] },
+      { "order": 3, "description": "Tweet is persisted to the durable Tweet Store", "nodes": ["tweet-service", "tweet-store"] },
+      { "order": 4, "description": "Tweet created event is published to Kafka event bus", "nodes": ["tweet-service", "kafka"] },
+      { "order": 5, "description": "Fanout service consumes event, queries Social Graph for follower list", "nodes": ["kafka", "fanout-service", "social-graph"] },
+      { "order": 6, "description": "For normal users: tweet ID pushed to each follower's Redis timeline cache", "nodes": ["fanout-service", "redis-cache"] },
+      { "order": 7, "description": "When a follower opens their timeline: Timeline service reads from Redis, merges celebrity tweets, applies ML ranking", "nodes": ["timeline-service", "redis-cache", "social-graph"] },
+      { "order": 8, "description": "Timeline service hydrates tweet IDs into full content from Tweet Store", "nodes": ["timeline-service", "tweet-store"] }
+    ]
+  },
+  {
+    "id": "trending",
+    "name": "📈 Trending Topics",
+    "description": "How trending topics are detected and served from real-time event streams",
+    "highlightNodes": ["client", "load-balancer", "api-service", "tweet-service", "kafka", "timeline-service"],
+    "highlightEdges": [
+      "client->load-balancer",
+      "load-balancer->api-service",
+      "tweet-service->kafka",
+      "kafka->timeline-service"
+    ],
+    "steps": [
+      { "order": 1, "description": "Every tweet creation event streams into Kafka with hashtags and content metadata", "nodes": ["tweet-service", "kafka"] },
+      { "order": 2, "description": "Stream processing pipeline analyzes real-time hashtag velocity and engagement spikes", "nodes": ["kafka", "timeline-service"] },
+      { "order": 3, "description": "Trending topics are computed using sliding window aggregation and anomaly detection", "nodes": ["timeline-service"] },
+      { "order": 4, "description": "Client requests trending data through API, results personalized by location and interests", "nodes": ["client", "load-balancer", "api-service"] }
+    ]
+  }
+]
+</file>
+
+<file path="src/components/catalog.js">
+/**
+ * catalog.js — Company card grid with filtering
+ */
+
+import { loadArchitectureList, getAllTags } from '../lib/data-loader.js';
+
+let currentFilter = '';
+let activeTag = '';
+
+/**
+ * Create the catalog page
+ */
+export async function createCatalog(container, navigateTo) {
+  container.innerHTML = '';
+
+  const list = await loadArchitectureList();
+  const tags = await getAllTags();
+
+  // ── Hero ──
+  const hero = document.createElement('section');
+  hero.className = 'hero';
+  hero.innerHTML = `
+    <h1 class="hero__title">
+      Architecture <span class="gradient-text">Encyclopedia</span>
+    </h1>
+    <p class="hero__subtitle">
+      Explore how the world's largest applications are built.
+      Interactive diagrams, component deep-dives, and architectural trade-offs — all in one place.
+    </p>
+    <div class="hero__stats">
+      <div class="hero__stat">
+        <div class="hero__stat-value gradient-text">${list.length}</div>
+        <div class="hero__stat-label">Architectures</div>
+      </div>
+      <div class="hero__stat">
+        <div class="hero__stat-value gradient-text">${tags.length}</div>
+        <div class="hero__stat-label">Technologies</div>
+      </div>
+      <div class="hero__stat">
+        <div class="hero__stat-value gradient-text">${list.reduce((sum, m) => sum + (m.tags?.length || 0), 0)}</div>
+        <div class="hero__stat-label">Components</div>
+      </div>
+    </div>
+  `;
+  container.appendChild(hero);
+
+  // ── Filter Bar ──
+  const filterBar = document.createElement('div');
+  filterBar.className = 'filter-bar';
+  filterBar.innerHTML = `
+    <div class="filter-bar__search">
+      <svg class="filter-bar__search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/>
+        <path d="m21 21-4.35-4.35"/>
+      </svg>
+      <input
+        type="text"
+        class="filter-bar__input"
+        id="search-input"
+        placeholder="Search architectures or technologies..."
+        autocomplete="off"
+      />
+    </div>
+    <div class="filter-bar__tags" id="filter-tags">
+      ${tags.map(tag => `
+        <button class="filter-tag" data-tag="${tag}">${tag}</button>
+      `).join('')}
+    </div>
+  `;
+  container.appendChild(filterBar);
+
+  // ── Card Grid ──
+  const grid = document.createElement('div');
+  grid.className = 'catalog-grid';
+  grid.id = 'catalog-grid';
+  container.appendChild(grid);
+
+  renderCards(grid, list, navigateTo);
+
+  // ── Event Listeners ──
+  const searchInput = filterBar.querySelector('#search-input');
+  searchInput.addEventListener('input', (e) => {
+    currentFilter = e.target.value.toLowerCase();
+    filterAndRender(grid, list, navigateTo);
+  });
+
+  const tagBtns = filterBar.querySelectorAll('.filter-tag');
+  tagBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      const tag = btn.dataset.tag;
+      if (activeTag === tag) {
+        activeTag = '';
+        btn.classList.remove('filter-tag--active');
+      } else {
+        tagBtns.forEach(b => b.classList.remove('filter-tag--active'));
+        activeTag = tag;
+        btn.classList.add('filter-tag--active');
+      }
+      filterAndRender(grid, list, navigateTo);
+    });
+  });
+}
+
+function filterAndRender(grid, list, navigateTo) {
+  const filtered = list.filter(item => {
+    const matchesSearch = !currentFilter ||
+      item.name.toLowerCase().includes(currentFilter) ||
+      item.description.toLowerCase().includes(currentFilter) ||
+      item.tags.some(t => t.includes(currentFilter));
+
+    const matchesTag = !activeTag || item.tags.includes(activeTag);
+
+    return matchesSearch && matchesTag;
+  });
+
+  renderCards(grid, filtered, navigateTo);
+}
+
+function renderCards(grid, items, navigateTo) {
+  if (items.length === 0) {
+    grid.innerHTML = `
+      <div class="catalog-empty">
+        <div class="catalog-empty__icon">🔍</div>
+        <p class="catalog-empty__message">No architectures found matching your search.</p>
+      </div>
+    `;
+    return;
+  }
+
+  grid.innerHTML = items.map((item, i) => `
+    <article
+      class="catalog-card"
+      data-id="${item.id}"
+      style="--card-accent: ${item.accentGradient}; animation-delay: ${i * 0.08}s"
+      role="button"
+      tabindex="0"
+      aria-label="View ${item.name} architecture"
+    >
+      <div class="catalog-card__header">
+        <div class="catalog-card__icon" style="background: ${item.accentGradient}">
+          ${item.name.charAt(0)}
+        </div>
+        <div>
+          <h2 class="catalog-card__title">${item.name}</h2>
+          <div class="catalog-card__category">${item.category}</div>
+        </div>
+      </div>
+      <p class="catalog-card__description">${item.description}</p>
+      <div class="catalog-card__tags">
+        ${item.tags.slice(0, 5).map(tag => `
+          <span class="catalog-card__tag">${tag}</span>
+        `).join('')}
+      </div>
+      <div class="catalog-card__arrow">→</div>
+    </article>
+  `).join('');
+
+  // Click handlers
+  grid.querySelectorAll('.catalog-card').forEach(card => {
+    const handler = () => navigateTo(card.dataset.id);
+    card.addEventListener('click', handler);
+    card.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        handler();
+      }
+    });
+  });
+}
+</file>
+
+<file path="src/components/diagram.js">
+/**
+ * diagram.js — Cytoscape.js interactive diagram component
+ */
+
+import cytoscape from 'cytoscape';
+import { loadArchitecture } from '../lib/data-loader.js';
+import { getCytoscapeStyles, toElements, NODE_COLORS, NODE_ICONS } from '../lib/graph-styles.js';
+import { startEdgeAnimations, stopEdgeAnimations } from '../lib/animations.js';
+import { openSidebar, closeSidebar } from './sidebar.js';
+
+let cy = null;
+let currentScenario = 'global';
+let archData = null;
+
+/**
+ * Create the diagram page
+ */
+export async function createDiagram(container, archId, navigateBack) {
+  container.innerHTML = '';
+  archData = await loadArchitecture(archId);
+
+  const page = document.createElement('div');
+  page.className = 'diagram-page';
+
+  // ── Toolbar ──
+  const toolbar = document.createElement('div');
+  toolbar.className = 'diagram-toolbar';
+  toolbar.innerHTML = `
+    <div class="diagram-toolbar__left">
+      <button class="diagram-toolbar__back" id="diagram-back" aria-label="Back to catalog">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
+        Back
+      </button>
+      <h1 class="diagram-toolbar__title">
+        ${archData.meta.name}
+        <span class="diagram-toolbar__company">System Architecture</span>
+      </h1>
+    </div>
+    <div class="diagram-toolbar__right">
+      <div class="diagram-toolbar__zoom-controls">
+        <button class="diagram-toolbar__zoom-btn" id="zoom-out" aria-label="Zoom out">−</button>
+        <span class="diagram-toolbar__zoom-level" id="zoom-level">100%</span>
+        <button class="diagram-toolbar__zoom-btn" id="zoom-in" aria-label="Zoom in">+</button>
+      </div>
+      <button class="diagram-toolbar__fit-btn" id="fit-view">Fit View</button>
+    </div>
+  `;
+  page.appendChild(toolbar);
+
+  // ── Scenario Bar ──
+  const scenarioBar = document.createElement('div');
+  scenarioBar.className = 'scenario-bar';
+  scenarioBar.innerHTML = `
+    <span class="scenario-bar__label">Scenario:</span>
+    ${archData.scenarios.map(s => `
+      <button
+        class="scenario-pill ${s.id === 'global' ? 'scenario-pill--active' : ''}"
+        data-scenario="${s.id}"
+      >${s.name}</button>
+    `).join('')}
+  `;
+  page.appendChild(scenarioBar);
+
+  // ── Canvas ──
+  const canvasWrap = document.createElement('div');
+  canvasWrap.className = 'diagram-canvas-wrap';
+
+  const canvasEl = document.createElement('div');
+  canvasEl.className = 'diagram-canvas';
+  canvasEl.id = 'cy-canvas';
+  canvasWrap.appendChild(canvasEl);
+
+  // ── Legend ──
+  const legend = document.createElement('div');
+  legend.className = 'diagram-legend glass';
+  legend.innerHTML = `
+    <div class="diagram-legend__title">Component Types</div>
+    <div class="diagram-legend__items">
+      ${Object.entries(NODE_COLORS).map(([type, color]) => `
+        <div class="diagram-legend__item">
+          <div class="diagram-legend__dot" style="background: ${color}"></div>
+          <span>${NODE_ICONS[type] || ''} ${type.charAt(0).toUpperCase() + type.slice(1)}</span>
+        </div>
+      `).join('')}
+    </div>
+  `;
+  canvasWrap.appendChild(legend);
+
+  page.appendChild(canvasWrap);
+  container.appendChild(page);
+
+  // ── Initialize Cytoscape ──
+  initCytoscape(canvasEl);
+
+  // ── Event Handlers ──
+  toolbar.querySelector('#diagram-back').addEventListener('click', () => {
+    destroyCytoscape();
+    navigateBack();
+  });
+
+  toolbar.querySelector('#zoom-in').addEventListener('click', () => {
+    cy.zoom({ level: cy.zoom() * 1.2, renderedPosition: { x: cy.width() / 2, y: cy.height() / 2 } });
+    updateZoomLevel();
+  });
+
+  toolbar.querySelector('#zoom-out').addEventListener('click', () => {
+    cy.zoom({ level: cy.zoom() * 0.8, renderedPosition: { x: cy.width() / 2, y: cy.height() / 2 } });
+    updateZoomLevel();
+  });
+
+  toolbar.querySelector('#fit-view').addEventListener('click', () => {
+    cy.fit(undefined, 50);
+    cy.animate({ fit: { eles: cy.elements(), padding: 50 }, duration: 400 });
+    updateZoomLevel();
+  });
+
+  // Scenario switching
+  const scenarioPills = scenarioBar.querySelectorAll('.scenario-pill');
+  scenarioPills.forEach(pill => {
+    pill.addEventListener('click', () => {
+      scenarioPills.forEach(p => p.classList.remove('scenario-pill--active'));
+      pill.classList.add('scenario-pill--active');
+      currentScenario = pill.dataset.scenario;
+      applyScenario(canvasWrap);
+    });
+  });
+}
+
+/**
+ * Initialize Cytoscape instance
+ */
+function initCytoscape(containerEl) {
+  const elements = toElements(archData.nodes, archData.edges);
+
+  cy = cytoscape({
+    container: containerEl,
+    elements,
+    style: getCytoscapeStyles(),
+    layout: {
+      name: 'preset',
+    },
+    minZoom: 0.3,
+    maxZoom: 3,
+    wheelSensitivity: 0.15,
+    boxSelectionEnabled: false,
+    autoungrabify: false,
+  });
+
+  // Fit to view after initialization
+  setTimeout(() => {
+    cy.fit(undefined, 60);
+    updateZoomLevel();
+  }, 100);
+
+  // ── Node click → open sidebar ──
+  cy.on('tap', 'node', (evt) => {
+    const nodeData = evt.target.data('_nodeData');
+    if (nodeData) {
+      openSidebar(nodeData);
+    }
+  });
+
+  // ── Canvas click → close sidebar ──
+  cy.on('tap', (evt) => {
+    if (evt.target === cy) {
+      closeSidebar();
+    }
+  });
+
+  // ── Track zoom level ──
+  cy.on('zoom', () => updateZoomLevel());
+
+  // ── Node hover effects ──
+  cy.on('mouseover', 'node', (evt) => {
+    const node = evt.target;
+    containerEl.style.cursor = 'pointer';
+    node.style({
+      'border-width': 3,
+      'background-opacity': 0.3,
+    });
+  });
+
+  cy.on('mouseout', 'node', (evt) => {
+    const node = evt.target;
+    containerEl.style.cursor = 'default';
+    if (!node.selected()) {
+      node.style({
+        'border-width': 2,
+        'background-opacity': 0.15,
+      });
+    }
+  });
+}
+
+/**
+ * Apply scenario highlighting
+ */
+function applyScenario(canvasWrap) {
+  if (!cy || !archData) return;
+
+  stopEdgeAnimations();
+
+  const scenario = archData.scenarios.find(s => s.id === currentScenario);
+  if (!scenario) return;
+
+  // Remove existing overlays
+  canvasWrap.querySelectorAll('.scenario-info, .scenario-steps').forEach(el => el.remove());
+
+  if (scenario.highlightNodes === '*') {
+    // Global view — remove all classes
+    cy.elements().removeClass('dimmed highlighted');
+    return;
+  }
+
+  // Dim everything, highlight relevant
+  cy.elements().addClass('dimmed').removeClass('highlighted');
+
+  // Highlight nodes
+  const nodeIds = new Set(scenario.highlightNodes);
+  cy.nodes().forEach(node => {
+    if (nodeIds.has(node.id())) {
+      node.removeClass('dimmed').addClass('highlighted');
+    }
+  });
+
+  // Highlight edges
+  const edgeKeys = new Set(scenario.highlightEdges);
+  cy.edges().forEach(edge => {
+    const key = `${edge.data('source')}->${edge.data('target')}`;
+    if (edgeKeys.has(key)) {
+      edge.removeClass('dimmed').addClass('highlighted');
+    }
+  });
+
+  // Start edge animations
+  startEdgeAnimations(cy);
+
+  // Show scenario description
+  const infoEl = document.createElement('div');
+  infoEl.className = 'scenario-info';
+  infoEl.innerHTML = `
+    <div class="scenario-info__card glass">
+      <div class="scenario-info__title">${scenario.name}</div>
+      <div class="scenario-info__desc">${scenario.description}</div>
+    </div>
+  `;
+  canvasWrap.appendChild(infoEl);
+
+  // Show steps if available
+  if (scenario.steps?.length) {
+    const stepsEl = document.createElement('div');
+    stepsEl.className = 'scenario-steps';
+    stepsEl.innerHTML = `
+      <div class="scenario-steps__card glass">
+        <div class="scenario-steps__title">Data Flow Steps</div>
+        ${scenario.steps.map(step => `
+          <div class="scenario-step">
+            <div class="scenario-step__number">${step.order}</div>
+            <div class="scenario-step__text">${step.description}</div>
+          </div>
+        `).join('')}
+      </div>
+    `;
+    canvasWrap.appendChild(stepsEl);
+  }
+}
+
+/**
+ * Update zoom level display
+ */
+function updateZoomLevel() {
+  const el = document.querySelector('#zoom-level');
+  if (el && cy) {
+    el.textContent = `${Math.round(cy.zoom() * 100)}%`;
+  }
+}
+
+/**
+ * Cleanup
+ */
+function destroyCytoscape() {
+  stopEdgeAnimations();
+  if (cy) {
+    cy.destroy();
+    cy = null;
+  }
+  archData = null;
+  currentScenario = 'global';
+}
+</file>
+
+<file path="src/components/header.js">
+/**
+ * header.js — Application header component
+ */
+
+export function createHeader() {
+  const header = document.createElement('header');
+  header.className = 'app-header glass';
+  header.innerHTML = `
+    <a href="#/" class="app-header__logo" id="header-logo">
+      <span class="app-header__logo-icon">🏗️</span>
+      <span class="app-header__logo-text">Arch<span class="gradient-text">Library</span></span>
+    </a>
+    <div class="app-header__actions">
+      <a href="https://github.com" target="_blank" rel="noopener" class="app-header__btn" id="header-github">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.3 3.44 9.8 8.2 11.39.6.11.82-.26.82-.58v-2.03c-3.34.73-4.04-1.61-4.04-1.61-.55-1.39-1.34-1.76-1.34-1.76-1.09-.74.08-.73.08-.73 1.2.09 1.84 1.24 1.84 1.24 1.07 1.84 2.81 1.31 3.5 1 .11-.78.42-1.31.76-1.61-2.67-.3-5.47-1.33-5.47-5.93 0-1.31.47-2.38 1.24-3.22-.13-.3-.54-1.52.12-3.18 0 0 1-.32 3.3 1.23a11.5 11.5 0 016.02 0c2.28-1.55 3.29-1.23 3.29-1.23.66 1.66.25 2.88.12 3.18.77.84 1.24 1.91 1.24 3.22 0 4.61-2.81 5.63-5.48 5.92.43.37.82 1.1.82 2.22v3.29c0 .32.21.7.82.58A12.01 12.01 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+        <span>GitHub</span>
+      </a>
+      <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark/light theme">
+        🌙
+      </button>
+    </div>
+  `;
+
+  // Theme toggle
+  const toggle = header.querySelector('#theme-toggle');
+  toggle.addEventListener('click', () => {
+    const isDark = document.documentElement.getAttribute('data-theme') !== 'light';
+    document.documentElement.setAttribute('data-theme', isDark ? 'light' : 'dark');
+    toggle.textContent = isDark ? '☀️' : '🌙';
+    localStorage.setItem('theme', isDark ? 'light' : 'dark');
+  });
+
+  // Restore saved theme
+  const saved = localStorage.getItem('theme');
+  if (saved === 'light') {
+    document.documentElement.setAttribute('data-theme', 'light');
+    toggle.textContent = '☀️';
+  }
+
+  return header;
+}
+</file>
+
+<file path="src/components/sidebar.js">
+/**
+ * sidebar.js — Detail panel (slide-in) for node information
+ */
+
+import { NODE_COLORS, NODE_ICONS } from '../lib/graph-styles.js';
+
+let sidebarEl = null;
+let overlayEl = null;
+let isOpen = false;
+
+/**
+ * Initialize the sidebar (call once)
+ */
+export function initSidebar() {
+  // Overlay
+  overlayEl = document.createElement('div');
+  overlayEl.className = 'sidebar-overlay';
+  overlayEl.id = 'sidebar-overlay';
+  overlayEl.addEventListener('click', closeSidebar);
+  document.body.appendChild(overlayEl);
+
+  // Sidebar
+  sidebarEl = document.createElement('aside');
+  sidebarEl.className = 'sidebar';
+  sidebarEl.id = 'sidebar';
+  sidebarEl.innerHTML = `
+    <div class="sidebar__header">
+      <div class="sidebar__header-info">
+        <div class="sidebar__type-badge" id="sidebar-badge"></div>
+        <h2 class="sidebar__title" id="sidebar-title"></h2>
+        <div class="sidebar__tech-stack" id="sidebar-tech"></div>
+      </div>
+      <button class="sidebar__close" id="sidebar-close" aria-label="Close panel">✕</button>
+    </div>
+    <div class="sidebar__content" id="sidebar-content"></div>
+  `;
+  document.body.appendChild(sidebarEl);
+
+  sidebarEl.querySelector('#sidebar-close').addEventListener('click', closeSidebar);
+
+  // ESC to close
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && isOpen) closeSidebar();
+  });
+}
+
+/**
+ * Open the sidebar with node data
+ */
+export function openSidebar(nodeData) {
+  if (!sidebarEl || !nodeData) return;
+
+  const color = NODE_COLORS[nodeData.type] || NODE_COLORS.service;
+  const icon = NODE_ICONS[nodeData.type] || '⚙️';
+
+  // Badge
+  const badge = sidebarEl.querySelector('#sidebar-badge');
+  badge.textContent = `${icon} ${nodeData.type}`;
+  badge.style.background = color.replace(')', ', 0.15)').replace('hsl', 'hsla');
+  badge.style.color = color;
+
+  // Title & tech
+  sidebarEl.querySelector('#sidebar-title').textContent = nodeData.label;
+  sidebarEl.querySelector('#sidebar-tech').textContent = nodeData.techStack || '';
+
+  // Content
+  const content = sidebarEl.querySelector('#sidebar-content');
+  content.innerHTML = `
+    ${buildSection('📋', 'Overview', `<p class="sidebar__text">${nodeData.description}</p>`)}
+
+    ${buildSection('🎯', 'Role & Responsibility', `<p class="sidebar__text">${nodeData.role}</p>`)}
+
+    ${nodeData.whyChosen ? buildSection('💡', 'Why This Was Chosen', `<p class="sidebar__text">${nodeData.whyChosen}</p>`) : ''}
+
+    ${nodeData.tradeoffs ? buildSection('⚖️', 'Trade-offs', buildTradeoffs(nodeData.tradeoffs)) : ''}
+
+    ${nodeData.alternatives?.length ? buildSection('🔄', 'Alternatives', buildAlternatives(nodeData.alternatives)) : ''}
+  `;
+
+  // Show
+  overlayEl.classList.add('sidebar-overlay--visible');
+  sidebarEl.classList.add('sidebar--open');
+  isOpen = true;
+}
+
+/**
+ * Close the sidebar
+ */
+export function closeSidebar() {
+  if (!sidebarEl) return;
+  overlayEl.classList.remove('sidebar-overlay--visible');
+  sidebarEl.classList.remove('sidebar--open');
+  isOpen = false;
+}
+
+/**
+ * Check if sidebar is open
+ */
+export function isSidebarOpen() {
+  return isOpen;
+}
+
+// ── Helper builders ──
+
+function buildSection(icon, title, content) {
+  return `
+    <div class="sidebar__section">
+      <div class="sidebar__section-title">
+        <span class="sidebar__section-icon">${icon}</span>
+        ${title}
+      </div>
+      ${content}
+    </div>
+  `;
+}
+
+function buildTradeoffs(tradeoffs) {
+  let html = '<div class="tradeoff-list">';
+
+  if (tradeoffs.pros) {
+    tradeoffs.pros.forEach(pro => {
+      html += `
+        <div class="tradeoff-item tradeoff-item--pro">
+          <span class="tradeoff-icon">✅</span>
+          <span>${pro}</span>
+        </div>
+      `;
+    });
+  }
+
+  if (tradeoffs.cons) {
+    tradeoffs.cons.forEach(con => {
+      html += `
+        <div class="tradeoff-item tradeoff-item--con">
+          <span class="tradeoff-icon">⚠️</span>
+          <span>${con}</span>
+        </div>
+      `;
+    });
+  }
+
+  html += '</div>';
+  return html;
+}
+
+function buildAlternatives(alternatives) {
+  let html = '<div class="alternatives-list">';
+
+  alternatives.forEach(alt => {
+    html += `
+      <div class="alternative-item">
+        <span class="alternative-item__name">${alt.name}</span>
+        <span class="alternative-item__context">${alt.context}</span>
+      </div>
+    `;
+  });
+
+  html += '</div>';
+  return html;
+}
+</file>
+
+<file path="src/data/architectures/amazon/edges.json">
+[
+  {
+    "source": "client",
+    "target": "elb",
+    "label": "HTTPS Requests",
+    "type": "sync",
+    "scenarios": ["global", "purchase", "search"]
+  },
+  {
+    "source": "elb",
+    "target": "api-gateway",
+    "label": "Load-Balanced Traffic",
+    "type": "sync",
+    "scenarios": ["global", "purchase", "search"]
+  },
+  {
+    "source": "api-gateway",
+    "target": "product-service",
+    "label": "Product Queries",
+    "type": "sync",
+    "scenarios": ["global", "purchase", "search"]
+  },
+  {
+    "source": "api-gateway",
+    "target": "order-service",
+    "label": "Order Requests",
+    "type": "sync",
+    "scenarios": ["global", "purchase"]
+  },
+  {
+    "source": "api-gateway",
+    "target": "search",
+    "label": "Search Queries",
+    "type": "sync",
+    "scenarios": ["global", "search"]
+  },
+  {
+    "source": "api-gateway",
+    "target": "recommendation",
+    "label": "Get Recommendations",
+    "type": "sync",
+    "scenarios": ["global", "search"]
+  },
+  {
+    "source": "product-service",
+    "target": "dynamodb",
+    "label": "Product Data R/W",
+    "type": "sync",
+    "scenarios": ["global", "purchase", "search"]
+  },
+  {
+    "source": "product-service",
+    "target": "elasticache",
+    "label": "Cache Product Details",
+    "type": "sync",
+    "scenarios": ["global", "purchase", "search"]
+  },
+  {
+    "source": "order-service",
+    "target": "dynamodb",
+    "label": "Order Data R/W",
+    "type": "sync",
+    "scenarios": ["global", "purchase"]
+  },
+  {
+    "source": "order-service",
+    "target": "sqs-sns",
+    "label": "Order Events",
+    "type": "async",
+    "scenarios": ["global", "purchase"]
+  },
+  {
+    "source": "search",
+    "target": "elasticache",
+    "label": "Cached Results",
+    "type": "sync",
+    "scenarios": ["global", "search"]
+  },
+  {
+    "source": "search",
+    "target": "dynamodb",
+    "label": "Index Data",
+    "type": "sync",
+    "scenarios": ["global", "search"]
+  },
+  {
+    "source": "sqs-sns",
+    "target": "recommendation",
+    "label": "Purchase Events",
+    "type": "async",
+    "scenarios": ["global", "purchase"]
+  },
+  {
+    "source": "recommendation",
+    "target": "elasticache",
+    "label": "Cache Recommendations",
+    "type": "sync",
+    "scenarios": ["global"]
+  }
+]
+</file>
+
+<file path="src/data/architectures/amazon/meta.json">
+{
+  "id": "amazon",
+  "name": "Amazon",
+  "description": "The world's largest e-commerce platform and cloud provider, pioneering microservices, distributed databases, and the two-pizza team philosophy.",
+  "category": "E-Commerce & Cloud",
+  "tags": ["microservices", "distributed-database", "event-driven", "serverless", "search", "recommendation"],
+  "color": "#FF9900",
+  "accentGradient": "linear-gradient(135deg, #FF9900, #E68A00)"
+}
+</file>
+
+<file path="src/data/architectures/amazon/nodes.json">
+[
+  {
+    "id": "client",
+    "label": "Client (Web/Mobile)",
+    "type": "client",
+    "description": "Web browsers and mobile apps through which customers browse, search, and purchase products.",
+    "techStack": "React (Web), Native Apps (iOS/Android), A/B Testing Framework",
+    "role": "Renders the storefront, product pages, and checkout flow. Each page is optimized for conversion through continuous experimentation.",
+    "whyChosen": "React enables rapid iteration on the web storefront. Native mobile apps provide smoother shopping experiences with push notification and offline catalog support.",
+    "tradeoffs": {
+      "pros": ["Platform-optimized UX", "Rich experimentation framework", "Progressive loading for fast Time-to-Interactive"],
+      "cons": ["Multiple codebases increase maintenance", "Feature parity across platforms is challenging"]
+    },
+    "alternatives": [
+      { "name": "Next.js SSR", "context": "Server-rendered React for faster initial loads" },
+      { "name": "Flutter", "context": "Single codebase for mobile platforms" }
+    ],
+    "position": { "x": 100, "y": 300 }
+  },
+  {
+    "id": "elb",
+    "label": "Elastic Load Balancer",
+    "type": "gateway",
+    "description": "AWS-native load balancer distributing incoming traffic across multiple availability zones.",
+    "techStack": "AWS ALB/NLB, Auto Scaling Groups",
+    "role": "Distributes millions of requests per second across healthy service instances, performs SSL termination, and integrates with AWS auto-scaling for elastic capacity.",
+    "whyChosen": "As the creators of AWS, Amazon leverages their own infrastructure. ALB provides L7 routing, sticky sessions, and seamless integration with ECS/EKS.",
+    "tradeoffs": {
+      "pros": ["Fully managed, zero operational overhead", "Deep AWS integration", "Automatic cross-AZ failover"],
+      "cons": ["AWS lock-in", "Cost at extreme scale", "Less customizable than software load balancers"]
+    },
+    "alternatives": [
+      { "name": "nginx / HAProxy", "context": "Self-managed, highly configurable" },
+      { "name": "Envoy Proxy", "context": "Service mesh L7 proxy" }
+    ],
+    "position": { "x": 300, "y": 300 }
+  },
+  {
+    "id": "api-gateway",
+    "label": "API Gateway Services",
+    "type": "gateway",
+    "description": "Microservice gateway handling authentication, rate limiting, and request routing to hundreds of backend services.",
+    "techStack": "Custom Java services, AWS API Gateway",
+    "role": "Authenticates requests, applies rate limits, transforms payloads, and routes to the correct domain services. Handles versioning and backward compatibility.",
+    "whyChosen": "Amazon's scale requires custom gateway logic for complex routing rules (marketplace vs retail, regional regulations, seller APIs).",
+    "tradeoffs": {
+      "pros": ["Custom routing for complex multi-tenant scenarios", "Per-service rate limiting and throttling"],
+      "cons": ["Custom solution requires dedicated team", "Single point of failure risk without proper redundancy"]
+    },
+    "alternatives": [
+      { "name": "Kong", "context": "Open-source API gateway with plugin ecosystem" },
+      { "name": "Apigee", "context": "Google Cloud managed API platform" }
+    ],
+    "position": { "x": 500, "y": 300 }
+  },
+  {
+    "id": "product-service",
+    "label": "Product Catalog Service",
+    "type": "service",
+    "description": "Manages the catalog of hundreds of millions of products with real-time pricing, availability, and attribute data.",
+    "techStack": "Java/Kotlin microservices, gRPC",
+    "role": "Central source of truth for product information. Serves product details, pricing, and inventory status to all consumer-facing and internal services.",
+    "whyChosen": "A dedicated product service allows independent scaling and data model evolution for the massive catalog without impacting other services.",
+    "tradeoffs": {
+      "pros": ["Independent scaling for catalog workloads", "Consistent product data across all channels"],
+      "cons": ["Must handle extreme read throughput", "Cross-region consistency for global catalog"]
+    },
+    "alternatives": [
+      { "name": "Commercetools", "context": "Headless commerce platform" },
+      { "name": "Shopify Plus Backend", "context": "Managed e-commerce platform" }
+    ],
+    "position": { "x": 700, "y": 150 }
+  },
+  {
+    "id": "order-service",
+    "label": "Order Processing Service",
+    "type": "service",
+    "description": "Manages the order lifecycle from cart to delivery, orchestrating payment, inventory, and fulfillment workflows.",
+    "techStack": "Java, Step Functions, SQS",
+    "role": "Coordinates the complex multi-step purchase flow: inventory reservation, payment processing, fraud detection, and fulfillment routing.",
+    "whyChosen": "Order processing requires strong consistency guarantees and saga-pattern orchestration across multiple bounded contexts (payment, inventory, shipping).",
+    "tradeoffs": {
+      "pros": ["Reliable saga orchestration for distributed transactions", "Idempotent operations prevent double-charges"],
+      "cons": ["Complex compensating transactions on failure", "High operational criticality — downtime = lost revenue"]
+    },
+    "alternatives": [
+      { "name": "Temporal", "context": "Open-source durable workflow engine" },
+      { "name": "Camunda", "context": "BPMN-based process orchestration" }
+    ],
+    "position": { "x": 700, "y": 450 }
+  },
+  {
+    "id": "search",
+    "label": "Search Engine",
+    "type": "service",
+    "description": "Powers product search across hundreds of millions of listings with sub-second response times.",
+    "techStack": "Custom search (A9), OpenSearch/Elasticsearch, ML Ranking",
+    "role": "Processes search queries, applies ML-based ranking, handles typo correction, synonyms, and personalized result ordering based on purchase history.",
+    "whyChosen": "Amazon's A9 search is a competitive differentiator. Custom search allows integration of purchase intent signals and advertiser-bid ranking that generic engines can't provide.",
+    "tradeoffs": {
+      "pros": ["Purchase-intent-optimized ranking", "Real-time index updates for price/availability changes", "Sponsored product integration"],
+      "cons": ["Massive index size requires sharding", "Balancing organic vs paid results transparency"]
+    },
+    "alternatives": [
+      { "name": "Elasticsearch / OpenSearch", "context": "Open-source full-text search" },
+      { "name": "Algolia", "context": "Managed search-as-a-service" }
+    ],
+    "position": { "x": 500, "y": 100 }
+  },
+  {
+    "id": "dynamodb",
+    "label": "DynamoDB",
+    "type": "database",
+    "description": "Fully managed NoSQL database providing single-digit millisecond performance at any scale.",
+    "techStack": "Amazon DynamoDB, Global Tables, DAX Cache",
+    "role": "Primary database for high-throughput workloads: shopping carts, session state, user preferences. Global Tables provide multi-region active-active replication.",
+    "whyChosen": "Born from Amazon's Dynamo paper. Provides predictable performance with automatic scaling — critical for Black Friday-scale traffic spikes.",
+    "tradeoffs": {
+      "pros": ["Predictable single-digit ms latency", "Fully managed with auto-scaling", "Global tables for multi-region"],
+      "cons": ["Limited query patterns (must design for access patterns)", "Cost can spike with high throughput", "25-item transaction limit"]
+    },
+    "alternatives": [
+      { "name": "Cassandra", "context": "Open-source, avoid vendor lock-in" },
+      { "name": "MongoDB Atlas", "context": "Document DB with flexible queries" },
+      { "name": "CockroachDB", "context": "Distributed SQL with strong consistency" }
+    ],
+    "position": { "x": 900, "y": 300 }
+  },
+  {
+    "id": "sqs-sns",
+    "label": "SQS / SNS / EventBridge",
+    "type": "queue",
+    "description": "Managed messaging services for asynchronous event-driven communication between microservices.",
+    "techStack": "Amazon SQS, SNS, EventBridge",
+    "role": "Decouples services through message queues (SQS) and pub/sub topics (SNS). EventBridge provides event routing with content-based filtering for complex workflows.",
+    "whyChosen": "Managed messaging eliminates the operational overhead of running Kafka/RabbitMQ clusters while providing at-least-once delivery guarantees.",
+    "tradeoffs": {
+      "pros": ["Fully managed, zero ops", "SQS provides dead-letter queues for error handling", "EventBridge enables event-driven architectures"],
+      "cons": ["Higher per-message cost than self-hosted Kafka", "SQS max message size 256KB", "Less control over partitioning and ordering"]
+    },
+    "alternatives": [
+      { "name": "Apache Kafka (MSK)", "context": "Event streaming with replay capability" },
+      { "name": "RabbitMQ", "context": "Feature-rich message broker" }
+    ],
+    "position": { "x": 700, "y": 300 }
+  },
+  {
+    "id": "elasticache",
+    "label": "ElastiCache (Redis)",
+    "type": "cache",
+    "description": "In-memory caching layer providing microsecond read latency for frequently accessed data.",
+    "techStack": "Amazon ElastiCache for Redis, cluster mode",
+    "role": "Caches product details, session state, and search results. Reduces database load and speeds up page rendering for high-traffic product pages.",
+    "whyChosen": "Redis provides rich data structures (sorted sets for rankings, hashes for session data) beyond simple key-value caching, with managed cluster mode for scaling.",
+    "tradeoffs": {
+      "pros": ["Sub-millisecond read latency", "Rich data structures", "Managed with automatic failover"],
+      "cons": ["Memory-bound (expensive at scale)", "Cache invalidation complexity", "Data loss risk on node failure without persistence"]
+    },
+    "alternatives": [
+      { "name": "Memcached", "context": "Simpler, multi-threaded for pure caching" },
+      { "name": "Momento", "context": "Serverless caching, pay-per-request" }
+    ],
+    "position": { "x": 500, "y": 500 }
+  },
+  {
+    "id": "recommendation",
+    "label": "Recommendation Engine",
+    "type": "ml",
+    "description": "ML-powered personalization engine generating 'Customers who bought...' and personalized homepage recommendations.",
+    "techStack": "Custom ML, SageMaker, Collaborative Filtering, Deep Learning",
+    "role": "Analyzes purchase history, browsing behavior, and contextual signals to generate real-time product recommendations that drive 35%+ of revenue.",
+    "whyChosen": "Personalized recommendations are a massive revenue driver. Custom models allow optimization for conversion and basket size rather than generic engagement metrics.",
+    "tradeoffs": {
+      "pros": ["Drives 35%+ of total revenue", "Real-time personalization based on session behavior", "Continuously improving with more data"],
+      "cons": ["Cold start for new users/products", "Massive compute for training at catalog scale", "Bias amplification risk"]
+    },
+    "alternatives": [
+      { "name": "Amazon Personalize", "context": "Managed version of their own tech" },
+      { "name": "Google Recommendations AI", "context": "GCP managed recommendations" }
+    ],
+    "position": { "x": 300, "y": 500 }
+  }
+]
+</file>
+
+<file path="src/data/architectures/amazon/scenarios.json">
+[
+  {
+    "id": "global",
+    "name": "🌐 Global View",
+    "description": "Full e-commerce platform overview with all components and connections",
+    "highlightNodes": "*",
+    "highlightEdges": "*"
+  },
+  {
+    "id": "purchase",
+    "name": "🛒 Purchase Flow",
+    "description": "Complete journey from 'Add to Cart' through payment to order confirmation",
+    "highlightNodes": ["client", "elb", "api-gateway", "product-service", "order-service", "dynamodb", "sqs-sns", "elasticache", "recommendation"],
+    "highlightEdges": [
+      "client->elb",
+      "elb->api-gateway",
+      "api-gateway->product-service",
+      "api-gateway->order-service",
+      "product-service->dynamodb",
+      "product-service->elasticache",
+      "order-service->dynamodb",
+      "order-service->sqs-sns",
+      "sqs-sns->recommendation"
+    ],
+    "steps": [
+      { "order": 1, "description": "Customer clicks 'Add to Cart' — request flows through ELB to API Gateway", "nodes": ["client", "elb", "api-gateway"] },
+      { "order": 2, "description": "Product service verifies availability and current price from cache/DynamoDB", "nodes": ["api-gateway", "product-service", "elasticache", "dynamodb"] },
+      { "order": 3, "description": "Customer proceeds to checkout — Order service begins the purchase saga", "nodes": ["api-gateway", "order-service"] },
+      { "order": 4, "description": "Order service reserves inventory and processes payment via DynamoDB transactions", "nodes": ["order-service", "dynamodb"] },
+      { "order": 5, "description": "Order confirmation event published to SQS/SNS for downstream processing", "nodes": ["order-service", "sqs-sns"] },
+      { "order": 6, "description": "Purchase event feeds recommendation engine to update 'Frequently Bought Together'", "nodes": ["sqs-sns", "recommendation"] }
+    ]
+  },
+  {
+    "id": "search",
+    "name": "🔍 Search & Discovery",
+    "description": "How product search, autocomplete, and personalized recommendations work together",
+    "highlightNodes": ["client", "elb", "api-gateway", "search", "product-service", "recommendation", "elasticache", "dynamodb"],
+    "highlightEdges": [
+      "client->elb",
+      "elb->api-gateway",
+      "api-gateway->search",
+      "api-gateway->product-service",
+      "api-gateway->recommendation",
+      "search->elasticache",
+      "search->dynamodb",
+      "product-service->elasticache",
+      "recommendation->elasticache"
+    ],
+    "steps": [
+      { "order": 1, "description": "User types search query — request hits API Gateway via ELB", "nodes": ["client", "elb", "api-gateway"] },
+      { "order": 2, "description": "Search service processes query with ML ranking, checks cache for frequent queries", "nodes": ["api-gateway", "search", "elasticache"] },
+      { "order": 3, "description": "On cache miss, search engine queries distributed index backed by DynamoDB", "nodes": ["search", "dynamodb"] },
+      { "order": 4, "description": "Product service enriches search results with real-time pricing and availability", "nodes": ["api-gateway", "product-service", "elasticache"] },
+      { "order": 5, "description": "Recommendation engine injects personalized suggestions based on browsing history", "nodes": ["api-gateway", "recommendation"] }
+    ]
+  }
+]
+</file>
+
+<file path="src/data/architectures/netflix/edges.json">
+[
+  {
+    "source": "client",
+    "target": "zuul",
+    "label": "API Requests (HTTPS)",
+    "type": "sync",
+    "scenarios": ["global", "video-playback", "recommendation"]
+  },
+  {
+    "source": "client",
+    "target": "cdn",
+    "label": "Video Stream (HLS/DASH)",
+    "type": "streaming",
+    "scenarios": ["global", "video-playback"]
+  },
+  {
+    "source": "zuul",
+    "target": "eureka",
+    "label": "Service Lookup",
+    "type": "sync",
+    "scenarios": ["global"]
+  },
+  {
+    "source": "zuul",
+    "target": "api-services",
+    "label": "Routed Requests",
+    "type": "sync",
+    "scenarios": ["global", "video-playback", "recommendation"]
+  },
+  {
+    "source": "api-services",
+    "target": "evcache",
+    "label": "Cache Read/Write",
+    "type": "sync",
+    "scenarios": ["global", "video-playback", "recommendation"]
+  },
+  {
+    "source": "api-services",
+    "target": "cassandra",
+    "label": "Persistent Data",
+    "type": "sync",
+    "scenarios": ["global", "video-playback"]
+  },
+  {
+    "source": "api-services",
+    "target": "kafka",
+    "label": "Publish Events",
+    "type": "async",
+    "scenarios": ["global", "video-playback", "recommendation"]
+  },
+  {
+    "source": "api-services",
+    "target": "recommendation",
+    "label": "Get Recommendations",
+    "type": "sync",
+    "scenarios": ["global", "recommendation"]
+  },
+  {
+    "source": "kafka",
+    "target": "recommendation",
+    "label": "Viewing Events Stream",
+    "type": "async",
+    "scenarios": ["global", "recommendation"]
+  },
+  {
+    "source": "recommendation",
+    "target": "cassandra",
+    "label": "Read User Profiles",
+    "type": "sync",
+    "scenarios": ["global", "recommendation"]
+  },
+  {
+    "source": "recommendation",
+    "target": "evcache",
+    "label": "Cache Model Results",
+    "type": "sync",
+    "scenarios": ["global", "recommendation"]
+  },
+  {
+    "source": "titus",
+    "target": "api-services",
+    "label": "Container Orchestration",
+    "type": "async",
+    "scenarios": ["global"]
+  },
+  {
+    "source": "titus",
+    "target": "eureka",
+    "label": "Register Instances",
+    "type": "sync",
+    "scenarios": ["global"]
+  }
+]
+</file>
+
+<file path="src/data/architectures/netflix/meta.json">
+{
+  "id": "netflix",
+  "name": "Netflix",
+  "description": "Global video streaming platform serving 250M+ subscribers with a sophisticated microservices architecture designed for massive scale, high availability, and resilience.",
+  "category": "Entertainment & Streaming",
+  "tags": ["microservices", "cdn", "distributed-cache", "ml-pipeline", "chaos-engineering", "event-streaming"],
+  "color": "#E50914",
+  "accentGradient": "linear-gradient(135deg, #E50914, #B20710)"
+}
+</file>
+
+<file path="src/data/architectures/netflix/nodes.json">
+[
+  {
+    "id": "client",
+    "label": "Client Apps",
+    "type": "client",
+    "description": "Netflix apps on Smart TVs, mobile devices, web browsers, and gaming consoles.",
+    "techStack": "React (Web), Native SDKs (iOS/Android/TV)",
+    "role": "The user-facing interface that requests content, displays personalized recommendations, and handles video playback via adaptive bitrate streaming.",
+    "whyChosen": "Platform-specific native apps deliver optimal playback performance and device integration, while the web app leverages React for rapid iteration.",
+    "tradeoffs": {
+      "pros": ["Optimal performance per platform", "Deep device integration (DRM, hardware decoding)"],
+      "cons": ["Multiple codebases to maintain", "Slower feature parity across platforms"]
+    },
+    "alternatives": [
+      { "name": "Flutter", "context": "Cross-platform with single codebase" },
+      { "name": "React Native", "context": "Shared code between mobile platforms" }
+    ],
+    "position": { "x": 100, "y": 300 }
+  },
+  {
+    "id": "cdn",
+    "label": "Open Connect CDN",
+    "type": "cdn",
+    "description": "Netflix's custom Content Delivery Network with appliances embedded in ISP networks worldwide.",
+    "techStack": "Open Connect Appliances (OCA), FreeBSD, nginx",
+    "role": "Caches and delivers video content from the network edge, minimizing latency and backbone bandwidth usage. Handles 100% of video streaming traffic.",
+    "whyChosen": "Third-party CDNs couldn't deliver the required quality at Netflix's scale. Building their own CDN allowed fine-grained control over caching, routing, and peering relationships.",
+    "tradeoffs": {
+      "pros": ["Full control over delivery quality", "Reduced bandwidth costs at scale", "Closer to end users via ISP partnerships"],
+      "cons": ["Massive capital and operational investment", "Requires ISP partnership negotiations globally"]
+    },
+    "alternatives": [
+      { "name": "Akamai / CloudFront", "context": "Managed CDN, lower upfront cost" },
+      { "name": "Cloudflare Stream", "context": "Integrated video delivery platform" }
+    ],
+    "position": { "x": 100, "y": 500 }
+  },
+  {
+    "id": "zuul",
+    "label": "Zuul API Gateway",
+    "type": "gateway",
+    "description": "Edge gateway that serves as the front door for all API requests entering the Netflix ecosystem.",
+    "techStack": "Zuul 2 (Netty-based, non-blocking)",
+    "role": "Handles dynamic routing, authentication, rate limiting, load shedding, and security filtering. Provides a single entry point for all backend microservices.",
+    "whyChosen": "Netflix needed a highly programmable, async gateway capable of handling millions of concurrent connections with custom filter chains for canary testing and traffic shaping.",
+    "tradeoffs": {
+      "pros": ["Programmable filter pipeline for dynamic behavior", "Non-blocking I/O for extreme throughput", "Enables canary deployments and A/B testing at the edge"],
+      "cons": ["Complex custom solution requiring deep expertise", "Higher operational burden than managed alternatives"]
+    },
+    "alternatives": [
+      { "name": "AWS API Gateway", "context": "Fully managed, serverless" },
+      { "name": "Kong", "context": "Open-source, plugin-based gateway" },
+      { "name": "Envoy Proxy", "context": "High-performance L7 proxy, CNCF project" }
+    ],
+    "position": { "x": 350, "y": 300 }
+  },
+  {
+    "id": "eureka",
+    "label": "Eureka Service Discovery",
+    "type": "service",
+    "description": "Client-side service discovery registry enabling microservices to find and communicate with each other.",
+    "techStack": "Eureka (Netflix OSS)",
+    "role": "Maintains a real-time registry of all service instances, their locations, and health status. Services register themselves on startup and query Eureka to find dependencies.",
+    "whyChosen": "In a cloud environment where instances are ephemeral, hardcoded addresses are impossible. Eureka provides AP (Available, Partition-tolerant) semantics ideal for Netflix's scale.",
+    "tradeoffs": {
+      "pros": ["High availability over strict consistency (AP system)", "Client-side load balancing", "Self-healing with heartbeat-based eviction"],
+      "cons": ["Eventually consistent — stale data possible", "Requires client-side integration in every service"]
+    },
+    "alternatives": [
+      { "name": "Consul", "context": "HashiCorp, supports health checking + KV store" },
+      { "name": "AWS Cloud Map", "context": "Managed service discovery on AWS" },
+      { "name": "Kubernetes Service Discovery", "context": "Built-in with K8s DNS" }
+    ],
+    "position": { "x": 350, "y": 100 }
+  },
+  {
+    "id": "api-services",
+    "label": "API / BFF Services",
+    "type": "service",
+    "description": "Backend-for-Frontend services that aggregate data from multiple microservices into client-optimized responses.",
+    "techStack": "Java, Spring Boot, gRPC",
+    "role": "Orchestrate calls to downstream domain services, transform and aggregate data, and return tailored payloads for different client types (TV, mobile, web).",
+    "whyChosen": "Decoupling client needs from domain service APIs allows independent evolution. Different clients have different data needs that a single API cannot efficiently serve.",
+    "tradeoffs": {
+      "pros": ["Client-optimized responses reduce over-fetching", "Isolates client changes from domain services"],
+      "cons": ["Additional layer of complexity", "Risk of becoming a monolithic aggregation layer"]
+    },
+    "alternatives": [
+      { "name": "GraphQL Gateway", "context": "Client-driven queries, flexible data fetching" },
+      { "name": "Direct microservice calls", "context": "Simpler but couples clients to internals" }
+    ],
+    "position": { "x": 600, "y": 300 }
+  },
+  {
+    "id": "evcache",
+    "label": "EVCache",
+    "type": "cache",
+    "description": "Netflix's distributed caching solution built on Memcached, optimized for high availability and low latency.",
+    "techStack": "EVCache (Memcached-based), cross-region replication",
+    "role": "Provides sub-millisecond access to frequently requested data (user profiles, viewing history, session data). Reduces load on backend databases by orders of magnitude.",
+    "whyChosen": "Standard Memcached lacked cross-region replication and Netflix-scale operational tooling. EVCache adds automatic failover, zone-aware routing, and data replication.",
+    "tradeoffs": {
+      "pros": ["Sub-millisecond latency", "Cross-region replication for global availability", "Handles millions of ops/sec"],
+      "cons": ["Cache invalidation complexity", "Memory-intensive infrastructure cost", "Data consistency challenges across regions"]
+    },
+    "alternatives": [
+      { "name": "Redis / ElastiCache", "context": "Rich data structures, pub/sub support" },
+      { "name": "Hazelcast", "context": "In-memory data grid with compute" }
+    ],
+    "position": { "x": 600, "y": 100 }
+  },
+  {
+    "id": "cassandra",
+    "label": "Cassandra",
+    "type": "database",
+    "description": "Distributed NoSQL database providing linear scalability and high availability with no single point of failure.",
+    "techStack": "Apache Cassandra, multi-region clusters",
+    "role": "Primary persistent storage for user data, viewing history, and content metadata. Chosen for workloads requiring massive write throughput and global replication.",
+    "whyChosen": "Netflix requires a database that scales horizontally across regions with tunable consistency. Cassandra's masterless architecture eliminates single points of failure.",
+    "tradeoffs": {
+      "pros": ["Linear horizontal scalability", "Multi-region active-active replication", "Tunable consistency per query"],
+      "cons": ["Complex data modeling (denormalization required)", "No ACID transactions across partitions", "Operational complexity at scale"]
+    },
+    "alternatives": [
+      { "name": "DynamoDB", "context": "Managed NoSQL with auto-scaling on AWS" },
+      { "name": "ScyllaDB", "context": "C++ Cassandra-compatible, higher throughput" },
+      { "name": "CockroachDB", "context": "Distributed SQL with strong consistency" }
+    ],
+    "position": { "x": 850, "y": 200 }
+  },
+  {
+    "id": "kafka",
+    "label": "Apache Kafka",
+    "type": "queue",
+    "description": "Distributed event streaming platform acting as the central nervous system for real-time data pipelines.",
+    "techStack": "Apache Kafka, 700+ billion messages/day",
+    "role": "Enables asynchronous communication between services, powers real-time analytics pipelines, and feeds the recommendation engine with viewing events and user interactions.",
+    "whyChosen": "Netflix processes hundreds of billions of events daily. Kafka's log-based architecture provides durable, ordered, replayable event streams — essential for both real-time processing and batch analytics.",
+    "tradeoffs": {
+      "pros": ["Massive throughput with durability", "Decouples producers from consumers", "Event replay capability for debugging and reprocessing"],
+      "cons": ["Operational complexity of large Kafka clusters", "Message ordering only within partitions", "Storage costs for long-retention topics"]
+    },
+    "alternatives": [
+      { "name": "Amazon Kinesis", "context": "Managed streaming, tighter AWS integration" },
+      { "name": "Apache Pulsar", "context": "Multi-tenancy, tiered storage" },
+      { "name": "RabbitMQ", "context": "Simpler message broker for lower-scale needs" }
+    ],
+    "position": { "x": 850, "y": 400 }
+  },
+  {
+    "id": "recommendation",
+    "label": "Recommendation Engine",
+    "type": "ml",
+    "description": "ML pipeline that personalizes the entire Netflix experience — from homepage rows to artwork selection.",
+    "techStack": "Custom ML models, TensorFlow, Spark, Flink",
+    "role": "Analyzes viewing history, ratings, and contextual signals to generate personalized content rankings. Powers the 'Top Picks', genre rows, and even which artwork is shown per title.",
+    "whyChosen": "Personalization is Netflix's core competitive advantage. 80% of content watched is driven by recommendations. Custom models allow optimization for engagement and satisfaction.",
+    "tradeoffs": {
+      "pros": ["Drives 80%+ of content discovery", "Continuously learns from user behavior", "Personalizes beyond just content (artwork, UI layout)"],
+      "cons": ["Filter bubble risk", "Massive compute costs for training and inference", "Cold start problem for new users"]
+    },
+    "alternatives": [
+      { "name": "Amazon Personalize", "context": "Managed recommendation service" },
+      { "name": "Google Recommendations AI", "context": "GCP managed ML recommendations" }
+    ],
+    "position": { "x": 600, "y": 500 }
+  },
+  {
+    "id": "titus",
+    "label": "Titus (Container Platform)",
+    "type": "service",
+    "description": "Netflix's container management platform running hundreds of thousands of containers on AWS.",
+    "techStack": "Titus (custom), runs on AWS EC2",
+    "role": "Manages the lifecycle of all microservice containers — scheduling, scaling, resource isolation, and integration with Netflix's deployment tooling (Spinnaker).",
+    "whyChosen": "Netflix needed deeper integration with their existing AWS infrastructure and custom scheduling policies that Kubernetes didn't provide at the time of development.",
+    "tradeoffs": {
+      "pros": ["Deep AWS integration", "Custom scheduling for Netflix workloads", "Unified platform for batch and service workloads"],
+      "cons": ["Proprietary — not open-source community-driven", "Migration cost if moving away from AWS"]
+    },
+    "alternatives": [
+      { "name": "Kubernetes (EKS)", "context": "Industry standard container orchestration" },
+      { "name": "AWS ECS", "context": "Managed container service, simpler than K8s" }
+    ],
+    "position": { "x": 350, "y": 500 }
+  }
+]
+</file>
+
+<file path="src/data/architectures/netflix/scenarios.json">
+[
+  {
+    "id": "global",
+    "name": "🌐 Global View",
+    "description": "Full system overview showing all components and their connections",
+    "highlightNodes": "*",
+    "highlightEdges": "*"
+  },
+  {
+    "id": "video-playback",
+    "name": "▶️ Video Playback",
+    "description": "What happens when a user presses Play — from API request to video stream delivery",
+    "highlightNodes": ["client", "zuul", "api-services", "evcache", "cassandra", "cdn", "kafka"],
+    "highlightEdges": [
+      "client->zuul",
+      "client->cdn",
+      "zuul->api-services",
+      "api-services->evcache",
+      "api-services->cassandra",
+      "api-services->kafka"
+    ],
+    "steps": [
+      { "order": 1, "description": "Client sends play request to Zuul Gateway", "nodes": ["client", "zuul"] },
+      { "order": 2, "description": "Zuul routes to API/BFF service for content resolution", "nodes": ["zuul", "api-services"] },
+      { "order": 3, "description": "API service checks EVCache for content metadata and DRM license", "nodes": ["api-services", "evcache"] },
+      { "order": 4, "description": "On cache miss, fetches from Cassandra and populates cache", "nodes": ["api-services", "cassandra"] },
+      { "order": 5, "description": "Play event published to Kafka for analytics and recommendations", "nodes": ["api-services", "kafka"] },
+      { "order": 6, "description": "Client receives stream manifest and begins adaptive bitrate playback via Open Connect CDN", "nodes": ["client", "cdn"] }
+    ]
+  },
+  {
+    "id": "recommendation",
+    "name": "🧠 Recommendation Pipeline",
+    "description": "How Netflix generates personalized content recommendations using ML and real-time event data",
+    "highlightNodes": ["client", "zuul", "api-services", "kafka", "recommendation", "evcache", "cassandra"],
+    "highlightEdges": [
+      "client->zuul",
+      "zuul->api-services",
+      "api-services->kafka",
+      "kafka->recommendation",
+      "recommendation->cassandra",
+      "recommendation->evcache",
+      "api-services->recommendation",
+      "api-services->evcache"
+    ],
+    "steps": [
+      { "order": 1, "description": "User interactions (views, ratings, browsing) are captured by client apps", "nodes": ["client"] },
+      { "order": 2, "description": "Events flow through Zuul and API services to Kafka", "nodes": ["zuul", "api-services", "kafka"] },
+      { "order": 3, "description": "Recommendation engine consumes event streams from Kafka in real-time", "nodes": ["kafka", "recommendation"] },
+      { "order": 4, "description": "ML models read user profiles and viewing history from Cassandra", "nodes": ["recommendation", "cassandra"] },
+      { "order": 5, "description": "Generated recommendations are cached in EVCache for fast retrieval", "nodes": ["recommendation", "evcache"] },
+      { "order": 6, "description": "When user opens the app, API services fetch personalized rankings from cache", "nodes": ["api-services", "evcache"] }
+    ]
+  }
+]
+</file>
+
+<file path="src/data/architectures/twitter/edges.json">
+[
+  {
+    "source": "client",
+    "target": "load-balancer",
+    "label": "HTTPS Requests",
+    "type": "sync",
+    "scenarios": ["global", "fanout", "trending"]
+  },
+  {
+    "source": "load-balancer",
+    "target": "api-service",
+    "label": "Routed Traffic",
+    "type": "sync",
+    "scenarios": ["global", "fanout", "trending"]
+  },
+  {
+    "source": "api-service",
+    "target": "tweet-service",
+    "label": "Create Tweet",
+    "type": "sync",
+    "scenarios": ["global", "fanout"]
+  },
+  {
+    "source": "api-service",
+    "target": "timeline-service",
+    "label": "Get Timeline",
+    "type": "sync",
+    "scenarios": ["global", "fanout"]
+  },
+  {
+    "source": "tweet-service",
+    "target": "tweet-store",
+    "label": "Persist Tweet",
+    "type": "sync",
+    "scenarios": ["global", "fanout"]
+  },
+  {
+    "source": "tweet-service",
+    "target": "kafka",
+    "label": "Tweet Created Event",
+    "type": "async",
+    "scenarios": ["global", "fanout", "trending"]
+  },
+  {
+    "source": "kafka",
+    "target": "fanout-service",
+    "label": "New Tweet Events",
+    "type": "async",
+    "scenarios": ["global", "fanout"]
+  },
+  {
+    "source": "fanout-service",
+    "target": "social-graph",
+    "label": "Query Followers",
+    "type": "sync",
+    "scenarios": ["global", "fanout"]
+  },
+  {
+    "source": "fanout-service",
+    "target": "redis-cache",
+    "label": "Push to Timelines",
+    "type": "async",
+    "scenarios": ["global", "fanout"]
+  },
+  {
+    "source": "timeline-service",
+    "target": "redis-cache",
+    "label": "Read Cached Timeline",
+    "type": "sync",
+    "scenarios": ["global", "fanout"]
+  },
+  {
+    "source": "timeline-service",
+    "target": "tweet-store",
+    "label": "Hydrate Tweets",
+    "type": "sync",
+    "scenarios": ["global", "fanout"]
+  },
+  {
+    "source": "timeline-service",
+    "target": "social-graph",
+    "label": "Celebrity Followings",
+    "type": "sync",
+    "scenarios": ["global", "fanout"]
+  },
+  {
+    "source": "kafka",
+    "target": "timeline-service",
+    "label": "Trending Signals",
+    "type": "async",
+    "scenarios": ["global", "trending"]
+  }
+]
+</file>
+
+<file path="src/data/architectures/twitter/meta.json">
+{
+  "id": "twitter",
+  "name": "Twitter / X",
+  "description": "Real-time social media platform handling 500M+ tweets/day with a hybrid fanout architecture for sub-second timeline delivery.",
+  "category": "Social Media",
+  "tags": ["fanout", "real-time", "distributed-cache", "graph-database", "search", "event-streaming"],
+  "color": "#1DA1F2",
+  "accentGradient": "linear-gradient(135deg, #1DA1F2, #0D8BD9)"
+}
+</file>
+
+<file path="src/data/architectures/twitter/nodes.json">
+[
+  {
+    "id": "client",
+    "label": "Client Apps",
+    "type": "client",
+    "description": "Web app (twitter.com/x.com), iOS, and Android native applications.",
+    "techStack": "React (Web), Swift (iOS), Kotlin (Android)",
+    "role": "Renders the timeline, handles tweet composition, real-time notifications, and media uploads. Web app uses progressive loading for timeline updates.",
+    "whyChosen": "React enables rapid iteration on web features. Native mobile apps provide smooth scrolling performance critical for timeline browsing.",
+    "tradeoffs": {
+      "pros": ["Platform-optimized performance", "Real-time push notifications", "Offline reading capability on mobile"],
+      "cons": ["Multiple codebases", "Feature rollout timing varies across platforms"]
+    },
+    "alternatives": [
+      { "name": "React Native", "context": "Shared codebase for mobile" },
+      { "name": "PWA", "context": "Progressive web app for unified experience" }
+    ],
+    "position": { "x": 100, "y": 300 }
+  },
+  {
+    "id": "load-balancer",
+    "label": "Load Balancer",
+    "type": "gateway",
+    "description": "L7 load balancer distributing incoming traffic across the service fleet.",
+    "techStack": "Custom L7 LB, GCP Load Balancer",
+    "role": "Distributes millions of requests per second, handles TLS termination, and routes to appropriate service clusters based on request type.",
+    "whyChosen": "A combination of custom load balancing logic and GCP managed infrastructure provides both flexibility for routing rules and operational simplicity.",
+    "tradeoffs": {
+      "pros": ["Flexible routing rules for different request types", "High availability with GCP infrastructure"],
+      "cons": ["Migration from bare-metal to cloud added complexity", "Custom LB logic requires maintenance"]
+    },
+    "alternatives": [
+      { "name": "AWS ALB/NLB", "context": "Managed AWS load balancing" },
+      { "name": "Envoy", "context": "L7 proxy with advanced traffic management" }
+    ],
+    "position": { "x": 300, "y": 300 }
+  },
+  {
+    "id": "api-service",
+    "label": "API / GraphQL Service",
+    "type": "service",
+    "description": "GraphQL-based API layer that serves as the unified interface between clients and backend microservices.",
+    "techStack": "GraphQL (Strato), Scala/Java",
+    "role": "Provides a single GraphQL endpoint for all client data needs. Aggregates data from multiple backend services (timeline, user, tweet storage) into efficient responses.",
+    "whyChosen": "GraphQL allows clients to request exactly the data they need, reducing over-fetching. Critical for mobile where bandwidth is limited and latency impacts scroll performance.",
+    "tradeoffs": {
+      "pros": ["Eliminates over-fetching and under-fetching", "Single endpoint simplifies client code", "Strong typing with schema evolution"],
+      "cons": ["Query complexity can impact backend performance", "Caching is more complex than REST", "N+1 query problem requires careful resolver design"]
+    },
+    "alternatives": [
+      { "name": "REST API Gateway", "context": "Simpler, widely understood" },
+      { "name": "gRPC", "context": "High-performance binary protocol for internal services" }
+    ],
+    "position": { "x": 500, "y": 300 }
+  },
+  {
+    "id": "tweet-service",
+    "label": "Tweet Ingestion Service",
+    "type": "service",
+    "description": "Handles tweet creation, validation, and persistence with globally unique Snowflake ID assignment.",
+    "techStack": "Scala, Snowflake ID Generator",
+    "role": "Validates tweet content (length, media, policies), assigns a Snowflake ID for time-ordered uniqueness, persists to the tweet store, and triggers the fanout pipeline.",
+    "whyChosen": "Snowflake IDs provide time-sortable, globally unique identifiers without coordination — essential for distributed tweet creation across data centers.",
+    "tradeoffs": {
+      "pros": ["Snowflake IDs enable chronological sorting without DB queries", "Decoupled from downstream processing via async fanout"],
+      "cons": ["Clock synchronization issues can cause ID collisions", "Single point of validation can become a bottleneck"]
+    },
+    "alternatives": [
+      { "name": "UUIDv7", "context": "Time-ordered UUIDs, no custom generator needed" },
+      { "name": "ULID", "context": "Universally Unique Lexicographically Sortable Identifier" }
+    ],
+    "position": { "x": 500, "y": 100 }
+  },
+  {
+    "id": "fanout-service",
+    "label": "Fanout Service",
+    "type": "service",
+    "description": "Distributes new tweets to follower timelines using a hybrid push/pull strategy.",
+    "techStack": "Custom Java/Scala service, Social Graph integration",
+    "role": "The heart of timeline delivery. For regular users (<10K followers), pushes tweet IDs to follower Redis caches. For celebrities, flags for pull-based merge at read time.",
+    "whyChosen": "Pure push (fanout-on-write) would overwhelm the system for celebrity accounts. Pure pull would make timeline reads slow. The hybrid approach optimizes both.",
+    "tradeoffs": {
+      "pros": ["Avoids write amplification storms from celebrity tweets", "Fast timeline reads for most users", "Dynamic threshold tuning based on load"],
+      "cons": ["Complex dual-path logic", "Celebrity tweet delivery has higher read-time latency", "Threshold tuning requires operational monitoring"]
+    },
+    "alternatives": [
+      { "name": "Pure fanout-on-write", "context": "Simpler but doesn't scale for high-follower accounts" },
+      { "name": "Pure fanout-on-read", "context": "Simpler writes but slower reads for everyone" }
+    ],
+    "position": { "x": 700, "y": 200 }
+  },
+  {
+    "id": "timeline-service",
+    "label": "Timeline Service",
+    "type": "service",
+    "description": "Constructs and serves the home timeline by merging precomputed cached timelines with celebrity tweets.",
+    "techStack": "Scala, Redis client, ML Ranking models",
+    "role": "Reads the user's precomputed timeline from Redis, merges in celebrity tweets (pull-based), applies ML-based relevance ranking, and returns the ordered feed.",
+    "whyChosen": "Separating timeline construction from fanout allows independent optimization of read and write paths. ML ranking can be updated without touching the delivery pipeline.",
+    "tradeoffs": {
+      "pros": ["Sub-100ms timeline generation", "ML ranking independent of delivery", "Handles diverse feed compositions (tweets, retweets, ads)"],
+      "cons": ["Merge logic adds read-time complexity", "Ranking model latency directly impacts user experience"]
+    },
+    "alternatives": [
+      { "name": "Pre-ranked timelines", "context": "Rank at write time, simpler reads" },
+      { "name": "Client-side ranking", "context": "Reduce server load, but less consistent" }
+    ],
+    "position": { "x": 700, "y": 400 }
+  },
+  {
+    "id": "redis-cache",
+    "label": "Redis Timeline Cache",
+    "type": "cache",
+    "description": "In-memory cache storing precomputed timelines as sorted sets of tweet IDs for each user.",
+    "techStack": "Redis clusters, ~100TB+ in-memory",
+    "role": "Stores the last ~800 tweet IDs for each user's home timeline. Enables O(1) timeline reads — the single most critical performance path in the entire system.",
+    "whyChosen": "Redis sorted sets are perfect for timelines — naturally ordered by Snowflake ID (timestamp), with O(log N) insertion and O(1) range reads.",
+    "tradeoffs": {
+      "pros": ["Sub-millisecond timeline reads", "Natural ordering via sorted sets", "Well-understood, battle-tested technology"],
+      "cons": ["Enormous memory footprint (~100TB+)", "Data loss on failure (regeneration from tweet store)", "Cost of maintaining hot replicas"]
+    },
+    "alternatives": [
+      { "name": "Memcached", "context": "Simpler caching, no sorted sets" },
+      { "name": "ScyllaDB", "context": "Persistent sorted storage, less memory" }
+    ],
+    "position": { "x": 900, "y": 300 }
+  },
+  {
+    "id": "tweet-store",
+    "label": "Tweet Store",
+    "type": "database",
+    "description": "Persistent storage for all tweets, handling hundreds of billions of records.",
+    "techStack": "Manhattan (custom), migrating to ScyllaDB/Cassandra",
+    "role": "Durable storage for tweet content, metadata, engagement counts, and media references. Handles massive write throughput during peak events.",
+    "whyChosen": "Manhattan was Twitter's custom distributed database optimized for their specific access patterns. ScyllaDB migration provides better performance with lower operational overhead.",
+    "tradeoffs": {
+      "pros": ["Optimized for tweet access patterns", "Handles extreme write throughput", "Multi-datacenter replication"],
+      "cons": ["Custom systems require specialized expertise", "Migration to new stores is complex and risky"]
+    },
+    "alternatives": [
+      { "name": "Cassandra", "context": "Open-source, large community" },
+      { "name": "DynamoDB", "context": "Managed NoSQL, no ops overhead" }
+    ],
+    "position": { "x": 900, "y": 100 }
+  },
+  {
+    "id": "social-graph",
+    "label": "Social Graph Service",
+    "type": "database",
+    "description": "Manages the follower/following relationships — the core social graph with billions of edges.",
+    "techStack": "FlockDB (custom graph DB), MySQL shards",
+    "role": "Stores and queries follow relationships. Answers 'who follows X?' queries needed by the fanout service to determine timeline delivery targets.",
+    "whyChosen": "The social graph requires specialized adjacency list operations (fan-out queries) at extreme scale. FlockDB was built for exactly this access pattern.",
+    "tradeoffs": {
+      "pros": ["Optimized for adjacency queries at billion-edge scale", "Efficient follower list pagination"],
+      "cons": ["Limited query flexibility vs general-purpose graph DB", "Sharding complexity for hot users"]
+    },
+    "alternatives": [
+      { "name": "Neo4j", "context": "Full-featured graph database" },
+      { "name": "Amazon Neptune", "context": "Managed graph database" },
+      { "name": "TigerGraph", "context": "High-performance graph analytics" }
+    ],
+    "position": { "x": 500, "y": 500 }
+  },
+  {
+    "id": "kafka",
+    "label": "Event Bus (Kafka)",
+    "type": "queue",
+    "description": "Distributed event streaming platform connecting all services through asynchronous event pipelines.",
+    "techStack": "Apache Kafka, custom event schemas",
+    "role": "Carries tweet creation events to the fanout service, user activity events to analytics, and engagement signals to the trending topics pipeline.",
+    "whyChosen": "Kafka's durable log provides replay capability essential for rebuilding timelines after failures and feeding multiple consumers from the same event stream.",
+    "tradeoffs": {
+      "pros": ["Durable event log with replay", "Multiple consumers per topic", "High throughput for event streaming"],
+      "cons": ["Operational complexity at scale", "Partition ordering constraints", "Consumer lag monitoring required"]
+    },
+    "alternatives": [
+      { "name": "Amazon Kinesis", "context": "Managed streaming on AWS" },
+      { "name": "Google Pub/Sub", "context": "Managed messaging on GCP" },
+      { "name": "Apache Pulsar", "context": "Multi-tenant, tiered storage" }
+    ],
+    "position": { "x": 300, "y": 100 }
+  }
+]
+</file>
+
+<file path="src/data/architectures/twitter/scenarios.json">
+[
+  {
+    "id": "global",
+    "name": "🌐 Global View",
+    "description": "Full Twitter/X system overview with all components and connections",
+    "highlightNodes": "*",
+    "highlightEdges": "*"
+  },
+  {
+    "id": "fanout",
+    "name": "📢 Tweet Fanout",
+    "description": "How a single tweet reaches millions of follower timelines using the hybrid push/pull strategy",
+    "highlightNodes": ["client", "load-balancer", "api-service", "tweet-service", "tweet-store", "kafka", "fanout-service", "social-graph", "redis-cache", "timeline-service"],
+    "highlightEdges": [
+      "client->load-balancer",
+      "load-balancer->api-service",
+      "api-service->tweet-service",
+      "tweet-service->tweet-store",
+      "tweet-service->kafka",
+      "kafka->fanout-service",
+      "fanout-service->social-graph",
+      "fanout-service->redis-cache",
+      "api-service->timeline-service",
+      "timeline-service->redis-cache",
+      "timeline-service->tweet-store",
+      "timeline-service->social-graph"
+    ],
+    "steps": [
+      { "order": 1, "description": "User composes tweet — request flows through LB to API service", "nodes": ["client", "load-balancer", "api-service"] },
+      { "order": 2, "description": "Tweet service validates content and assigns a Snowflake ID", "nodes": ["api-service", "tweet-service"] },
+      { "order": 3, "description": "Tweet is persisted to the durable Tweet Store", "nodes": ["tweet-service", "tweet-store"] },
+      { "order": 4, "description": "Tweet created event is published to Kafka event bus", "nodes": ["tweet-service", "kafka"] },
+      { "order": 5, "description": "Fanout service consumes event, queries Social Graph for follower list", "nodes": ["kafka", "fanout-service", "social-graph"] },
+      { "order": 6, "description": "For normal users: tweet ID pushed to each follower's Redis timeline cache", "nodes": ["fanout-service", "redis-cache"] },
+      { "order": 7, "description": "When a follower opens their timeline: Timeline service reads from Redis, merges celebrity tweets, applies ML ranking", "nodes": ["timeline-service", "redis-cache", "social-graph"] },
+      { "order": 8, "description": "Timeline service hydrates tweet IDs into full content from Tweet Store", "nodes": ["timeline-service", "tweet-store"] }
+    ]
+  },
+  {
+    "id": "trending",
+    "name": "📈 Trending Topics",
+    "description": "How trending topics are detected and served from real-time event streams",
+    "highlightNodes": ["client", "load-balancer", "api-service", "tweet-service", "kafka", "timeline-service"],
+    "highlightEdges": [
+      "client->load-balancer",
+      "load-balancer->api-service",
+      "tweet-service->kafka",
+      "kafka->timeline-service"
+    ],
+    "steps": [
+      { "order": 1, "description": "Every tweet creation event streams into Kafka with hashtags and content metadata", "nodes": ["tweet-service", "kafka"] },
+      { "order": 2, "description": "Stream processing pipeline analyzes real-time hashtag velocity and engagement spikes", "nodes": ["kafka", "timeline-service"] },
+      { "order": 3, "description": "Trending topics are computed using sliding window aggregation and anomaly detection", "nodes": ["timeline-service"] },
+      { "order": 4, "description": "Client requests trending data through API, results personalized by location and interests", "nodes": ["client", "load-balancer", "api-service"] }
+    ]
+  }
+]
+</file>
+
+<file path="src/lib/animations.js">
+/**
+ * animations.js — Edge flow animations using Cytoscape
+ */
+
+let animationFrameId = null;
+let animatedEdges = [];
+
+/**
+ * Start flowing animation on highlighted edges
+ */
+export function startEdgeAnimations(cy) {
+  stopEdgeAnimations();
+
+  animatedEdges = cy.edges('.highlighted').toArray();
+  if (animatedEdges.length === 0) return;
+
+  let offset = 0;
+  const speed = 0.5;
+
+  function animate() {
+    offset = (offset + speed) % 20;
+
+    animatedEdges.forEach(edge => {
+      try {
+        edge.style('line-dash-offset', -offset);
+      } catch (_) {
+        // Edge may have been removed
+      }
+    });
+
+    animationFrameId = requestAnimationFrame(animate);
+  }
+
+  // Set edges to have animated dashes
+  animatedEdges.forEach(edge => {
+    const type = edge.data('type');
+    if (type !== 'async') {
+      edge.style({
+        'line-style': 'dashed',
+        'line-dash-pattern': [10, 6],
+      });
+    }
+  });
+
+  animate();
+}
+
+/**
+ * Stop all edge animations
+ */
+export function stopEdgeAnimations() {
+  if (animationFrameId) {
+    cancelAnimationFrame(animationFrameId);
+    animationFrameId = null;
+  }
+
+  // Restore original edge styles
+  animatedEdges.forEach(edge => {
+    try {
+      const type = edge.data('type');
+      if (type !== 'async') {
+        edge.style({
+          'line-style': 'solid',
+          'line-dash-pattern': [],
+          'line-dash-offset': 0,
+        });
+      }
+    } catch (_) {
+      // Edge may have been removed
+    }
+  });
+
+  animatedEdges = [];
+}
+</file>
+
+<file path="src/lib/data-loader.js">
+/**
+ * data-loader.js — Fetch and cache architecture data
+ */
+
+const cache = new Map();
+
+/**
+ * Fetch JSON with error handling
+ */
+async function fetchJSON(url) {
+  const res = await fetch(url);
+  if (!res.ok) {
+    throw new Error(`Failed to fetch ${url}: ${res.status} ${res.statusText}`);
+  }
+  return res.json();
+}
+
+/**
+ * Load all architecture metadata (for catalog)
+ */
+export async function loadArchitectureList() {
+  if (cache.has('__list__')) return cache.get('__list__');
+
+  const ids = ['netflix', 'amazon', 'twitter'];
+  const metas = await Promise.all(
+    ids.map((id) =>
+      fetchJSON(`${import.meta.env.BASE_URL}data/architectures/${id}/meta.json`)
+    )
+  );
+
+  cache.set('__list__', metas);
+  return metas;
+}
+
+/**
+ * Load full architecture data for a specific company
+ */
+export async function loadArchitecture(id) {
+  if (cache.has(id)) return cache.get(id);
+
+  const base = `${import.meta.env.BASE_URL}data/architectures/${id}`;
+  const [meta, nodes, edges, scenarios] = await Promise.all([
+    fetchJSON(`${base}/meta.json`),
+    fetchJSON(`${base}/nodes.json`),
+    fetchJSON(`${base}/edges.json`),
+    fetchJSON(`${base}/scenarios.json`),
+  ]);
+
+  const data = { meta, nodes, edges, scenarios };
+  cache.set(id, data);
+  return data;
+}
+
+/**
+ * Get unique tags across all architectures
+ */
+export async function getAllTags() {
+  const list = await loadArchitectureList();
+  const tagSet = new Set();
+  list.forEach(meta => meta.tags.forEach(tag => tagSet.add(tag)));
+  return Array.from(tagSet).sort();
+}
+</file>
+
+<file path="src/lib/graph-styles.js">
+/**
+ * graph-styles.js — Cytoscape.js style definitions
+ */
+
+/** Color map for node types */
+export const NODE_COLORS = {
+  client:   'hsl(220, 70%, 60%)',
+  gateway:  'hsl(190, 90%, 50%)',
+  service:  'hsl(265, 65%, 60%)',
+  database: 'hsl(280, 60%, 55%)',
+  cache:    'hsl(38, 90%, 55%)',
+  queue:    'hsl(350, 75%, 55%)',
+  cdn:      'hsl(160, 65%, 45%)',
+  ml:       'hsl(320, 70%, 55%)',
+};
+
+/** Icon map for node types */
+export const NODE_ICONS = {
+  client:   '📱',
+  gateway:  '🚪',
+  service:  '⚙️',
+  database: '🗄️',
+  cache:    '⚡',
+  queue:    '📨',
+  cdn:      '🌐',
+  ml:       '🧠',
+};
+
+/** Edge type styles */
+const EDGE_STYLES = {
+  sync:      { lineStyle: 'solid',  color: 'hsl(190, 80%, 55%)',  width: 2 },
+  async:     { lineStyle: 'dashed', color: 'hsl(38, 85%, 55%)',   width: 2 },
+  streaming: { lineStyle: 'solid',  color: 'hsl(160, 65%, 50%)',  width: 3 },
+};
+
+/**
+ * Generate Cytoscape stylesheet
+ */
+export function getCytoscapeStyles() {
+  return [
+    // ─── Base Node ───
+    {
+      selector: 'node',
+      style: {
+        'shape': 'round-rectangle',
+        'width': 170,
+        'height': 60,
+        'background-color': 'data(color)',
+        'background-opacity': 0.15,
+        'border-width': 2,
+        'border-color': 'data(color)',
+        'border-opacity': 0.7,
+        'label': 'data(label)',
+        'text-valign': 'center',
+        'text-halign': 'center',
+        'font-family': "'Inter', sans-serif",
+        'font-size': 12,
+        'font-weight': 600,
+        'color': 'data(color)',
+        'text-wrap': 'wrap',
+        'text-max-width': 150,
+        'padding': '12px',
+        'transition-property': 'background-opacity, border-opacity, opacity, border-width',
+        'transition-duration': '0.3s',
+        'transition-timing-function': 'ease-out',
+      },
+    },
+
+    // ─── Node Hover ───
+    {
+      selector: 'node:active',
+      style: {
+        'border-width': 3,
+        'background-opacity': 0.25,
+        'overlay-opacity': 0,
+      },
+    },
+
+    // ─── Selected Node ───
+    {
+      selector: 'node:selected',
+      style: {
+        'border-width': 3,
+        'background-opacity': 0.3,
+        'border-opacity': 1,
+        'overlay-opacity': 0,
+      },
+    },
+
+    // ─── Dimmed Node (during scenario filtering) ───
+    {
+      selector: 'node.dimmed',
+      style: {
+        'opacity': 0.12,
+        'transition-property': 'opacity',
+        'transition-duration': '0.4s',
+      },
+    },
+
+    // ─── Highlighted Node ───
+    {
+      selector: 'node.highlighted',
+      style: {
+        'border-width': 3,
+        'background-opacity': 0.25,
+        'border-opacity': 1,
+        'opacity': 1,
+        'transition-property': 'opacity, border-width, background-opacity',
+        'transition-duration': '0.4s',
+      },
+    },
+
+    // ─── Base Edge ───
+    {
+      selector: 'edge',
+      style: {
+        'width': 2,
+        'line-color': 'data(color)',
+        'target-arrow-color': 'data(color)',
+        'target-arrow-shape': 'triangle',
+        'arrow-scale': 1.2,
+        'curve-style': 'bezier',
+        'label': 'data(label)',
+        'font-family': "'Inter', sans-serif",
+        'font-size': 9,
+        'color': 'hsl(220, 15%, 50%)',
+        'text-rotation': 'autorotate',
+        'text-margin-y': -10,
+        'text-background-color': 'hsl(222, 25%, 6%)',
+        'text-background-opacity': 0.85,
+        'text-background-padding': '3px',
+        'text-background-shape': 'roundrectangle',
+        'transition-property': 'opacity, line-color, width',
+        'transition-duration': '0.3s',
+        'transition-timing-function': 'ease-out',
+      },
+    },
+
+    // ─── Async Edge ───
+    {
+      selector: 'edge[type="async"]',
+      style: {
+        'line-style': 'dashed',
+        'line-dash-pattern': [8, 5],
+      },
+    },
+
+    // ─── Streaming Edge ───
+    {
+      selector: 'edge[type="streaming"]',
+      style: {
+        'width': 3,
+        'line-style': 'solid',
+      },
+    },
+
+    // ─── Dimmed Edge ───
+    {
+      selector: 'edge.dimmed',
+      style: {
+        'opacity': 0.08,
+        'transition-property': 'opacity',
+        'transition-duration': '0.4s',
+      },
+    },
+
+    // ─── Highlighted Edge ───
+    {
+      selector: 'edge.highlighted',
+      style: {
+        'opacity': 1,
+        'width': 3,
+        'transition-property': 'opacity, width',
+        'transition-duration': '0.4s',
+      },
+    },
+  ];
+}
+
+/**
+ * Convert architecture data to Cytoscape elements
+ */
+export function toElements(nodes, edges) {
+  const cyNodes = nodes.map(node => ({
+    data: {
+      id: node.id,
+      label: node.label,
+      type: node.type,
+      color: NODE_COLORS[node.type] || NODE_COLORS.service,
+      // Store full node data for sidebar
+      _nodeData: node,
+    },
+    position: {
+      x: node.position.x * 1.5,
+      y: node.position.y * 1.2,
+    },
+  }));
+
+  const cyEdges = edges.map((edge, i) => ({
+    data: {
+      id: `e-${edge.source}-${edge.target}-${i}`,
+      source: edge.source,
+      target: edge.target,
+      label: edge.label,
+      type: edge.type,
+      color: EDGE_STYLES[edge.type]?.color || EDGE_STYLES.sync.color,
+      scenarios: edge.scenarios,
+    },
+  }));
+
+  return [...cyNodes, ...cyEdges];
+}
+</file>
+
+<file path="src/styles/catalog.css">
+/* ═══════════════════════════════════════════════════════
+   CATALOG — Company Card Grid & Hero Section
+   ═══════════════════════════════════════════════════════ */
+
+/* ── Hero Section ── */
+.hero {
+  position: relative;
+  padding: var(--space-20) var(--space-8) var(--space-16);
+  text-align: center;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 0%, hsla(190, 90%, 55%, 0.08) 0%, transparent 70%),
+    radial-gradient(ellipse 60% 50% at 80% 100%, hsla(265, 80%, 65%, 0.06) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 40% at 10% 60%, hsla(38, 95%, 60%, 0.04) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.hero__title {
+  font-size: var(--text-5xl);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: var(--leading-tight);
+  margin-bottom: var(--space-4);
+  animation: fadeInUp 0.8s var(--ease-out);
+}
+
+.hero__subtitle {
+  font-size: var(--text-lg);
+  color: var(--text-secondary);
+  max-width: 640px;
+  margin: 0 auto var(--space-10);
+  line-height: var(--leading-relaxed);
+  animation: fadeInUp 0.8s var(--ease-out) 0.1s both;
+}
+
+.hero__stats {
+  display: flex;
+  justify-content: center;
+  gap: var(--space-10);
+  animation: fadeInUp 0.8s var(--ease-out) 0.2s both;
+}
+
+.hero__stat {
+  text-align: center;
+}
+
+.hero__stat-value {
+  font-size: var(--text-3xl);
+  font-weight: 700;
+  font-family: var(--font-mono);
+}
+
+.hero__stat-label {
+  font-size: var(--text-sm);
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-top: var(--space-1);
+}
+
+/* ── Filter Bar ── */
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-4) var(--space-8);
+  flex-wrap: wrap;
+  animation: fadeInUp 0.8s var(--ease-out) 0.3s both;
+}
+
+.filter-bar__search {
+  flex: 1;
+  min-width: 240px;
+  position: relative;
+}
+
+.filter-bar__search-icon {
+  position: absolute;
+  left: var(--space-4);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-tertiary);
+  pointer-events: none;
+  width: 18px;
+  height: 18px;
+}
+
+.filter-bar__input {
+  width: 100%;
+  padding: var(--space-3) var(--space-4) var(--space-3) var(--space-12);
+  font-family: var(--font-body);
+  font-size: var(--text-sm);
+  color: var(--text-primary);
+  background: var(--bg-secondary);
+  border: 1px solid var(--bg-glass-border);
+  border-radius: var(--radius-full);
+  outline: none;
+  transition: border-color var(--duration-fast) var(--ease-out),
+              box-shadow var(--duration-fast) var(--ease-out);
+}
+
+.filter-bar__input::placeholder {
+  color: var(--text-tertiary);
+}
+
+.filter-bar__input:focus {
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 0 3px hsla(190, 90%, 55%, 0.15);
+}
+
+.filter-bar__tags {
+  display: flex;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.filter-tag {
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: var(--bg-secondary);
+  border: 1px solid var(--bg-glass-border);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all var(--duration-fast) var(--ease-out);
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+.filter-tag:hover {
+  color: var(--text-primary);
+  border-color: var(--accent-cyan);
+  background: hsla(190, 90%, 55%, 0.08);
+}
+
+.filter-tag--active {
+  color: var(--bg-primary);
+  background: var(--accent-cyan);
+  border-color: var(--accent-cyan);
+}
+
+.filter-tag--active:hover {
+  color: var(--bg-primary);
+  background: var(--accent-violet);
+  border-color: var(--accent-violet);
+}
+
+/* ── Card Grid ── */
+.catalog-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+  gap: var(--space-6);
+  padding: var(--space-6) var(--space-8) var(--space-16);
+}
+
+.catalog-card {
+  position: relative;
+  background: var(--bg-secondary);
+  border: 1px solid var(--bg-glass-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-6);
+  cursor: pointer;
+  transition: all var(--duration-normal) var(--ease-out);
+  overflow: hidden;
+  animation: fadeInUp 0.6s var(--ease-out) both;
+  content-visibility: auto;
+  contain-intrinsic-size: 0 220px;
+}
+
+.catalog-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--card-accent, var(--accent-gradient));
+  opacity: 0;
+  transition: opacity var(--duration-normal) var(--ease-out);
+}
+
+.catalog-card:hover {
+  transform: translateY(-4px);
+  border-color: hsla(190, 60%, 50%, 0.3);
+  box-shadow: var(--shadow-lg), var(--shadow-glow-cyan);
+}
+
+.catalog-card:hover::before {
+  opacity: 1;
+}
+
+.catalog-card__header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.catalog-card__icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  color: white;
+  flex-shrink: 0;
+}
+
+.catalog-card__title {
+  font-size: var(--text-xl);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.catalog-card__category {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  margin-top: var(--space-1);
+}
+
+.catalog-card__description {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  line-height: var(--leading-relaxed);
+  margin-bottom: var(--space-5);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.catalog-card__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.catalog-card__tag {
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--text-xs);
+  font-family: var(--font-mono);
+  color: var(--text-tertiary);
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-sm);
+}
+
+.catalog-card__arrow {
+  position: absolute;
+  bottom: var(--space-6);
+  right: var(--space-6);
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-tertiary);
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-full);
+  transition: all var(--duration-normal) var(--ease-out);
+}
+
+.catalog-card:hover .catalog-card__arrow {
+  color: var(--text-primary);
+  background: var(--accent-cyan);
+  transform: translateX(4px);
+}
+
+/* ── Empty State ── */
+.catalog-empty {
+  grid-column: 1 / -1;
+  text-align: center;
+  padding: var(--space-20) var(--space-8);
+}
+
+.catalog-empty__icon {
+  font-size: 3rem;
+  margin-bottom: var(--space-4);
+}
+
+.catalog-empty__message {
+  font-size: var(--text-lg);
+  color: var(--text-secondary);
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .hero {
+    padding: var(--space-12) var(--space-4) var(--space-10);
+  }
+
+  .hero__title {
+    font-size: var(--text-3xl);
+  }
+
+  .hero__subtitle {
+    font-size: var(--text-base);
+  }
+
+  .hero__stats {
+    gap: var(--space-6);
+  }
+
+  .hero__stat-value {
+    font-size: var(--text-2xl);
+  }
+
+  .filter-bar {
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .catalog-grid {
+    grid-template-columns: 1fr;
+    padding: var(--space-4);
+  }
+}
+</file>
+
+<file path="src/styles/diagram.css">
+/* ═══════════════════════════════════════════════════════
+   DIAGRAM — Interactive Canvas & Scenario Controls
+   ═══════════════════════════════════════════════════════ */
+
+/* ── Diagram Page Layout ── */
+.diagram-page {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  overflow: hidden;
+}
+
+/* ── Toolbar ── */
+.diagram-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-6);
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--bg-glass-border);
+  z-index: var(--z-ui);
+  gap: var(--space-4);
+}
+
+.diagram-toolbar__left {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.diagram-toolbar__back {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  border-radius: var(--radius-sm);
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.diagram-toolbar__back:hover {
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
+}
+
+.diagram-toolbar__title {
+  font-size: var(--text-lg);
+  font-weight: 700;
+}
+
+.diagram-toolbar__company {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  margin-left: var(--space-2);
+  font-weight: 400;
+}
+
+.diagram-toolbar__right {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.diagram-toolbar__zoom-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-md);
+  padding: var(--space-1);
+}
+
+.diagram-toolbar__zoom-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-lg);
+  color: var(--text-secondary);
+  border-radius: var(--radius-sm);
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.diagram-toolbar__zoom-btn:hover {
+  color: var(--text-primary);
+  background: var(--bg-elevated);
+}
+
+.diagram-toolbar__zoom-level {
+  font-size: var(--text-xs);
+  font-family: var(--font-mono);
+  color: var(--text-tertiary);
+  min-width: 44px;
+  text-align: center;
+}
+
+.diagram-toolbar__fit-btn {
+  padding: var(--space-2) var(--space-3);
+  font-size: var(--text-xs);
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-sm);
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.diagram-toolbar__fit-btn:hover {
+  color: var(--text-primary);
+  background: var(--bg-elevated);
+}
+
+/* ── Scenario Switcher ── */
+.scenario-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-6);
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--bg-glass-border);
+  z-index: var(--z-scenario-bar);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.scenario-bar::-webkit-scrollbar {
+  display: none;
+}
+
+.scenario-bar__label {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+
+.scenario-pill {
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all var(--duration-normal) var(--ease-out);
+  white-space: nowrap;
+}
+
+.scenario-pill:hover {
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
+}
+
+.scenario-pill--active {
+  color: var(--text-primary);
+  background: hsla(190, 90%, 55%, 0.12);
+  border-color: var(--accent-cyan);
+}
+
+/* ── Canvas Container ── */
+.diagram-canvas-wrap {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  background: var(--bg-primary);
+}
+
+.diagram-canvas {
+  width: 100%;
+  height: 100%;
+}
+
+/* Canvas grid background pattern */
+.diagram-canvas-wrap::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle, hsla(220, 15%, 30%, 0.15) 1px, transparent 1px);
+  background-size: 24px 24px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ── Scenario Description Overlay ── */
+.scenario-info {
+  position: absolute;
+  bottom: var(--space-6);
+  left: var(--space-6);
+  max-width: 420px;
+  z-index: var(--z-ui);
+  animation: fadeInUp 0.4s var(--ease-out);
+}
+
+.scenario-info__card {
+  padding: var(--space-4) var(--space-5);
+  border-radius: var(--radius-lg);
+}
+
+.scenario-info__title {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  margin-bottom: var(--space-2);
+}
+
+.scenario-info__desc {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  line-height: var(--leading-relaxed);
+}
+
+/* ── Step Indicator ── */
+.scenario-steps {
+  position: absolute;
+  bottom: var(--space-6);
+  right: var(--space-6);
+  z-index: var(--z-ui);
+  max-width: 380px;
+  max-height: calc(100dvh - 200px);
+  overflow-y: auto;
+}
+
+.scenario-steps__card {
+  padding: var(--space-4) var(--space-5);
+  border-radius: var(--radius-lg);
+}
+
+.scenario-steps__title {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-tertiary);
+  margin-bottom: var(--space-3);
+}
+
+.scenario-step {
+  display: flex;
+  gap: var(--space-3);
+  padding: var(--space-2) 0;
+  transition: opacity var(--duration-normal) var(--ease-out);
+}
+
+.scenario-step + .scenario-step {
+  border-top: 1px solid var(--bg-glass-border);
+}
+
+.scenario-step__number {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-xs);
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: var(--bg-primary);
+  background: var(--accent-cyan);
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+}
+
+.scenario-step__text {
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+  line-height: var(--leading-relaxed);
+  padding-top: 2px;
+}
+
+/* ── Legend ── */
+.diagram-legend {
+  position: absolute;
+  top: var(--space-4);
+  right: var(--space-4);
+  z-index: var(--z-ui);
+  padding: var(--space-3) var(--space-4);
+  border-radius: var(--radius-md);
+}
+
+.diagram-legend__title {
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-tertiary);
+  margin-bottom: var(--space-2);
+}
+
+.diagram-legend__items {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.diagram-legend__item {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-xs);
+  color: var(--text-secondary);
+}
+
+.diagram-legend__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: var(--radius-full);
+  flex-shrink: 0;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .diagram-toolbar {
+    padding: var(--space-2) var(--space-3);
+    flex-wrap: wrap;
+  }
+
+  .diagram-toolbar__title {
+    font-size: var(--text-base);
+  }
+
+  .scenario-bar {
+    padding: var(--space-2) var(--space-3);
+  }
+
+  .scenario-info,
+  .scenario-steps {
+    position: static;
+    max-width: none;
+  }
+
+  .diagram-legend {
+    display: none;
+  }
+}
+</file>
+
+<file path="src/styles/index.css">
+/* ═══════════════════════════════════════════════════════
+   ARCH-LIB — Design System
+   Architecture Encyclopedia — Design Tokens & Base Styles
+   ═══════════════════════════════════════════════════════ */
+
+/* ── Google Fonts ── */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+/* ── Design Tokens ── */
+:root {
+  /* Colors — Dark Theme (Default) */
+  --bg-primary: hsl(222, 25%, 6%);
+  --bg-secondary: hsl(222, 20%, 10%);
+  --bg-tertiary: hsl(222, 18%, 14%);
+  --bg-elevated: hsl(222, 18%, 16%);
+  --bg-glass: hsla(222, 20%, 12%, 0.7);
+  --bg-glass-border: hsla(220, 30%, 30%, 0.25);
+
+  --text-primary: hsl(220, 20%, 95%);
+  --text-secondary: hsl(220, 15%, 65%);
+  --text-tertiary: hsl(220, 10%, 45%);
+  --text-inverse: hsl(222, 25%, 6%);
+
+  /* Accent — Cyan/Violet Gradient */
+  --accent-cyan: hsl(190, 90%, 55%);
+  --accent-violet: hsl(265, 80%, 65%);
+  --accent-amber: hsl(38, 95%, 60%);
+  --accent-emerald: hsl(160, 70%, 50%);
+  --accent-rose: hsl(350, 80%, 60%);
+  --accent-gradient: linear-gradient(135deg, var(--accent-cyan), var(--accent-violet));
+
+  /* Node type colors */
+  --node-client: hsl(220, 70%, 60%);
+  --node-gateway: hsl(190, 90%, 50%);
+  --node-service: hsl(265, 65%, 60%);
+  --node-database: hsl(280, 60%, 55%);
+  --node-cache: hsl(38, 90%, 55%);
+  --node-queue: hsl(350, 75%, 55%);
+  --node-cdn: hsl(160, 65%, 45%);
+  --node-ml: hsl(320, 70%, 55%);
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+
+  /* Typography */
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+
+  --text-xs: 0.75rem;
+  --text-sm: 0.875rem;
+  --text-base: 1rem;
+  --text-lg: 1.125rem;
+  --text-xl: 1.25rem;
+  --text-2xl: 1.5rem;
+  --text-3xl: 2rem;
+  --text-4xl: 2.5rem;
+  --text-5xl: 3.5rem;
+
+  --leading-tight: 1.2;
+  --leading-normal: 1.5;
+  --leading-relaxed: 1.7;
+
+  /* Radius */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-full: 9999px;
+
+  /* Shadows */
+  --shadow-sm: 0 1px 3px hsla(0, 0%, 0%, 0.3);
+  --shadow-md: 0 4px 12px hsla(0, 0%, 0%, 0.4);
+  --shadow-lg: 0 8px 32px hsla(0, 0%, 0%, 0.5);
+  --shadow-glow-cyan: 0 0 20px hsla(190, 90%, 55%, 0.3);
+  --shadow-glow-violet: 0 0 20px hsla(265, 80%, 65%, 0.3);
+
+  /* Transitions */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --duration-fast: 150ms;
+  --duration-normal: 300ms;
+  --duration-slow: 500ms;
+
+  /* Z-index scale */
+  --z-canvas: 1;
+  --z-ui: 10;
+  --z-scenario-bar: 20;
+  --z-sidebar: 100;
+  --z-overlay: 200;
+  --z-header: 300;
+  --z-modal: 400;
+}
+
+/* ── Light Theme ── */
+[data-theme="light"] {
+  --bg-primary: hsl(220, 20%, 97%);
+  --bg-secondary: hsl(220, 15%, 93%);
+  --bg-tertiary: hsl(220, 12%, 88%);
+  --bg-elevated: hsl(0, 0%, 100%);
+  --bg-glass: hsla(220, 15%, 95%, 0.8);
+  --bg-glass-border: hsla(220, 20%, 75%, 0.3);
+
+  --text-primary: hsl(222, 25%, 10%);
+  --text-secondary: hsl(220, 12%, 40%);
+  --text-tertiary: hsl(220, 8%, 55%);
+  --text-inverse: hsl(220, 20%, 95%);
+
+  --shadow-sm: 0 1px 3px hsla(0, 0%, 0%, 0.08);
+  --shadow-md: 0 4px 12px hsla(0, 0%, 0%, 0.1);
+  --shadow-lg: 0 8px 32px hsla(0, 0%, 0%, 0.12);
+  --shadow-glow-cyan: 0 0 20px hsla(190, 90%, 55%, 0.2);
+  --shadow-glow-violet: 0 0 20px hsla(265, 80%, 65%, 0.2);
+}
+
+/* ── Reset ── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-body);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: var(--leading-normal);
+  min-height: 100dvh;
+  overflow-x: hidden;
+  transition: background-color var(--duration-normal) var(--ease-out),
+              color var(--duration-normal) var(--ease-out);
+}
+
+a {
+  color: var(--accent-cyan);
+  text-decoration: none;
+  transition: color var(--duration-fast) var(--ease-out);
+}
+
+a:hover {
+  color: var(--accent-violet);
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  color: inherit;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+ul, ol {
+  list-style: none;
+}
+
+/* ── Utility Classes ── */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+.glass {
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--bg-glass-border);
+}
+
+.gradient-text {
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: hsla(220, 15%, 40%, 0.4);
+  border-radius: var(--radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: hsla(220, 15%, 50%, 0.6);
+}
+
+/* ── Animations ── */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideOutRight {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes nodeGlow {
+  0%, 100% { box-shadow: 0 0 8px currentColor; }
+  50% { box-shadow: 0 0 20px currentColor; }
+}
+</file>
+
+<file path="src/styles/panel.css">
+/* ═══════════════════════════════════════════════════════
+   PANEL — Detail Sidebar (Slide-in)
+   ═══════════════════════════════════════════════════════ */
+
+/* ── Overlay ── */
+.sidebar-overlay {
+  position: fixed;
+  inset: 0;
+  background: hsla(0, 0%, 0%, 0.4);
+  z-index: calc(var(--z-sidebar) - 1);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--duration-normal) var(--ease-out);
+}
+
+.sidebar-overlay--visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ── Sidebar ── */
+.sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 440px;
+  max-width: 90vw;
+  z-index: var(--z-sidebar);
+  background: var(--bg-secondary);
+  border-left: 1px solid var(--bg-glass-border);
+  transform: translateX(100%);
+  transition: transform var(--duration-slow) var(--ease-out);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.sidebar--open {
+  transform: translateX(0);
+}
+
+/* ── Sidebar Header ── */
+.sidebar__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: var(--space-6);
+  border-bottom: 1px solid var(--bg-glass-border);
+  flex-shrink: 0;
+}
+
+.sidebar__header-info {
+  flex: 1;
+}
+
+.sidebar__type-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-radius: var(--radius-full);
+  margin-bottom: var(--space-3);
+}
+
+.sidebar__title {
+  font-size: var(--text-2xl);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  margin-bottom: var(--space-2);
+}
+
+.sidebar__tech-stack {
+  font-size: var(--text-sm);
+  font-family: var(--font-mono);
+  color: var(--text-tertiary);
+}
+
+.sidebar__close {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-xl);
+  color: var(--text-tertiary);
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-full);
+  transition: all var(--duration-fast) var(--ease-out);
+  flex-shrink: 0;
+  margin-left: var(--space-3);
+}
+
+.sidebar__close:hover {
+  color: var(--text-primary);
+  background: var(--bg-elevated);
+}
+
+/* ── Sidebar Content ── */
+.sidebar__content {
+  flex: 1;
+  overflow-y: auto;
+  padding: var(--space-6);
+}
+
+.sidebar__section {
+  margin-bottom: var(--space-8);
+}
+
+.sidebar__section:last-child {
+  margin-bottom: 0;
+}
+
+.sidebar__section-title {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-tertiary);
+  margin-bottom: var(--space-3);
+  padding-bottom: var(--space-2);
+  border-bottom: 1px solid var(--bg-glass-border);
+}
+
+.sidebar__section-icon {
+  font-size: var(--text-sm);
+}
+
+.sidebar__text {
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  line-height: var(--leading-relaxed);
+}
+
+/* ── Tradeoff Cards ── */
+.tradeoff-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.tradeoff-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  color: var(--text-secondary);
+  line-height: var(--leading-relaxed);
+}
+
+.tradeoff-item--pro {
+  border-left: 3px solid var(--accent-emerald);
+}
+
+.tradeoff-item--con {
+  border-left: 3px solid var(--accent-rose);
+}
+
+.tradeoff-icon {
+  font-size: var(--text-base);
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+/* ── Alternatives ── */
+.alternatives-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.alternative-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-4);
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-md);
+  gap: var(--space-3);
+}
+
+.alternative-item__name {
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+
+.alternative-item__context {
+  font-size: var(--text-xs);
+  color: var(--text-tertiary);
+  text-align: right;
+}
+
+/* ── Header ── */
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-6);
+  background: var(--bg-glass);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--bg-glass-border);
+  position: sticky;
+  top: 0;
+  z-index: var(--z-header);
+}
+
+.app-header__logo {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.app-header__logo-icon {
+  font-size: var(--text-2xl);
+}
+
+.app-header__logo-text {
+  font-size: var(--text-lg);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+}
+
+.app-header__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.app-header__btn {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  font-size: var(--text-sm);
+  font-weight: 500;
+  color: var(--text-secondary);
+  border-radius: var(--radius-md);
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.app-header__btn:hover {
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
+}
+
+.theme-toggle {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--text-lg);
+  color: var(--text-secondary);
+  border-radius: var(--radius-full);
+  transition: all var(--duration-fast) var(--ease-out);
+}
+
+.theme-toggle:hover {
+  color: var(--accent-amber);
+  background: var(--bg-tertiary);
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .sidebar {
+    width: 100vw;
+    max-width: 100vw;
+  }
+
+  .app-header {
+    padding: var(--space-2) var(--space-4);
+  }
+
+  .app-header__logo-text {
+    font-size: var(--text-base);
+  }
+}
+</file>
+
+<file path="src/main.js">
+/**
+ * main.js — App entry point, routing, initialization
+ */
+
+import './styles/index.css';
+import './styles/catalog.css';
+import './styles/diagram.css';
+import './styles/panel.css';
+
+import { createHeader } from './components/header.js';
+import { createCatalog } from './components/catalog.js';
+import { createDiagram } from './components/diagram.js';
+import { initSidebar } from './components/sidebar.js';
+
+// ── App Container ──
+const app = document.getElementById('app');
+
+// ── Clear loading state ──
+app.innerHTML = '';
+
+// ── Header ──
+const header = createHeader();
+document.body.insertBefore(header, app);
+
+// ── Sidebar (singleton) ──
+initSidebar();
+
+// ── Main Content Area ──
+const main = document.createElement('main');
+main.id = 'main-content';
+app.appendChild(main);
+
+// ── Hash-based Router ──
+function getRoute() {
+  const hash = window.location.hash.slice(1) || '/';
+  const parts = hash.split('/').filter(Boolean);
+  return { path: parts[0] || '', param: parts[1] || '' };
+}
+
+async function router() {
+  const { path, param } = getRoute();
+
+  try {
+    if (path && path !== '' && param === '') {
+      await showDiagram(path);
+    } else if (path && param) {
+      await showDiagram(path);
+    } else {
+      await showCatalog();
+    }
+  } catch (err) {
+    console.error('Router error:', err);
+    main.innerHTML = `
+      <div style="padding:40px;text-align:center;color:var(--text-secondary)">
+        <h2>⚠️ エラーが発生しました</h2>
+        <p>${err.message}</p>
+      </div>
+    `;
+  }
+}
+
+async function showCatalog() {
+  header.style.display = '';
+  main.className = '';
+  await createCatalog(main, (archId) => {
+    window.location.hash = `#/${archId}`;
+  });
+}
+
+async function showDiagram(archId) {
+  header.style.display = 'none';
+  main.className = 'diagram-view';
+  await createDiagram(main, archId, () => {
+    window.location.hash = '#/';
+  });
+}
+
+// ── Listen for hash changes ──
+window.addEventListener('hashchange', router);
+
+// ── Initial route ──
+router();
+</file>
+
+<file path=".gitignore">
+node_modules/
+dist/
+.DS_Store
+*.local
+</file>
+
+<file path="CONTRIBUTING.md">
+# Contributing to ArchLibrary
+
+Thank you for your interest in contributing to the Architecture Encyclopedia! 🏗️
+
+## Adding a New Architecture
+
+Adding a new company/service architecture requires **no code changes** — just data files!
+
+### 1. Create the Data Directory
+
+```
+src/data/architectures/your-company/
+├── meta.json          # Company metadata
+├── nodes.json         # Architecture components
+├── edges.json         # Connections between components
+└── scenarios.json     # Use-case scenario definitions
+```
+
+Also copy the same files to `public/data/architectures/your-company/`.
+
+### 2. Register the Architecture
+
+Add your company ID to the `ids` array in `src/lib/data-loader.js`:
+
+```javascript
+const ids = ['netflix', 'amazon', 'twitter', 'your-company'];
+```
+
+### 3. Data Schema Reference
+
+#### meta.json
+
+```json
+{
+  "id": "your-company",
+  "name": "Your Company",
+  "description": "Brief description of the service/platform",
+  "category": "Category (e.g., E-Commerce, Social Media)",
+  "tags": ["tag1", "tag2", "tag3"],
+  "color": "#HEX_COLOR",
+  "accentGradient": "linear-gradient(135deg, #COLOR1, #COLOR2)"
+}
+```
+
+#### nodes.json
+
+Each node represents a component in the architecture:
+
+```json
+[
+  {
+    "id": "unique-id",
+    "label": "Display Name",
+    "type": "service",
+    "description": "What this component does",
+    "techStack": "Technologies used",
+    "role": "Why this component exists in the architecture",
+    "whyChosen": "Why this technology was selected",
+    "tradeoffs": {
+      "pros": ["Advantage 1", "Advantage 2"],
+      "cons": ["Disadvantage 1", "Disadvantage 2"]
+    },
+    "alternatives": [
+      { "name": "Alternative Tech", "context": "When to use it instead" }
+    ],
+    "position": { "x": 100, "y": 200 }
+  }
+]
+```
+
+**Node types:** `client`, `gateway`, `service`, `database`, `cache`, `queue`, `cdn`, `ml`
+
+#### edges.json
+
+Connections between nodes:
+
+```json
+[
+  {
+    "source": "node-id-1",
+    "target": "node-id-2",
+    "label": "Description of data flow",
+    "type": "sync",
+    "scenarios": ["global", "scenario-id"]
+  }
+]
+```
+
+**Edge types:** `sync` (solid line), `async` (dashed), `streaming` (thick solid)
+
+#### scenarios.json
+
+Use-case drill-down views:
+
+```json
+[
+  {
+    "id": "global",
+    "name": "🌐 Global View",
+    "description": "Full system overview",
+    "highlightNodes": "*",
+    "highlightEdges": "*"
+  },
+  {
+    "id": "use-case-id",
+    "name": "📋 Use Case Name",
+    "description": "What this scenario shows",
+    "highlightNodes": ["node1", "node2"],
+    "highlightEdges": ["node1->node2"],
+    "steps": [
+      { "order": 1, "description": "Step description", "nodes": ["node1", "node2"] }
+    ]
+  }
+]
+```
+
+### 4. Positioning Guide
+
+Node positions use `{ x, y }` coordinates. A good layout typically:
+- Places clients on the **left** (~100)
+- Load balancers/gateways in the **center-left** (~300-500)
+- Backend services in the **center** (~500-700)
+- Data stores on the **right** (~800-1000)
+- y-axis spread: ~100-500
+
+### 5. Quality Checklist
+
+- [ ] All node IDs are unique within the architecture
+- [ ] All edges reference valid node IDs in both source and target
+- [ ] Every scenario includes at least the "global" view
+- [ ] Descriptions cite publicly available sources (engineering blogs, conference talks)
+- [ ] Trade-offs include both pros AND cons
+- [ ] At least 2 alternatives listed per node
+
+### 6. Submit a PR
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b add-your-company`
+3. Add your data files
+4. Test locally: `npm run dev`
+5. Open a Pull Request with:
+   - Company name and brief description
+   - Sources for architectural information
+
+## Fixing Existing Data
+
+If you spot inaccuracies or want to improve descriptions:
+
+1. Locate the relevant JSON file in `src/data/architectures/`
+2. Make your changes
+3. Copy changes to `public/data/architectures/` too
+4. Submit a PR with the source of your correction
+
+## Code Contributions
+
+For UI/code changes:
+
+1. Fork and clone the repo
+2. Install dependencies: `npm install`
+3. Start dev server: `npm run dev`
+4. Make changes
+5. Test: `npm run build` to verify static output
+6. Submit a PR
+
+## License
+
+By contributing, you agree that your contributions will be licensed under the project's MIT License.
+</file>
+
+<file path="index.html">
+<!DOCTYPE html>
+<html lang="ja" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ArchLibrary — Architecture Encyclopedia</title>
+  <meta name="description" content="Explore how Netflix, Amazon, Twitter and other world-class applications are built. Interactive architecture diagrams with component deep-dives and trade-off analysis." />
+  <meta name="keywords" content="system design, architecture, microservices, distributed systems, Netflix, Amazon, Twitter" />
+  <meta name="theme-color" content="#0d1117" />
+
+  <!-- Preload fonts for performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏗️</text></svg>" />
+
+  <style>
+    /* Critical CSS — prevent FOUC */
+    body {
+      margin: 0;
+      background: hsl(222, 25%, 6%);
+      color: hsl(220, 20%, 95%);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    }
+    #app {
+      min-height: 100dvh;
+    }
+    /* Loading state */
+    .app-loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100dvh;
+      font-size: 1.25rem;
+      color: hsl(220, 15%, 50%);
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div class="app-loading">Loading architectures...</div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
+</file>
+
+<file path="package.json">
+{
+  "name": "arch-lib",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Architecture Encyclopedia — Interactive visual exploration of world-class system architectures",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^6.3.0"
+  },
+  "dependencies": {
+    "cytoscape": "^3.30.0"
+  }
+}
+</file>
+
+<file path="README.md">
+# 🏗️ ArchLibrary — Architecture Encyclopedia
+
+> Explore how the world's largest applications are built.
+> Interactive architecture diagrams with component deep-dives and trade-off analysis.
+
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+![Built with](https://img.shields.io/badge/built%20with-Vite-646CFF.svg)
+
+## ✨ Features
+
+- **Interactive Diagrams** — Explore architecture components with zoom, pan, and click interactions powered by Cytoscape.js
+- **Scenario Drill-down** — Switch between use-case views (e.g., "Video Playback Flow") to highlight relevant components
+- **Component Deep-dives** — Click any node for detailed information including trade-offs, alternatives, and selection rationale
+- **Dark/Light Theme** — Developer-friendly dark mode with a clean glassmorphism UI
+- **Zero Backend** — Pure static site, hosted on GitHub Pages
+
+## 🗂️ Included Architectures
+
+| Company | Scenarios |
+|---------|-----------|
+| **Netflix** | Global View, Video Playback, Recommendation Pipeline |
+| **Amazon** | Global View, Purchase Flow, Search & Discovery |
+| **Twitter/X** | Global View, Tweet Fanout, Trending Topics |
+
+## 🚀 Getting Started
+
+```bash
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+
+# Build for production
+npm run build
+```
+
+## 📁 Project Structure
+
+```
+src/
+├── main.js                 # App entry point & router
+├── components/             # UI components
+│   ├── catalog.js          # Company card grid
+│   ├── diagram.js          # Cytoscape canvas
+│   ├── sidebar.js          # Detail panel
+│   └── header.js           # Navigation bar
+├── lib/                    # Utilities
+│   ├── data-loader.js      # JSON data fetcher
+│   ├── graph-styles.js     # Cytoscape styles
+│   └── animations.js       # Edge animations
+├── styles/                 # CSS
+│   ├── index.css           # Design system
+│   ├── catalog.css         # Catalog page
+│   ├── diagram.css         # Diagram page
+│   └── panel.css           # Sidebar panel
+└── data/architectures/     # Architecture data (JSON)
+```
+
+## 🤝 Contributing
+
+Adding a new architecture requires **no code changes** — just JSON files!
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full guide.
+
+## 📄 License
+
+MIT
+</file>
+
+<file path="vite.config.js">
+import { defineConfig } from 'vite';
+
+export default defineConfig(({ command }) => ({
+  // dev時は '/', build時は GitHub Pages用に '/arch-lib/'
+  base: command === 'serve' ? '/' : '/arch-lib/',
+  root: '.',
+  publicDir: 'public',
+  build: {
+    outDir: 'dist',
+    assetsDir: 'assets',
+  },
+  server: {
+    port: 3000,
+    open: true,
+  },
+}));
+</file>
+
+</files>

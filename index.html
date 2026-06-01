@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ja" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ArchLibrary — Architecture Encyclopedia</title>
+  <meta name="description" content="Explore how Netflix, Amazon, Twitter and other world-class applications are built. Interactive architecture diagrams with component deep-dives and trade-off analysis." />
+  <meta name="keywords" content="system design, architecture, microservices, distributed systems, Netflix, Amazon, Twitter" />
+  <meta name="theme-color" content="#0d1117" />
+
+  <!-- Preload fonts for performance -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏗️</text></svg>" />
+
+  <style>
+    /* Critical CSS — prevent FOUC */
+    body {
+      margin: 0;
+      background: hsl(222, 25%, 6%);
+      color: hsl(220, 20%, 95%);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+    }
+    #app {
+      min-height: 100dvh;
+    }
+    /* Loading state */
+    .app-loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100dvh;
+      font-size: 1.25rem;
+      color: hsl(220, 15%, 50%);
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <div class="app-loading">Loading architectures...</div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>

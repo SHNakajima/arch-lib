@@ -1,0 +1,184 @@
+[
+  {
+    "id": "client",
+    "label": "Client Apps",
+    "type": "client",
+    "description": "Web app (twitter.com/x.com), iOS, and Android native applications.",
+    "techStack": "React (Web), Swift (iOS), Kotlin (Android)",
+    "role": "Renders the timeline, handles tweet composition, real-time notifications, and media uploads. Web app uses progressive loading for timeline updates.",
+    "whyChosen": "React enables rapid iteration on web features. Native mobile apps provide smooth scrolling performance critical for timeline browsing.",
+    "tradeoffs": {
+      "pros": ["Platform-optimized performance", "Real-time push notifications", "Offline reading capability on mobile"],
+      "cons": ["Multiple codebases", "Feature rollout timing varies across platforms"]
+    },
+    "alternatives": [
+      { "name": "React Native", "context": "Shared codebase for mobile" },
+      { "name": "PWA", "context": "Progressive web app for unified experience" }
+    ],
+    "position": { "x": 100, "y": 300 }
+  },
+  {
+    "id": "load-balancer",
+    "label": "Load Balancer",
+    "type": "gateway",
+    "description": "L7 load balancer distributing incoming traffic across the service fleet.",
+    "techStack": "Custom L7 LB, GCP Load Balancer",
+    "role": "Distributes millions of requests per second, handles TLS termination, and routes to appropriate service clusters based on request type.",
+    "whyChosen": "A combination of custom load balancing logic and GCP managed infrastructure provides both flexibility for routing rules and operational simplicity.",
+    "tradeoffs": {
+      "pros": ["Flexible routing rules for different request types", "High availability with GCP infrastructure"],
+      "cons": ["Migration from bare-metal to cloud added complexity", "Custom LB logic requires maintenance"]
+    },
+    "alternatives": [
+      { "name": "AWS ALB/NLB", "context": "Managed AWS load balancing" },
+      { "name": "Envoy", "context": "L7 proxy with advanced traffic management" }
+    ],
+    "position": { "x": 300, "y": 300 }
+  },
+  {
+    "id": "api-service",
+    "label": "API / GraphQL Service",
+    "type": "service",
+    "description": "GraphQL-based API layer that serves as the unified interface between clients and backend microservices.",
+    "techStack": "GraphQL (Strato), Scala/Java",
+    "role": "Provides a single GraphQL endpoint for all client data needs. Aggregates data from multiple backend services (timeline, user, tweet storage) into efficient responses.",
+    "whyChosen": "GraphQL allows clients to request exactly the data they need, reducing over-fetching. Critical for mobile where bandwidth is limited and latency impacts scroll performance.",
+    "tradeoffs": {
+      "pros": ["Eliminates over-fetching and under-fetching", "Single endpoint simplifies client code", "Strong typing with schema evolution"],
+      "cons": ["Query complexity can impact backend performance", "Caching is more complex than REST", "N+1 query problem requires careful resolver design"]
+    },
+    "alternatives": [
+      { "name": "REST API Gateway", "context": "Simpler, widely understood" },
+      { "name": "gRPC", "context": "High-performance binary protocol for internal services" }
+    ],
+    "position": { "x": 500, "y": 300 }
+  },
+  {
+    "id": "tweet-service",
+    "label": "Tweet Ingestion Service",
+    "type": "service",
+    "description": "Handles tweet creation, validation, and persistence with globally unique Snowflake ID assignment.",
+    "techStack": "Scala, Snowflake ID Generator",
+    "role": "Validates tweet content (length, media, policies), assigns a Snowflake ID for time-ordered uniqueness, persists to the tweet store, and triggers the fanout pipeline.",
+    "whyChosen": "Snowflake IDs provide time-sortable, globally unique identifiers without coordination — essential for distributed tweet creation across data centers.",
+    "tradeoffs": {
+      "pros": ["Snowflake IDs enable chronological sorting without DB queries", "Decoupled from downstream processing via async fanout"],
+      "cons": ["Clock synchronization issues can cause ID collisions", "Single point of validation can become a bottleneck"]
+    },
+    "alternatives": [
+      { "name": "UUIDv7", "context": "Time-ordered UUIDs, no custom generator needed" },
+      { "name": "ULID", "context": "Universally Unique Lexicographically Sortable Identifier" }
+    ],
+    "position": { "x": 500, "y": 100 }
+  },
+  {
+    "id": "fanout-service",
+    "label": "Fanout Service",
+    "type": "service",
+    "description": "Distributes new tweets to follower timelines using a hybrid push/pull strategy.",
+    "techStack": "Custom Java/Scala service, Social Graph integration",
+    "role": "The heart of timeline delivery. For regular users (<10K followers), pushes tweet IDs to follower Redis caches. For celebrities, flags for pull-based merge at read time.",
+    "whyChosen": "Pure push (fanout-on-write) would overwhelm the system for celebrity accounts. Pure pull would make timeline reads slow. The hybrid approach optimizes both.",
+    "tradeoffs": {
+      "pros": ["Avoids write amplification storms from celebrity tweets", "Fast timeline reads for most users", "Dynamic threshold tuning based on load"],
+      "cons": ["Complex dual-path logic", "Celebrity tweet delivery has higher read-time latency", "Threshold tuning requires operational monitoring"]
+    },
+    "alternatives": [
+      { "name": "Pure fanout-on-write", "context": "Simpler but doesn't scale for high-follower accounts" },
+      { "name": "Pure fanout-on-read", "context": "Simpler writes but slower reads for everyone" }
+    ],
+    "position": { "x": 700, "y": 200 }
+  },
+  {
+    "id": "timeline-service",
+    "label": "Timeline Service",
+    "type": "service",
+    "description": "Constructs and serves the home timeline by merging precomputed cached timelines with celebrity tweets.",
+    "techStack": "Scala, Redis client, ML Ranking models",
+    "role": "Reads the user's precomputed timeline from Redis, merges in celebrity tweets (pull-based), applies ML-based relevance ranking, and returns the ordered feed.",
+    "whyChosen": "Separating timeline construction from fanout allows independent optimization of read and write paths. ML ranking can be updated without touching the delivery pipeline.",
+    "tradeoffs": {
+      "pros": ["Sub-100ms timeline generation", "ML ranking independent of delivery", "Handles diverse feed compositions (tweets, retweets, ads)"],
+      "cons": ["Merge logic adds read-time complexity", "Ranking model latency directly impacts user experience"]
+    },
+    "alternatives": [
+      { "name": "Pre-ranked timelines", "context": "Rank at write time, simpler reads" },
+      { "name": "Client-side ranking", "context": "Reduce server load, but less consistent" }
+    ],
+    "position": { "x": 700, "y": 400 }
+  },
+  {
+    "id": "redis-cache",
+    "label": "Redis Timeline Cache",
+    "type": "cache",
+    "description": "In-memory cache storing precomputed timelines as sorted sets of tweet IDs for each user.",
+    "techStack": "Redis clusters, ~100TB+ in-memory",
+    "role": "Stores the last ~800 tweet IDs for each user's home timeline. Enables O(1) timeline reads — the single most critical performance path in the entire system.",
+    "whyChosen": "Redis sorted sets are perfect for timelines — naturally ordered by Snowflake ID (timestamp), with O(log N) insertion and O(1) range reads.",
+    "tradeoffs": {
+      "pros": ["Sub-millisecond timeline reads", "Natural ordering via sorted sets", "Well-understood, battle-tested technology"],
+      "cons": ["Enormous memory footprint (~100TB+)", "Data loss on failure (regeneration from tweet store)", "Cost of maintaining hot replicas"]
+    },
+    "alternatives": [
+      { "name": "Memcached", "context": "Simpler caching, no sorted sets" },
+      { "name": "ScyllaDB", "context": "Persistent sorted storage, less memory" }
+    ],
+    "position": { "x": 900, "y": 300 }
+  },
+  {
+    "id": "tweet-store",
+    "label": "Tweet Store",
+    "type": "database",
+    "description": "Persistent storage for all tweets, handling hundreds of billions of records.",
+    "techStack": "Manhattan (custom), migrating to ScyllaDB/Cassandra",
+    "role": "Durable storage for tweet content, metadata, engagement counts, and media references. Handles massive write throughput during peak events.",
+    "whyChosen": "Manhattan was Twitter's custom distributed database optimized for their specific access patterns. ScyllaDB migration provides better performance with lower operational overhead.",
+    "tradeoffs": {
+      "pros": ["Optimized for tweet access patterns", "Handles extreme write throughput", "Multi-datacenter replication"],
+      "cons": ["Custom systems require specialized expertise", "Migration to new stores is complex and risky"]
+    },
+    "alternatives": [
+      { "name": "Cassandra", "context": "Open-source, large community" },
+      { "name": "DynamoDB", "context": "Managed NoSQL, no ops overhead" }
+    ],
+    "position": { "x": 900, "y": 100 }
+  },
+  {
+    "id": "social-graph",
+    "label": "Social Graph Service",
+    "type": "database",
+    "description": "Manages the follower/following relationships — the core social graph with billions of edges.",
+    "techStack": "FlockDB (custom graph DB), MySQL shards",
+    "role": "Stores and queries follow relationships. Answers 'who follows X?' queries needed by the fanout service to determine timeline delivery targets.",
+    "whyChosen": "The social graph requires specialized adjacency list operations (fan-out queries) at extreme scale. FlockDB was built for exactly this access pattern.",
+    "tradeoffs": {
+      "pros": ["Optimized for adjacency queries at billion-edge scale", "Efficient follower list pagination"],
+      "cons": ["Limited query flexibility vs general-purpose graph DB", "Sharding complexity for hot users"]
+    },
+    "alternatives": [
+      { "name": "Neo4j", "context": "Full-featured graph database" },
+      { "name": "Amazon Neptune", "context": "Managed graph database" },
+      { "name": "TigerGraph", "context": "High-performance graph analytics" }
+    ],
+    "position": { "x": 500, "y": 500 }
+  },
+  {
+    "id": "kafka",
+    "label": "Event Bus (Kafka)",
+    "type": "queue",
+    "description": "Distributed event streaming platform connecting all services through asynchronous event pipelines.",
+    "techStack": "Apache Kafka, custom event schemas",
+    "role": "Carries tweet creation events to the fanout service, user activity events to analytics, and engagement signals to the trending topics pipeline.",
+    "whyChosen": "Kafka's durable log provides replay capability essential for rebuilding timelines after failures and feeding multiple consumers from the same event stream.",
+    "tradeoffs": {
+      "pros": ["Durable event log with replay", "Multiple consumers per topic", "High throughput for event streaming"],
+      "cons": ["Operational complexity at scale", "Partition ordering constraints", "Consumer lag monitoring required"]
+    },
+    "alternatives": [
+      { "name": "Amazon Kinesis", "context": "Managed streaming on AWS" },
+      { "name": "Google Pub/Sub", "context": "Managed messaging on GCP" },
+      { "name": "Apache Pulsar", "context": "Multi-tenant, tiered storage" }
+    ],
+    "position": { "x": 300, "y": 100 }
+  }
+]

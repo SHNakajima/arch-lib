@@ -1,0 +1,100 @@
+[
+  {
+    "source": "client",
+    "target": "elb",
+    "label": "HTTPS Requests",
+    "type": "sync",
+    "scenarios": ["global", "purchase", "search"]
+  },
+  {
+    "source": "elb",
+    "target": "api-gateway",
+    "label": "Load-Balanced Traffic",
+    "type": "sync",
+    "scenarios": ["global", "purchase", "search"]
+  },
+  {
+    "source": "api-gateway",
+    "target": "product-service",
+    "label": "Product Queries",
+    "type": "sync",
+    "scenarios": ["global", "purchase", "search"]
+  },
+  {
+    "source": "api-gateway",
+    "target": "order-service",
+    "label": "Order Requests",
+    "type": "sync",
+    "scenarios": ["global", "purchase"]
+  },
+  {
+    "source": "api-gateway",
+    "target": "search",
+    "label": "Search Queries",
+    "type": "sync",
+    "scenarios": ["global", "search"]
+  },
+  {
+    "source": "api-gateway",
+    "target": "recommendation",
+    "label": "Get Recommendations",
+    "type": "sync",
+    "scenarios": ["global", "search"]
+  },
+  {
+    "source": "product-service",
+    "target": "dynamodb",
+    "label": "Product Data R/W",
+    "type": "sync",
+    "scenarios": ["global", "purchase", "search"]
+  },
+  {
+    "source": "product-service",
+    "target": "elasticache",
+    "label": "Cache Product Details",
+    "type": "sync",
+    "scenarios": ["global", "purchase", "search"]
+  },
+  {
+    "source": "order-service",
+    "target": "dynamodb",
+    "label": "Order Data R/W",
+    "type": "sync",
+    "scenarios": ["global", "purchase"]
+  },
+  {
+    "source": "order-service",
+    "target": "sqs-sns",
+    "label": "Order Events",
+    "type": "async",
+    "scenarios": ["global", "purchase"]
+  },
+  {
+    "source": "search",
+    "target": "elasticache",
+    "label": "Cached Results",
+    "type": "sync",
+    "scenarios": ["global", "search"]
+  },
+  {
+    "source": "search",
+    "target": "dynamodb",
+    "label": "Index Data",
+    "type": "sync",
+    "scenarios": ["global", "search"]
+  },
+  {
+    "source": "sqs-sns",
+    "target": "recommendation",
+    "label": "Purchase Events",
+    "type": "async",
+    "scenarios": ["global", "purchase"]
+  },
+  {
+    "source": "recommendation",
+    "target": "elasticache",
+    "label": "Cache Recommendations",
+    "type": "sync",
+    "scenarios": ["global"]
+  }
+]

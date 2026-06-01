@@ -1,0 +1,58 @@
+[
+  {
+    "id": "global",
+    "name": "🌐 Global View",
+    "description": "Full e-commerce platform overview with all components and connections",
+    "highlightNodes": "*",
+    "highlightEdges": "*"
+  },
+  {
+    "id": "purchase",
+    "name": "🛒 Purchase Flow",
+    "description": "Complete journey from 'Add to Cart' through payment to order confirmation",
+    "highlightNodes": ["client", "elb", "api-gateway", "product-service", "order-service", "dynamodb", "sqs-sns", "elasticache", "recommendation"],
+    "highlightEdges": [
+      "client->elb",
+      "elb->api-gateway",
+      "api-gateway->product-service",
+      "api-gateway->order-service",
+      "product-service->dynamodb",
+      "product-service->elasticache",
+      "order-service->dynamodb",
+      "order-service->sqs-sns",
+      "sqs-sns->recommendation"
+    ],
+    "steps": [
+      { "order": 1, "description": "Customer clicks 'Add to Cart' — request flows through ELB to API Gateway", "nodes": ["client", "elb", "api-gateway"] },
+      { "order": 2, "description": "Product service verifies availability and current price from cache/DynamoDB", "nodes": ["api-gateway", "product-service", "elasticache", "dynamodb"] },
+      { "order": 3, "description": "Customer proceeds to checkout — Order service begins the purchase saga", "nodes": ["api-gateway", "order-service"] },
+      { "order": 4, "description": "Order service reserves inventory and processes payment via DynamoDB transactions", "nodes": ["order-service", "dynamodb"] },
+      { "order": 5, "description": "Order confirmation event published to SQS/SNS for downstream processing", "nodes": ["order-service", "sqs-sns"] },
+      { "order": 6, "description": "Purchase event feeds recommendation engine to update 'Frequently Bought Together'", "nodes": ["sqs-sns", "recommendation"] }
+    ]
+  },
+  {
+    "id": "search",
+    "name": "🔍 Search & Discovery",
+    "description": "How product search, autocomplete, and personalized recommendations work together",
+    "highlightNodes": ["client", "elb", "api-gateway", "search", "product-service", "recommendation", "elasticache", "dynamodb"],
+    "highlightEdges": [
+      "client->elb",
+      "elb->api-gateway",
+      "api-gateway->search",
+      "api-gateway->product-service",
+      "api-gateway->recommendation",
+      "search->elasticache",
+      "search->dynamodb",
+      "product-service->elasticache",
+      "recommendation->elasticache"
+    ],
+    "steps": [
+      { "order": 1, "description": "User types search query — request hits API Gateway via ELB", "nodes": ["client", "elb", "api-gateway"] },
+      { "order": 2, "description": "Search service processes query with ML ranking, checks cache for frequent queries", "nodes": ["api-gateway", "search", "elasticache"] },
+      { "order": 3, "description": "On cache miss, search engine queries distributed index backed by DynamoDB", "nodes": ["search", "dynamodb"] },
+      { "order": 4, "description": "Product service enriches search results with real-time pricing and availability", "nodes": ["api-gateway", "product-service", "elasticache"] },
+      { "order": 5, "description": "Recommendation engine injects personalized suggestions based on browsing history", "nodes": ["api-gateway", "recommendation"] }
+    ]
+  }
+]

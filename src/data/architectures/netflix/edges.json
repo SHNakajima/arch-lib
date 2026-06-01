@@ -1,0 +1,93 @@
+[
+  {
+    "source": "client",
+    "target": "zuul",
+    "label": "API Requests (HTTPS)",
+    "type": "sync",
+    "scenarios": ["global", "video-playback", "recommendation"]
+  },
+  {
+    "source": "client",
+    "target": "cdn",
+    "label": "Video Stream (HLS/DASH)",
+    "type": "streaming",
+    "scenarios": ["global", "video-playback"]
+  },
+  {
+    "source": "zuul",
+    "target": "eureka",
+    "label": "Service Lookup",
+    "type": "sync",
+    "scenarios": ["global"]
+  },
+  {
+    "source": "zuul",
+    "target": "api-services",
+    "label": "Routed Requests",
+    "type": "sync",
+    "scenarios": ["global", "video-playback", "recommendation"]
+  },
+  {
+    "source": "api-services",
+    "target": "evcache",
+    "label": "Cache Read/Write",
+    "type": "sync",
+    "scenarios": ["global", "video-playback", "recommendation"]
+  },
+  {
+    "source": "api-services",
+    "target": "cassandra",
+    "label": "Persistent Data",
+    "type": "sync",
+    "scenarios": ["global", "video-playback"]
+  },
+  {
+    "source": "api-services",
+    "target": "kafka",
+    "label": "Publish Events",
+    "type": "async",
+    "scenarios": ["global", "video-playback", "recommendation"]
+  },
+  {
+    "source": "api-services",
+    "target": "recommendation",
+    "label": "Get Recommendations",
+    "type": "sync",
+    "scenarios": ["global", "recommendation"]
+  },
+  {
+    "source": "kafka",
+    "target": "recommendation",
+    "label": "Viewing Events Stream",
+    "type": "async",
+    "scenarios": ["global", "recommendation"]
+  },
+  {
+    "source": "recommendation",
+    "target": "cassandra",
+    "label": "Read User Profiles",
+    "type": "sync",
+    "scenarios": ["global", "recommendation"]
+  },
+  {
+    "source": "recommendation",
+    "target": "evcache",
+    "label": "Cache Model Results",
+    "type": "sync",
+    "scenarios": ["global", "recommendation"]
+  },
+  {
+    "source": "titus",
+    "target": "api-services",
+    "label": "Container Orchestration",
+    "type": "async",
+    "scenarios": ["global"]
+  },
+  {
+    "source": "titus",
+    "target": "eureka",
+    "label": "Register Instances",
+    "type": "sync",
+    "scenarios": ["global"]
+  }
+]

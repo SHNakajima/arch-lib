@@ -1,0 +1,93 @@
+[
+  {
+    "source": "client",
+    "target": "load-balancer",
+    "label": "HTTPS Requests",
+    "type": "sync",
+    "scenarios": ["global", "fanout", "trending"]
+  },
+  {
+    "source": "load-balancer",
+    "target": "api-service",
+    "label": "Routed Traffic",
+    "type": "sync",
+    "scenarios": ["global", "fanout", "trending"]
+  },
+  {
+    "source": "api-service",
+    "target": "tweet-service",
+    "label": "Create Tweet",
+    "type": "sync",
+    "scenarios": ["global", "fanout"]
+  },
+  {
+    "source": "api-service",
+    "target": "timeline-service",
+    "label": "Get Timeline",
+    "type": "sync",
+    "scenarios": ["global", "fanout"]
+  },
+  {
+    "source": "tweet-service",
+    "target": "tweet-store",
+    "label": "Persist Tweet",
+    "type": "sync",
+    "scenarios": ["global", "fanout"]
+  },
+  {
+    "source": "tweet-service",
+    "target": "kafka",
+    "label": "Tweet Created Event",
+    "type": "async",
+    "scenarios": ["global", "fanout", "trending"]
+  },
+  {
+    "source": "kafka",
+    "target": "fanout-service",
+    "label": "New Tweet Events",
+    "type": "async",
+    "scenarios": ["global", "fanout"]
+  },
+  {
+    "source": "fanout-service",
+    "target": "social-graph",
+    "label": "Query Followers",
+    "type": "sync",
+    "scenarios": ["global", "fanout"]
+  },
+  {
+    "source": "fanout-service",
+    "target": "redis-cache",
+    "label": "Push to Timelines",
+    "type": "async",
+    "scenarios": ["global", "fanout"]
+  },
+  {
+    "source": "timeline-service",
+    "target": "redis-cache",
+    "label": "Read Cached Timeline",
+    "type": "sync",
+    "scenarios": ["global", "fanout"]
+  },
+  {
+    "source": "timeline-service",
+    "target": "tweet-store",
+    "label": "Hydrate Tweets",
+    "type": "sync",
+    "scenarios": ["global", "fanout"]
+  },
+  {
+    "source": "timeline-service",
+    "target": "social-graph",
+    "label": "Celebrity Followings",
+    "type": "sync",
+    "scenarios": ["global", "fanout"]
+  },
+  {
+    "source": "kafka",
+    "target": "timeline-service",
+    "label": "Trending Signals",
+    "type": "async",
+    "scenarios": ["global", "trending"]
+  }
+]

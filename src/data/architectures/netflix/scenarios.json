@@ -1,0 +1,55 @@
+[
+  {
+    "id": "global",
+    "name": "🌐 Global View",
+    "description": "Full system overview showing all components and their connections",
+    "highlightNodes": "*",
+    "highlightEdges": "*"
+  },
+  {
+    "id": "video-playback",
+    "name": "▶️ Video Playback",
+    "description": "What happens when a user presses Play — from API request to video stream delivery",
+    "highlightNodes": ["client", "zuul", "api-services", "evcache", "cassandra", "cdn", "kafka"],
+    "highlightEdges": [
+      "client->zuul",
+      "client->cdn",
+      "zuul->api-services",
+      "api-services->evcache",
+      "api-services->cassandra",
+      "api-services->kafka"
+    ],
+    "steps": [
+      { "order": 1, "description": "Client sends play request to Zuul Gateway", "nodes": ["client", "zuul"] },
+      { "order": 2, "description": "Zuul routes to API/BFF service for content resolution", "nodes": ["zuul", "api-services"] },
+      { "order": 3, "description": "API service checks EVCache for content metadata and DRM license", "nodes": ["api-services", "evcache"] },
+      { "order": 4, "description": "On cache miss, fetches from Cassandra and populates cache", "nodes": ["api-services", "cassandra"] },
+      { "order": 5, "description": "Play event published to Kafka for analytics and recommendations", "nodes": ["api-services", "kafka"] },
+      { "order": 6, "description": "Client receives stream manifest and begins adaptive bitrate playback via Open Connect CDN", "nodes": ["client", "cdn"] }
+    ]
+  },
+  {
+    "id": "recommendation",
+    "name": "🧠 Recommendation Pipeline",
+    "description": "How Netflix generates personalized content recommendations using ML and real-time event data",
+    "highlightNodes": ["client", "zuul", "api-services", "kafka", "recommendation", "evcache", "cassandra"],
+    "highlightEdges": [
+      "client->zuul",
+      "zuul->api-services",
+      "api-services->kafka",
+      "kafka->recommendation",
+      "recommendation->cassandra",
+      "recommendation->evcache",
+      "api-services->recommendation",
+      "api-services->evcache"
+    ],
+    "steps": [
+      { "order": 1, "description": "User interactions (views, ratings, browsing) are captured by client apps", "nodes": ["client"] },
+      { "order": 2, "description": "Events flow through Zuul and API services to Kafka", "nodes": ["zuul", "api-services", "kafka"] },
+      { "order": 3, "description": "Recommendation engine consumes event streams from Kafka in real-time", "nodes": ["kafka", "recommendation"] },
+      { "order": 4, "description": "ML models read user profiles and viewing history from Cassandra", "nodes": ["recommendation", "cassandra"] },
+      { "order": 5, "description": "Generated recommendations are cached in EVCache for fast retrieval", "nodes": ["recommendation", "evcache"] },
+      { "order": 6, "description": "When user opens the app, API services fetch personalized rankings from cache", "nodes": ["api-services", "evcache"] }
+    ]
+  }
+]

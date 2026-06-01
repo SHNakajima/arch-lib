@@ -1,0 +1,57 @@
+[
+  {
+    "id": "global",
+    "name": "🌐 Global View",
+    "description": "Full Twitter/X system overview with all components and connections",
+    "highlightNodes": "*",
+    "highlightEdges": "*"
+  },
+  {
+    "id": "fanout",
+    "name": "📢 Tweet Fanout",
+    "description": "How a single tweet reaches millions of follower timelines using the hybrid push/pull strategy",
+    "highlightNodes": ["client", "load-balancer", "api-service", "tweet-service", "tweet-store", "kafka", "fanout-service", "social-graph", "redis-cache", "timeline-service"],
+    "highlightEdges": [
+      "client->load-balancer",
+      "load-balancer->api-service",
+      "api-service->tweet-service",
+      "tweet-service->tweet-store",
+      "tweet-service->kafka",
+      "kafka->fanout-service",
+      "fanout-service->social-graph",
+      "fanout-service->redis-cache",
+      "api-service->timeline-service",
+      "timeline-service->redis-cache",
+      "timeline-service->tweet-store",
+      "timeline-service->social-graph"
+    ],
+    "steps": [
+      { "order": 1, "description": "User composes tweet — request flows through LB to API service", "nodes": ["client", "load-balancer", "api-service"] },
+      { "order": 2, "description": "Tweet service validates content and assigns a Snowflake ID", "nodes": ["api-service", "tweet-service"] },
+      { "order": 3, "description": "Tweet is persisted to the durable Tweet Store", "nodes": ["tweet-service", "tweet-store"] },
+      { "order": 4, "description": "Tweet created event is published to Kafka event bus", "nodes": ["tweet-service", "kafka"] },
+      { "order": 5, "description": "Fanout service consumes event, queries Social Graph for follower list", "nodes": ["kafka", "fanout-service", "social-graph"] },
+      { "order": 6, "description": "For normal users: tweet ID pushed to each follower's Redis timeline cache", "nodes": ["fanout-service", "redis-cache"] },
+      { "order": 7, "description": "When a follower opens their timeline: Timeline service reads from Redis, merges celebrity tweets, applies ML ranking", "nodes": ["timeline-service", "redis-cache", "social-graph"] },
+      { "order": 8, "description": "Timeline service hydrates tweet IDs into full content from Tweet Store", "nodes": ["timeline-service", "tweet-store"] }
+    ]
+  },
+  {
+    "id": "trending",
+    "name": "📈 Trending Topics",
+    "description": "How trending topics are detected and served from real-time event streams",
+    "highlightNodes": ["client", "load-balancer", "api-service", "tweet-service", "kafka", "timeline-service"],
+    "highlightEdges": [
+      "client->load-balancer",
+      "load-balancer->api-service",
+      "tweet-service->kafka",
+      "kafka->timeline-service"
+    ],
+    "steps": [
+      { "order": 1, "description": "Every tweet creation event streams into Kafka with hashtags and content metadata", "nodes": ["tweet-service", "kafka"] },
+      { "order": 2, "description": "Stream processing pipeline analyzes real-time hashtag velocity and engagement spikes", "nodes": ["kafka", "timeline-service"] },
+      { "order": 3, "description": "Trending topics are computed using sliding window aggregation and anomaly detection", "nodes": ["timeline-service"] },
+      { "order": 4, "description": "Client requests trending data through API, results personalized by location and interests", "nodes": ["client", "load-balancer", "api-service"] }
+    ]
+  }
+]

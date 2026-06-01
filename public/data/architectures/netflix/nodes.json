@@ -1,0 +1,186 @@
+[
+  {
+    "id": "client",
+    "label": "Client Apps",
+    "type": "client",
+    "description": "Netflix apps on Smart TVs, mobile devices, web browsers, and gaming consoles.",
+    "techStack": "React (Web), Native SDKs (iOS/Android/TV)",
+    "role": "The user-facing interface that requests content, displays personalized recommendations, and handles video playback via adaptive bitrate streaming.",
+    "whyChosen": "Platform-specific native apps deliver optimal playback performance and device integration, while the web app leverages React for rapid iteration.",
+    "tradeoffs": {
+      "pros": ["Optimal performance per platform", "Deep device integration (DRM, hardware decoding)"],
+      "cons": ["Multiple codebases to maintain", "Slower feature parity across platforms"]
+    },
+    "alternatives": [
+      { "name": "Flutter", "context": "Cross-platform with single codebase" },
+      { "name": "React Native", "context": "Shared code between mobile platforms" }
+    ],
+    "position": { "x": 100, "y": 300 }
+  },
+  {
+    "id": "cdn",
+    "label": "Open Connect CDN",
+    "type": "cdn",
+    "description": "Netflix's custom Content Delivery Network with appliances embedded in ISP networks worldwide.",
+    "techStack": "Open Connect Appliances (OCA), FreeBSD, nginx",
+    "role": "Caches and delivers video content from the network edge, minimizing latency and backbone bandwidth usage. Handles 100% of video streaming traffic.",
+    "whyChosen": "Third-party CDNs couldn't deliver the required quality at Netflix's scale. Building their own CDN allowed fine-grained control over caching, routing, and peering relationships.",
+    "tradeoffs": {
+      "pros": ["Full control over delivery quality", "Reduced bandwidth costs at scale", "Closer to end users via ISP partnerships"],
+      "cons": ["Massive capital and operational investment", "Requires ISP partnership negotiations globally"]
+    },
+    "alternatives": [
+      { "name": "Akamai / CloudFront", "context": "Managed CDN, lower upfront cost" },
+      { "name": "Cloudflare Stream", "context": "Integrated video delivery platform" }
+    ],
+    "position": { "x": 100, "y": 500 }
+  },
+  {
+    "id": "zuul",
+    "label": "Zuul API Gateway",
+    "type": "gateway",
+    "description": "Edge gateway that serves as the front door for all API requests entering the Netflix ecosystem.",
+    "techStack": "Zuul 2 (Netty-based, non-blocking)",
+    "role": "Handles dynamic routing, authentication, rate limiting, load shedding, and security filtering. Provides a single entry point for all backend microservices.",
+    "whyChosen": "Netflix needed a highly programmable, async gateway capable of handling millions of concurrent connections with custom filter chains for canary testing and traffic shaping.",
+    "tradeoffs": {
+      "pros": ["Programmable filter pipeline for dynamic behavior", "Non-blocking I/O for extreme throughput", "Enables canary deployments and A/B testing at the edge"],
+      "cons": ["Complex custom solution requiring deep expertise", "Higher operational burden than managed alternatives"]
+    },
+    "alternatives": [
+      { "name": "AWS API Gateway", "context": "Fully managed, serverless" },
+      { "name": "Kong", "context": "Open-source, plugin-based gateway" },
+      { "name": "Envoy Proxy", "context": "High-performance L7 proxy, CNCF project" }
+    ],
+    "position": { "x": 350, "y": 300 }
+  },
+  {
+    "id": "eureka",
+    "label": "Eureka Service Discovery",
+    "type": "service",
+    "description": "Client-side service discovery registry enabling microservices to find and communicate with each other.",
+    "techStack": "Eureka (Netflix OSS)",
+    "role": "Maintains a real-time registry of all service instances, their locations, and health status. Services register themselves on startup and query Eureka to find dependencies.",
+    "whyChosen": "In a cloud environment where instances are ephemeral, hardcoded addresses are impossible. Eureka provides AP (Available, Partition-tolerant) semantics ideal for Netflix's scale.",
+    "tradeoffs": {
+      "pros": ["High availability over strict consistency (AP system)", "Client-side load balancing", "Self-healing with heartbeat-based eviction"],
+      "cons": ["Eventually consistent — stale data possible", "Requires client-side integration in every service"]
+    },
+    "alternatives": [
+      { "name": "Consul", "context": "HashiCorp, supports health checking + KV store" },
+      { "name": "AWS Cloud Map", "context": "Managed service discovery on AWS" },
+      { "name": "Kubernetes Service Discovery", "context": "Built-in with K8s DNS" }
+    ],
+    "position": { "x": 350, "y": 100 }
+  },
+  {
+    "id": "api-services",
+    "label": "API / BFF Services",
+    "type": "service",
+    "description": "Backend-for-Frontend services that aggregate data from multiple microservices into client-optimized responses.",
+    "techStack": "Java, Spring Boot, gRPC",
+    "role": "Orchestrate calls to downstream domain services, transform and aggregate data, and return tailored payloads for different client types (TV, mobile, web).",
+    "whyChosen": "Decoupling client needs from domain service APIs allows independent evolution. Different clients have different data needs that a single API cannot efficiently serve.",
+    "tradeoffs": {
+      "pros": ["Client-optimized responses reduce over-fetching", "Isolates client changes from domain services"],
+      "cons": ["Additional layer of complexity", "Risk of becoming a monolithic aggregation layer"]
+    },
+    "alternatives": [
+      { "name": "GraphQL Gateway", "context": "Client-driven queries, flexible data fetching" },
+      { "name": "Direct microservice calls", "context": "Simpler but couples clients to internals" }
+    ],
+    "position": { "x": 600, "y": 300 }
+  },
+  {
+    "id": "evcache",
+    "label": "EVCache",
+    "type": "cache",
+    "description": "Netflix's distributed caching solution built on Memcached, optimized for high availability and low latency.",
+    "techStack": "EVCache (Memcached-based), cross-region replication",
+    "role": "Provides sub-millisecond access to frequently requested data (user profiles, viewing history, session data). Reduces load on backend databases by orders of magnitude.",
+    "whyChosen": "Standard Memcached lacked cross-region replication and Netflix-scale operational tooling. EVCache adds automatic failover, zone-aware routing, and data replication.",
+    "tradeoffs": {
+      "pros": ["Sub-millisecond latency", "Cross-region replication for global availability", "Handles millions of ops/sec"],
+      "cons": ["Cache invalidation complexity", "Memory-intensive infrastructure cost", "Data consistency challenges across regions"]
+    },
+    "alternatives": [
+      { "name": "Redis / ElastiCache", "context": "Rich data structures, pub/sub support" },
+      { "name": "Hazelcast", "context": "In-memory data grid with compute" }
+    ],
+    "position": { "x": 600, "y": 100 }
+  },
+  {
+    "id": "cassandra",
+    "label": "Cassandra",
+    "type": "database",
+    "description": "Distributed NoSQL database providing linear scalability and high availability with no single point of failure.",
+    "techStack": "Apache Cassandra, multi-region clusters",
+    "role": "Primary persistent storage for user data, viewing history, and content metadata. Chosen for workloads requiring massive write throughput and global replication.",
+    "whyChosen": "Netflix requires a database that scales horizontally across regions with tunable consistency. Cassandra's masterless architecture eliminates single points of failure.",
+    "tradeoffs": {
+      "pros": ["Linear horizontal scalability", "Multi-region active-active replication", "Tunable consistency per query"],
+      "cons": ["Complex data modeling (denormalization required)", "No ACID transactions across partitions", "Operational complexity at scale"]
+    },
+    "alternatives": [
+      { "name": "DynamoDB", "context": "Managed NoSQL with auto-scaling on AWS" },
+      { "name": "ScyllaDB", "context": "C++ Cassandra-compatible, higher throughput" },
+      { "name": "CockroachDB", "context": "Distributed SQL with strong consistency" }
+    ],
+    "position": { "x": 850, "y": 200 }
+  },
+  {
+    "id": "kafka",
+    "label": "Apache Kafka",
+    "type": "queue",
+    "description": "Distributed event streaming platform acting as the central nervous system for real-time data pipelines.",
+    "techStack": "Apache Kafka, 700+ billion messages/day",
+    "role": "Enables asynchronous communication between services, powers real-time analytics pipelines, and feeds the recommendation engine with viewing events and user interactions.",
+    "whyChosen": "Netflix processes hundreds of billions of events daily. Kafka's log-based architecture provides durable, ordered, replayable event streams — essential for both real-time processing and batch analytics.",
+    "tradeoffs": {
+      "pros": ["Massive throughput with durability", "Decouples producers from consumers", "Event replay capability for debugging and reprocessing"],
+      "cons": ["Operational complexity of large Kafka clusters", "Message ordering only within partitions", "Storage costs for long-retention topics"]
+    },
+    "alternatives": [
+      { "name": "Amazon Kinesis", "context": "Managed streaming, tighter AWS integration" },
+      { "name": "Apache Pulsar", "context": "Multi-tenancy, tiered storage" },
+      { "name": "RabbitMQ", "context": "Simpler message broker for lower-scale needs" }
+    ],
+    "position": { "x": 850, "y": 400 }
+  },
+  {
+    "id": "recommendation",
+    "label": "Recommendation Engine",
+    "type": "ml",
+    "description": "ML pipeline that personalizes the entire Netflix experience — from homepage rows to artwork selection.",
+    "techStack": "Custom ML models, TensorFlow, Spark, Flink",
+    "role": "Analyzes viewing history, ratings, and contextual signals to generate personalized content rankings. Powers the 'Top Picks', genre rows, and even which artwork is shown per title.",
+    "whyChosen": "Personalization is Netflix's core competitive advantage. 80% of content watched is driven by recommendations. Custom models allow optimization for engagement and satisfaction.",
+    "tradeoffs": {
+      "pros": ["Drives 80%+ of content discovery", "Continuously learns from user behavior", "Personalizes beyond just content (artwork, UI layout)"],
+      "cons": ["Filter bubble risk", "Massive compute costs for training and inference", "Cold start problem for new users"]
+    },
+    "alternatives": [
+      { "name": "Amazon Personalize", "context": "Managed recommendation service" },
+      { "name": "Google Recommendations AI", "context": "GCP managed ML recommendations" }
+    ],
+    "position": { "x": 600, "y": 500 }
+  },
+  {
+    "id": "titus",
+    "label": "Titus (Container Platform)",
+    "type": "service",
+    "description": "Netflix's container management platform running hundreds of thousands of containers on AWS.",
+    "techStack": "Titus (custom), runs on AWS EC2",
+    "role": "Manages the lifecycle of all microservice containers — scheduling, scaling, resource isolation, and integration with Netflix's deployment tooling (Spinnaker).",
+    "whyChosen": "Netflix needed deeper integration with their existing AWS infrastructure and custom scheduling policies that Kubernetes didn't provide at the time of development.",
+    "tradeoffs": {
+      "pros": ["Deep AWS integration", "Custom scheduling for Netflix workloads", "Unified platform for batch and service workloads"],
+      "cons": ["Proprietary — not open-source community-driven", "Migration cost if moving away from AWS"]
+    },
+    "alternatives": [
+      { "name": "Kubernetes (EKS)", "context": "Industry standard container orchestration" },
+      { "name": "AWS ECS", "context": "Managed container service, simpler than K8s" }
+    ],
+    "position": { "x": 350, "y": 500 }
+  }
+]
