@@ -1,8 +1,8 @@
 {
   "id": "amazon",
   "name": "Amazon",
-  "description": "The world's largest e-commerce platform and cloud provider, pioneering microservices, distributed databases, and the two-pizza team philosophy.",
-  "category": "E-Commerce & Cloud",
+  "description": "世界最大級のEコマースプラットフォームでありクラウドプロバイダー。マイクロサービス、分散データベース、そして「2枚のピザチーム（Two-Pizza Teams）」と呼ばれるアジャイルな組織構造・設計思想の先駆者。",
+  "category": "Eコマース・クラウド",
   "tags": ["microservices", "distributed-database", "event-driven", "serverless", "search", "recommendation"],
   "color": "#FF9900",
   "accentGradient": "linear-gradient(135deg, #FF9900, #E68A00)"

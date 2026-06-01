@@ -1,8 +1,8 @@
 {
   "id": "twitter",
   "name": "Twitter / X",
-  "description": "Real-time social media platform handling 500M+ tweets/day with a hybrid fanout architecture for sub-second timeline delivery.",
-  "category": "Social Media",
+  "description": "1日あたり5億件以上のツイートを処理するリアルタイムソーシャルメディア。1秒未満でのタイムライン配信を可能にする、プッシュ（ライト・ファンアウト）とプル（リード・ファンアウト）のハイブリッドアーキテクチャ。",
+  "category": "ソーシャルメディア",
   "tags": ["fanout", "real-time", "distributed-cache", "graph-database", "search", "event-streaming"],
   "color": "#1DA1F2",
   "accentGradient": "linear-gradient(135deg, #1DA1F2, #0D8BD9)"

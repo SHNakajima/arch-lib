@@ -14,6 +14,18 @@ export const NODE_COLORS = {
   ml:       'hsl(320, 70%, 55%)',
 };
 
+/** Japanese name map for node types */
+export const NODE_TYPE_JA = {
+  client:   'クライアント',
+  gateway:  'APIゲートウェイ',
+  service:  'マイクロサービス',
+  database: 'データベース',
+  cache:    '分散キャッシュ',
+  queue:    'メッセージキュー',
+  cdn:      'CDN',
+  ml:       '機械学習 / ML',
+};
+
 /** Icon map for node types */
 export const NODE_ICONS = {
   client:   '📱',

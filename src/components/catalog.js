@@ -24,21 +24,21 @@ export async function createCatalog(container, navigateTo) {
       Architecture <span class="gradient-text">Encyclopedia</span>
     </h1>
     <p class="hero__subtitle">
-      Explore how the world's largest applications are built.
-      Interactive diagrams, component deep-dives, and architectural trade-offs — all in one place.
+      世界規模のサービスがどのように構築されているかを探索しましょう。
+      インタラクティブな構成図、コンポーネントの深掘り、設計のトレードオフをこの一つの場所で学べます。
     </p>
     <div class="hero__stats">
       <div class="hero__stat">
         <div class="hero__stat-value gradient-text">${list.length}</div>
-        <div class="hero__stat-label">Architectures</div>
+        <div class="hero__stat-label">掲載数</div>
       </div>
       <div class="hero__stat">
         <div class="hero__stat-value gradient-text">${tags.length}</div>
-        <div class="hero__stat-label">Technologies</div>
+        <div class="hero__stat-label">技術スタック</div>
       </div>
       <div class="hero__stat">
         <div class="hero__stat-value gradient-text">${list.reduce((sum, m) => sum + (m.tags?.length || 0), 0)}</div>
-        <div class="hero__stat-label">Components</div>
+        <div class="hero__stat-label">コンポーネント</div>
       </div>
     </div>
   `;
@@ -57,7 +57,7 @@ export async function createCatalog(container, navigateTo) {
         type="text"
         class="filter-bar__input"
         id="search-input"
-        placeholder="Search architectures or technologies..."
+        placeholder="アーキテクチャ名や技術スタックで検索..."
         autocomplete="off"
       />
     </div>
@@ -121,7 +121,7 @@ function renderCards(grid, items, navigateTo) {
     grid.innerHTML = `
       <div class="catalog-empty">
         <div class="catalog-empty__icon">🔍</div>
-        <p class="catalog-empty__message">No architectures found matching your search.</p>
+        <p class="catalog-empty__message">条件に一致するアーキテクチャが見つかりませんでした。</p>
       </div>
     `;
     return;
@@ -134,7 +134,7 @@ function renderCards(grid, items, navigateTo) {
       style="--card-accent: ${item.accentGradient}; animation-delay: ${i * 0.08}s"
       role="button"
       tabindex="0"
-      aria-label="View ${item.name} architecture"
+      aria-label="${item.name}のアーキテクチャを表示"
     >
       <div class="catalog-card__header">
         <div class="catalog-card__icon" style="background: ${item.accentGradient}">

@@ -1,15 +1,15 @@
 [
   {
     "id": "global",
-    "name": "🌐 Global View",
-    "description": "Full e-commerce platform overview with all components and connections",
+    "name": "🌐 全体概要",
+    "description": "すべてのコンポーネントと接続を示すEコマースプラットフォーム全体の概要",
     "highlightNodes": "*",
     "highlightEdges": "*"
   },
   {
     "id": "purchase",
-    "name": "🛒 Purchase Flow",
-    "description": "Complete journey from 'Add to Cart' through payment to order confirmation",
+    "name": "🛒 購入フロー",
+    "description": "「カートに入れる」から決済、注文完了までのフロー",
     "highlightNodes": ["client", "elb", "api-gateway", "product-service", "order-service", "dynamodb", "sqs-sns", "elasticache", "recommendation"],
     "highlightEdges": [
       "client->elb",
@@ -23,18 +23,18 @@
       "sqs-sns->recommendation"
     ],
     "steps": [
-      { "order": 1, "description": "Customer clicks 'Add to Cart' — request flows through ELB to API Gateway", "nodes": ["client", "elb", "api-gateway"] },
-      { "order": 2, "description": "Product service verifies availability and current price from cache/DynamoDB", "nodes": ["api-gateway", "product-service", "elasticache", "dynamodb"] },
-      { "order": 3, "description": "Customer proceeds to checkout — Order service begins the purchase saga", "nodes": ["api-gateway", "order-service"] },
-      { "order": 4, "description": "Order service reserves inventory and processes payment via DynamoDB transactions", "nodes": ["order-service", "dynamodb"] },
-      { "order": 5, "description": "Order confirmation event published to SQS/SNS for downstream processing", "nodes": ["order-service", "sqs-sns"] },
-      { "order": 6, "description": "Purchase event feeds recommendation engine to update 'Frequently Bought Together'", "nodes": ["sqs-sns", "recommendation"] }
+      { "order": 1, "description": "顧客が「カートに追加」をクリック — リクエストはELB経由でAPI Gatewayに流れる", "nodes": ["client", "elb", "api-gateway"] },
+      { "order": 2, "description": "商品サービスがキャッシュ（ElastiCache）またはDynamoDBから在庫状況と現在の価格を確認", "nodes": ["api-gateway", "product-service", "elasticache", "dynamodb"] },
+      { "order": 3, "description": "顧客が決済に進む — 注文サービスが購入トランザクション（Sagaパターン）を開始", "nodes": ["api-gateway", "order-service"] },
+      { "order": 4, "description": "注文サービスが在庫を確保し、DynamoDBのトランザクションを介して決済を処理", "nodes": ["order-service", "dynamodb"] },
+      { "order": 5, "description": "注文確認イベントを後続処理のためにSQS/SNSにパブリッシュ", "nodes": ["order-service", "sqs-sns"] },
+      { "order": 6, "description": "購入イベントがレコメンデーションエンジンに供給され、「よく一緒に購入されている商品」を更新", "nodes": ["sqs-sns", "recommendation"] }
     ]
   },
   {
     "id": "search",
-    "name": "🔍 Search & Discovery",
-    "description": "How product search, autocomplete, and personalized recommendations work together",
+    "name": "🔍 検索とディスカバリー",
+    "description": "商品検索、オートコンプリート、パーソナライズされたレコメンデーションが連携する仕組み",
     "highlightNodes": ["client", "elb", "api-gateway", "search", "product-service", "recommendation", "elasticache", "dynamodb"],
     "highlightEdges": [
       "client->elb",
@@ -48,11 +48,11 @@
       "recommendation->elasticache"
     ],
     "steps": [
-      { "order": 1, "description": "User types search query — request hits API Gateway via ELB", "nodes": ["client", "elb", "api-gateway"] },
-      { "order": 2, "description": "Search service processes query with ML ranking, checks cache for frequent queries", "nodes": ["api-gateway", "search", "elasticache"] },
-      { "order": 3, "description": "On cache miss, search engine queries distributed index backed by DynamoDB", "nodes": ["search", "dynamodb"] },
-      { "order": 4, "description": "Product service enriches search results with real-time pricing and availability", "nodes": ["api-gateway", "product-service", "elasticache"] },
-      { "order": 5, "description": "Recommendation engine injects personalized suggestions based on browsing history", "nodes": ["api-gateway", "recommendation"] }
+      { "order": 1, "description": "ユーザーが検索クエリを入力 — リクエストがELB経由でAPI Gatewayに到達", "nodes": ["client", "elb", "api-gateway"] },
+      { "order": 2, "description": "検索サービスがMLランキングでクエリを処理し、頻出クエリのキャッシュを確認", "nodes": ["api-gateway", "search", "elasticache"] },
+      { "order": 3, "description": "キャッシュミスの際、検索エンジンがDynamoDBをバックエンドとする分散インデックスにクエリを実行", "nodes": ["search", "dynamodb"] },
+      { "order": 4, "description": "商品サービスが検索結果にリアルタイムの価格と在庫状況を付与", "nodes": ["api-gateway", "product-service", "elasticache"] },
+      { "order": 5, "description": "レコメンデーションエンジンが閲覧履歴に基づいてパーソナライズされた提案を挿入", "nodes": ["api-gateway", "recommendation"] }
     ]
   }
 ]

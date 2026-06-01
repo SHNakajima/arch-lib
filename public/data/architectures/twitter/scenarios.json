@@ -1,15 +1,15 @@
 [
   {
     "id": "global",
-    "name": "🌐 Global View",
-    "description": "Full Twitter/X system overview with all components and connections",
+    "name": "🌐 全体概要",
+    "description": "すべてのコンポーネントと接続を示すTwitter/Xシステム全体の概要",
     "highlightNodes": "*",
     "highlightEdges": "*"
   },
   {
     "id": "fanout",
-    "name": "📢 Tweet Fanout",
-    "description": "How a single tweet reaches millions of follower timelines using the hybrid push/pull strategy",
+    "name": "📢 ツイートの配信（ファンアウト）",
+    "description": "プッシュ/プル方式を組み合わせたハイブリッド配信戦略により、1つのツイートが数百万人のフォロワーのタイムラインに届く仕組み",
     "highlightNodes": ["client", "load-balancer", "api-service", "tweet-service", "tweet-store", "kafka", "fanout-service", "social-graph", "redis-cache", "timeline-service"],
     "highlightEdges": [
       "client->load-balancer",
@@ -26,20 +26,20 @@
       "timeline-service->social-graph"
     ],
     "steps": [
-      { "order": 1, "description": "User composes tweet — request flows through LB to API service", "nodes": ["client", "load-balancer", "api-service"] },
-      { "order": 2, "description": "Tweet service validates content and assigns a Snowflake ID", "nodes": ["api-service", "tweet-service"] },
-      { "order": 3, "description": "Tweet is persisted to the durable Tweet Store", "nodes": ["tweet-service", "tweet-store"] },
-      { "order": 4, "description": "Tweet created event is published to Kafka event bus", "nodes": ["tweet-service", "kafka"] },
-      { "order": 5, "description": "Fanout service consumes event, queries Social Graph for follower list", "nodes": ["kafka", "fanout-service", "social-graph"] },
-      { "order": 6, "description": "For normal users: tweet ID pushed to each follower's Redis timeline cache", "nodes": ["fanout-service", "redis-cache"] },
-      { "order": 7, "description": "When a follower opens their timeline: Timeline service reads from Redis, merges celebrity tweets, applies ML ranking", "nodes": ["timeline-service", "redis-cache", "social-graph"] },
-      { "order": 8, "description": "Timeline service hydrates tweet IDs into full content from Tweet Store", "nodes": ["timeline-service", "tweet-store"] }
+      { "order": 1, "description": "ユーザーがツイートを作成 — リクエストがロードバランサー（LB）経由でAPIサービスに流れる", "nodes": ["client", "load-balancer", "api-service"] },
+      { "order": 2, "description": "ツイートサービスがコンテンツを検証し、Snowflake IDを割り当てる", "nodes": ["api-service", "tweet-service"] },
+      { "order": 3, "description": "ツイートが永続ストレージであるTweet Storeに書き込まれる", "nodes": ["tweet-service", "tweet-store"] },
+      { "order": 4, "description": "ツイート作成イベントがKafkaイベントバスにパブリッシュされる", "nodes": ["tweet-service", "kafka"] },
+      { "order": 5, "description": "ファンアウトサービスがイベントを消費し、ソーシャルグラフ（Social Graph）に問い合わせてフォロワーリストを取得", "nodes": ["kafka", "fanout-service", "social-graph"] },
+      { "order": 6, "description": "【通常ユーザー】フォロワーそれぞれのRedisタイムラインキャッシュにツイートIDをプッシュ（書き込み）", "nodes": ["fanout-service", "redis-cache"] },
+      { "order": 7, "description": "【フォロワーがタイムラインを開いた時】タイムラインサービスがRedisから読み出し、有名人（セレブリティ）のツイートをマージし、ML（機械学習）ランキングを適用", "nodes": ["timeline-service", "redis-cache", "social-graph"] },
+      { "order": 8, "description": "タイムラインサービスがツイートIDに対応する本文などの詳細情報をTweet Storeから取得して構築（ハイドレーション）", "nodes": ["timeline-service", "tweet-store"] }
     ]
   },
   {
     "id": "trending",
-    "name": "📈 Trending Topics",
-    "description": "How trending topics are detected and served from real-time event streams",
+    "name": "📈 トレンド・トピック",
+    "description": "リアルタイムイベントストリームからトレンドを検出し、提供する仕組み",
     "highlightNodes": ["client", "load-balancer", "api-service", "tweet-service", "kafka", "timeline-service"],
     "highlightEdges": [
       "client->load-balancer",
@@ -48,10 +48,10 @@
       "kafka->timeline-service"
     ],
     "steps": [
-      { "order": 1, "description": "Every tweet creation event streams into Kafka with hashtags and content metadata", "nodes": ["tweet-service", "kafka"] },
-      { "order": 2, "description": "Stream processing pipeline analyzes real-time hashtag velocity and engagement spikes", "nodes": ["kafka", "timeline-service"] },
-      { "order": 3, "description": "Trending topics are computed using sliding window aggregation and anomaly detection", "nodes": ["timeline-service"] },
-      { "order": 4, "description": "Client requests trending data through API, results personalized by location and interests", "nodes": ["client", "load-balancer", "api-service"] }
+      { "order": 1, "description": "すべてのツイート作成イベントが、ハッシュタグやコンテンツメタデータとともにKafkaにストリーミングされる", "nodes": ["tweet-service", "kafka"] },
+      { "order": 2, "description": "ストリーム処理パイプラインが、ハッシュタグのリアルタイムな出現速度やエンゲージメントの急増を分析", "nodes": ["kafka", "timeline-service"] },
+      { "order": 3, "description": "スライディングウィンドウ集計と異常検出アルゴリズムを使用して、トレンドトピックを算出", "nodes": ["timeline-service"] },
+      { "order": 4, "description": "クライアントがAPI経由でトレンドデータをリクエストし、位置情報や興味関心に基づいてパーソナライズされた結果を受け取る", "nodes": ["client", "load-balancer", "api-service"] }
     ]
   }
 ]

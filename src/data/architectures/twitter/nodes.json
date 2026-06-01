@@ -1,127 +1,127 @@
 [
   {
     "id": "client",
-    "label": "Client Apps",
+    "label": "クライアントアプリ",
     "type": "client",
-    "description": "Web app (twitter.com/x.com), iOS, and Android native applications.",
+    "description": "Webアプリ（twitter.com / x.com）およびiOS・Androidのネイティブアプリケーション。",
     "techStack": "React (Web), Swift (iOS), Kotlin (Android)",
-    "role": "Renders the timeline, handles tweet composition, real-time notifications, and media uploads. Web app uses progressive loading for timeline updates.",
-    "whyChosen": "React enables rapid iteration on web features. Native mobile apps provide smooth scrolling performance critical for timeline browsing.",
+    "role": "タイムラインの描画、ツイートの作成、リアルタイム通知、および画像・動画などのメディアアップロードを処理する。Webアプリは表示遅延を防ぐために段階的ローディングを使用。",
+    "whyChosen": "WebではReactを採用し迅速なUI機能イテレーションを実現。モバイルでは、タイムラインのブラウジングに極めて重要な『滑らかに吸い付くようなスクロールパフォーマンス』を保証するためにネイティブSDKで実装。",
     "tradeoffs": {
-      "pros": ["Platform-optimized performance", "Real-time push notifications", "Offline reading capability on mobile"],
-      "cons": ["Multiple codebases", "Feature rollout timing varies across platforms"]
+      "pros": ["各モバイルデバイスに完全に最適化された描画パフォーマンス", "リアルタイム性の高いプッシュ通知機能の統合", "モバイル回線切断時にも読めるローカルキャッシュによるオフライン対応"],
+      "cons": ["プラットフォームごとに個別のコードベースを並行管理する運用負荷", "機能リリースやアップデートのタイミングが各アプリストアの審査などによりズレる点"]
     },
     "alternatives": [
-      { "name": "React Native", "context": "Shared codebase for mobile" },
-      { "name": "PWA", "context": "Progressive web app for unified experience" }
+      { "name": "React Native", "context": "モバイル間でのコード共有を最優先とするクロスプラットフォーム開発" },
+      { "name": "PWA", "context": "アプリのインストールなしで統一したユーザー体験を提供する進化的Webアプローチ" }
     ],
     "position": { "x": 100, "y": 300 }
   },
   {
     "id": "load-balancer",
-    "label": "Load Balancer",
+    "label": "ロードバランサー",
     "type": "gateway",
-    "description": "L7 load balancer distributing incoming traffic across the service fleet.",
-    "techStack": "Custom L7 LB, GCP Load Balancer",
-    "role": "Distributes millions of requests per second, handles TLS termination, and routes to appropriate service clusters based on request type.",
-    "whyChosen": "A combination of custom load balancing logic and GCP managed infrastructure provides both flexibility for routing rules and operational simplicity.",
+    "description": "流入するすべてのトラフィックを受け取り、適切なサービスフリート（サーバー群）に均等分散する、L7ロードバランサー。",
+    "techStack": "カスタムL7ロードバランサー, GCP Load Balancer",
+    "role": "毎秒数百万件におよぶリクエストを健全なインスタンス群へ均等分散し、SSL/TLSの暗号終端を処理。リクエストの種類やパスに応じて最適なサービス群へルーティングする。",
+    "whyChosen": "独自の高度なルーティング要件を処理するためのカスタムプロキシロジックと、GCPの堅牢なグローバルLoad Balancerを組み合わせることで、柔軟性と運用の簡素化を両立するため。",
     "tradeoffs": {
-      "pros": ["Flexible routing rules for different request types", "High availability with GCP infrastructure"],
-      "cons": ["Migration from bare-metal to cloud added complexity", "Custom LB logic requires maintenance"]
+      "pros": ["リクエストパスやペイロードに基づく柔軟なカスタムルーティングルールの設計", "クラウドインフラをベースとした優れた高可用性と自動的な容量拡張"],
+      "cons": ["オンプレミス環境からクラウドへの移行・共存に伴うネットワーク構成の複雑化", "独自のカスタムLBロジックに対する継続的な保守メンテナンスタスク"]
     },
     "alternatives": [
-      { "name": "AWS ALB/NLB", "context": "Managed AWS load balancing" },
-      { "name": "Envoy", "context": "L7 proxy with advanced traffic management" }
+      { "name": "AWS ALB/NLB", "context": "AWS環境で利用されるマネージドでスケーラブルなロードバランサー" },
+      { "name": "Envoy Proxy", "context": "先進的なトラフィック管理やサービスメッシュ構築に適した高性能L7プロキシ" }
     ],
     "position": { "x": 300, "y": 300 }
   },
   {
     "id": "api-service",
-    "label": "API / GraphQL Service",
+    "label": "API / GraphQL サービス",
     "type": "service",
-    "description": "GraphQL-based API layer that serves as the unified interface between clients and backend microservices.",
+    "description": "クライアントアプリとバックエンドマイクロサービスの間を繋ぎ、効率的なデータ取得を可能にするGraphQLベースのAPIゲートウェイレイヤー。",
     "techStack": "GraphQL (Strato), Scala/Java",
-    "role": "Provides a single GraphQL endpoint for all client data needs. Aggregates data from multiple backend services (timeline, user, tweet storage) into efficient responses.",
-    "whyChosen": "GraphQL allows clients to request exactly the data they need, reducing over-fetching. Critical for mobile where bandwidth is limited and latency impacts scroll performance.",
+    "role": "クライアントの全データ要求に対して単一のGraphQLエンドポイントを提供。タイムライン、ユーザー情報、ツイートストアなどの複数の下流サービスからデータを効率的に集約・成形してレスポンスを返却する。",
+    "whyChosen": "GraphQLを採用することで、モバイルクライアントが必要なデータ項目（例えば、ツイート本文とユーザーアイコンのURLのみ等）をピンポイントで要求でき、不要な通信量（オーバーフェッチ）を劇的に削減できるため。これはスクロール中のネットワーク遅延を極力排除するために不可欠だった。",
     "tradeoffs": {
-      "pros": ["Eliminates over-fetching and under-fetching", "Single endpoint simplifies client code", "Strong typing with schema evolution"],
-      "cons": ["Query complexity can impact backend performance", "Caching is more complex than REST", "N+1 query problem requires careful resolver design"]
+      "pros": ["通信量の最小化と、1APIリクエストで完結するデータ結合(アンダーフェッチ防止)", "フロントエンドとバックエンド間のインターフェースの厳密な型定義とスキーマ管理"],
+      "cons": ["クライアント側で複雑なネストクエリを組み立てた場合の、バックエンド全体の負荷制御の難易度", "RESTのように静的パス単位での単純なHTTPキャッシュの適用が非常に困難", "resolver設計で注意しないと発生しやすいN+1クエリ問題の解決コスト"]
     },
     "alternatives": [
-      { "name": "REST API Gateway", "context": "Simpler, widely understood" },
-      { "name": "gRPC", "context": "High-performance binary protocol for internal services" }
+      { "name": "REST API Gateway", "context": "シンプルで標準的、キャッシュが効きやすく一般的に広く理解されている構成" },
+      { "name": "gRPC Gateway", "context": "HTTP/2ベースの超高性能バイナリプロトコルを内部および外部向けAPIに適用する設計" }
     ],
     "position": { "x": 500, "y": 300 }
   },
   {
     "id": "tweet-service",
-    "label": "Tweet Ingestion Service",
+    "label": "ツイート書き込みサービス",
     "type": "service",
-    "description": "Handles tweet creation, validation, and persistence with globally unique Snowflake ID assignment.",
-    "techStack": "Scala, Snowflake ID Generator",
-    "role": "Validates tweet content (length, media, policies), assigns a Snowflake ID for time-ordered uniqueness, persists to the tweet store, and triggers the fanout pipeline.",
-    "whyChosen": "Snowflake IDs provide time-sortable, globally unique identifiers without coordination — essential for distributed tweet creation across data centers.",
+    "description": "ツイートの作成リクエストを受け付け、データポリシー検証を行い、時系列ソート可能なSnowflake IDを割り当てて保存するサービス。",
+    "techStack": "Scala, Snowflake IDジェネレーター",
+    "role": "ツイート文字数やメディア制限のバリデーションを実行し、タイムスタンプを埋め込んだSnowflake IDを付与して永続化ストア（Tweet Store）へ書き込む。保存完了後、非同期の配信（ファンアウト）バスへイベントを流す。",
+    "whyChosen": "Snowflake IDは、中央データベース等との分散ロックやID発行用のマスターを一切必要とせず、複数データセンター間で完全に疎結合のまま『時系列順にソート可能でグローバルに一意』なIDを生成できるため、秒間数万のツイート投稿を捌く上で最適とされたため。",
     "tradeoffs": {
-      "pros": ["Snowflake IDs enable chronological sorting without DB queries", "Decoupled from downstream processing via async fanout"],
-      "cons": ["Clock synchronization issues can cause ID collisions", "Single point of validation can become a bottleneck"]
+      "pros": ["データベースに問い合わせ不要で、ID単体から時系列ソートが可能", "非同期のファンアウト処理により、書き込み（ツイート）処理自体を後続処理から完全分離"],
+      "cons": ["サーバー間の時刻同期（NTP）にわずかでもズレが発生した場合のID競合（衝突）リスク", "すべてのツイート投稿の検証を一箇所で処理するため、ボトルネックになりやすい"]
     },
     "alternatives": [
-      { "name": "UUIDv7", "context": "Time-ordered UUIDs, no custom generator needed" },
-      { "name": "ULID", "context": "Universally Unique Lexicographically Sortable Identifier" }
+      { "name": "UUIDv7", "context": "UUID標準仕様に追加された、時刻情報を含むソート可能な新しい一意識別子" },
+      { "name": "ULID", "context": "ミリ秒精度のタイムスタンプとランダムデータを組み合わせた、辞書順ソート可能な一意ID" }
     ],
     "position": { "x": 500, "y": 100 }
   },
   {
     "id": "fanout-service",
-    "label": "Fanout Service",
+    "label": "ファンアウトサービス",
     "type": "service",
-    "description": "Distributes new tweets to follower timelines using a hybrid push/pull strategy.",
-    "techStack": "Custom Java/Scala service, Social Graph integration",
-    "role": "The heart of timeline delivery. For regular users (<10K followers), pushes tweet IDs to follower Redis caches. For celebrities, flags for pull-based merge at read time.",
-    "whyChosen": "Pure push (fanout-on-write) would overwhelm the system for celebrity accounts. Pure pull would make timeline reads slow. The hybrid approach optimizes both.",
+    "description": "新しく投稿されたツイートを、プッシュとプルのハイブリッド配信戦略を用いてフォロワーのタイムラインへ配信するシステム。",
+    "techStack": "カスタムJava/Scalaサービス, ソーシャルグラフサービス連携",
+    "role": "タイムライン配信の心臓部。ツイート投稿者のフォロワー数が一定（例：1万人など）より少ない場合は、フォロワーそれぞれのRedisタイムラインキャッシュにツイートIDを即時書き込む（ライト・ファンアウト）。超人気ユーザーの場合は書き込まず、読込時に動的にマージする（リード・ファンアウト）。",
+    "whyChosen": "数千万人ものフォロワーを持つ有名人がツイートするたびに、全員のキャッシュへ瞬時に書き込む（プッシュ）と、巨大な書き込み増幅（Write Amplification）が起きてシステムが崩壊（インフラ障害）するため。ライト（書込）とリード（読込）のコストを論理的に最適化したハイブリッド設計。",
     "tradeoffs": {
-      "pros": ["Avoids write amplification storms from celebrity tweets", "Fast timeline reads for most users", "Dynamic threshold tuning based on load"],
-      "cons": ["Complex dual-path logic", "Celebrity tweet delivery has higher read-time latency", "Threshold tuning requires operational monitoring"]
+      "pros": ["有名人ツイートによる超巨大な書き込みストーム（書き込み増幅）の完全な回避", "ほとんどの一般ユーザーにおける、タイムライン読込時のキャッシュヒットによる超高速表示", "システムの負荷状態やリソース状況に応じた、動的な閾値判定ロジックの適応力"],
+      "cons": ["プッシュ（事前書込）とプル（参照時マージ）の2つの通信経路を同時に制御するコードの複雑さ", "有名人ツイートの読込時マージに伴う、タイムライン読込のわずかな遅延増加（リード負荷）", "フォロワー数の境界判定における、運用保守上の継続的なモニタリングコスト"]
     },
     "alternatives": [
-      { "name": "Pure fanout-on-write", "context": "Simpler but doesn't scale for high-follower accounts" },
-      { "name": "Pure fanout-on-read", "context": "Simpler writes but slower reads for everyone" }
+      { "name": "完全ライト・ファンアウト (Pure Push)", "context": "書込時に全員へ配り切る設計。読込は超高速だが、インフルエンサーの投稿時にシステムが停止する" },
+      { "name": "完全リード・ファンアウト (Pure Pull)", "context": "書込時は自らのみ保存し、読込時に毎回全員分をマージする。書込は一瞬だが、読込が壊滅的に遅くなる" }
     ],
     "position": { "x": 700, "y": 200 }
   },
   {
     "id": "timeline-service",
-    "label": "Timeline Service",
+    "label": "タイムラインサービス",
     "type": "service",
-    "description": "Constructs and serves the home timeline by merging precomputed cached timelines with celebrity tweets.",
-    "techStack": "Scala, Redis client, ML Ranking models",
-    "role": "Reads the user's precomputed timeline from Redis, merges in celebrity tweets (pull-based), applies ML-based relevance ranking, and returns the ordered feed.",
-    "whyChosen": "Separating timeline construction from fanout allows independent optimization of read and write paths. ML ranking can be updated without touching the delivery pipeline.",
+    "description": "事前構築されたRedisキャッシュのデータと、フォローしている有名人のツイートを読み込み時に動的マージし、MLスコアを適用して最終タイムラインを返すサービス。",
+    "techStack": "Scala, Redisクライアント, 機械学習ランキングモデル",
+    "role": "Redisからユーザーの事前集計済みタイムラインを取得し、フォローしている有名人の最新ツイートを動的にマージ。その後、機械学習モデルによってパーソナライズされたスコア（おすすめ度）で並び替え、最終フィードとして返却する。",
+    "whyChosen": "タイムラインの構築（読込）処理をファンアウト（配信）処理から完全に分離することで、読込と書込のそれぞれのボトルネックを独立して最適化するため。また、配信処理に手を加えることなくMLアルゴリズムを容易に改善するため。",
     "tradeoffs": {
-      "pros": ["Sub-100ms timeline generation", "ML ranking independent of delivery", "Handles diverse feed compositions (tweets, retweets, ads)"],
-      "cons": ["Merge logic adds read-time complexity", "Ranking model latency directly impacts user experience"]
+      "pros": ["事前キャッシュにより、100ミリ秒未満での圧倒的に高速なタイムライン生成", "配信パイプラインに影響を与えることなく、機械学習スコアリングロジックを安全に変更・更新可能", "ツイート、リツイート、広告などの多様なタイムライン構成要素をインメモリで容易に統合可能"],
+      "cons": ["読込時に有名人ツイートを探してマージ（プル処理）する設計に伴う、読込時の処理コスト増加", "スコアリング処理の遅延がタイムライン表示速度（ユーザーの初期待機時間）に直接影響を与える点"]
     },
     "alternatives": [
-      { "name": "Pre-ranked timelines", "context": "Rank at write time, simpler reads" },
-      { "name": "Client-side ranking", "context": "Reduce server load, but less consistent" }
+      { "name": "事前ランキング型タイムライン", "context": "書込（ファンアウト時）にML並び替えも実施して保存しておく。読込は最速だが動的なおすすめ変化に弱い" },
+      { "name": "クライアントサイドレンダリング・ソート", "context": "生データを渡しクライアントの端末側でML並び替えを行う。サーバー負荷は低いが端末負担が重い" }
     ],
     "position": { "x": 700, "y": 400 }
   },
   {
     "id": "redis-cache",
-    "label": "Redis Timeline Cache",
+    "label": "Redis タイムラインキャッシュ",
     "type": "cache",
-    "description": "In-memory cache storing precomputed timelines as sorted sets of tweet IDs for each user.",
-    "techStack": "Redis clusters, ~100TB+ in-memory",
-    "role": "Stores the last ~800 tweet IDs for each user's home timeline. Enables O(1) timeline reads — the single most critical performance path in the entire system.",
-    "whyChosen": "Redis sorted sets are perfect for timelines — naturally ordered by Snowflake ID (timestamp), with O(log N) insertion and O(1) range reads.",
+    "description": "ユーザーごとのホームタイムライン（事前構築済み）を、ツイートIDのソート済みセットとしてメモリ上に極めて高速に保持する分散キャッシュクラスタ。",
+    "techStack": "Redisクラスタ, 計100TB以上のインメモリ容量",
+    "role": "各アクティブユーザーのホームタイムライン用ツイートID（最新800件程度）をメモリ上に保存する。これにより、最もリクエスト頻度が高いタイムラインの読み込みアクセスに対して、定数時間 O(1) に近い圧倒的低遅延で即答する。",
+    "whyChosen": "Redisの提供するSorted Set（ソート済みセット）はタイムラインのデータ構造に最適で、Snowflake ID（タイムスタンプ）によって追加順にインメモリ自動整列され、O(log N)の挿入とO(1)の高速スライス取得をサポートするため。",
     "tradeoffs": {
-      "pros": ["Sub-millisecond timeline reads", "Natural ordering via sorted sets", "Well-understood, battle-tested technology"],
-      "cons": ["Enormous memory footprint (~100TB+)", "Data loss on failure (regeneration from tweet store)", "Cost of maintaining hot replicas"]
+      "pros": ["1ミリ秒未満での圧倒的なタイムライン読込アクセスレイテンシ", "Sorted Setによるメモリ内での自然な時系列順序の維持", "業界で極めて安定稼働実績の豊富な、信頼性の高い枯れたインメモリテクノロジー"],
+      "cons": ["膨大なアクティブユーザー全員のデータをインメモリで維持するための莫大なハードウェア費用", "キャッシュサーバー障害時に、バックエンドの永続ストアからデータを再構築する際の巨大なスパイク負荷", "冗長性を維持するために、高価なインメモリレプリカを常時ペアで複数維持するコスト"]
     },
     "alternatives": [
-      { "name": "Memcached", "context": "Simpler caching, no sorted sets" },
-      { "name": "ScyllaDB", "context": "Persistent sorted storage, less memory" }
+      { "name": "Memcached", "context": "シンプルなKey-Valueのみを扱い、マルチスレッドにより純粋なキャッシュ性能を追求する場合の選択肢" },
+      { "name": "ScyllaDB", "context": "SSDに最適化され、インメモリに近い読込性能をディスク永続化しつつ提供するNoSQLデータベース" }
     ],
     "position": { "x": 900, "y": 300 }
   },
@@ -129,55 +129,53 @@
     "id": "tweet-store",
     "label": "Tweet Store",
     "type": "database",
-    "description": "Persistent storage for all tweets, handling hundreds of billions of records.",
-    "techStack": "Manhattan (custom), migrating to ScyllaDB/Cassandra",
-    "role": "Durable storage for tweet content, metadata, engagement counts, and media references. Handles massive write throughput during peak events.",
-    "whyChosen": "Manhattan was Twitter's custom distributed database optimized for their specific access patterns. ScyllaDB migration provides better performance with lower operational overhead.",
+    "description": "過去に投稿されたすべてのツイートデータ（数千億件）を物理的に保存し、高耐久性を実現する分散永続化データベース。",
+    "techStack": "Manhattan (独自NoSQL), Migrating to ScyllaDB/Cassandra",
+    "role": "ツイート本文、投稿者ID、メディア参照URL、いいねやリツイートカウンター、各種メタデータを永続的に格納する。日常的な大規模トラフィックやリアルタイムイベント時における極限の書き込みを処理する。",
+    "whyChosen": "『Manhattan』はTwitter社が自社のアクセス特性（短い文字列の超高頻度のランダム読込・書込）に最適化して内製した分散キーバリューストアだった。現在は運用保守のコストを下げ、エコシステムの恩恵を受けるため、よりスループットの高いScyllaDBなどへの移行を推進。",
     "tradeoffs": {
-      "pros": ["Optimized for tweet access patterns", "Handles extreme write throughput", "Multi-datacenter replication"],
-      "cons": ["Custom systems require specialized expertise", "Migration to new stores is complex and risky"]
+      "pros": ["ツイートデータの書き込みおよび単一キー検索に高度に特化した独自のデータ構造", "スポーツ実況などアクセスがスパイクする瞬間でも、確実にデータを保存する高い書き込み耐性", "複数データセンター間での双方向アクティブ-アクティブデータ同期"],
+      "cons": ["内製システムであるため、インフラの維持開発に膨大な専任チームと高度な専門技術が要求される", "無停止のままペタバイト級の歴史的データ資産を別データベースへ移行する難易度とリスク"]
     },
     "alternatives": [
-      { "name": "Cassandra", "context": "Open-source, large community" },
-      { "name": "DynamoDB", "context": "Managed NoSQL, no ops overhead" }
+      { "name": "AWS DynamoDB", "context": "完全マネージドでインフラのプロビジョニングが不要な、超スケーラブルなNoSQL" },
+      { "name": "Apache Cassandra", "context": "マスタレスで水平スケーラビリティに優れ、オープンソースで巨大コミュニティを持つ分散NoSQL" }
     ],
     "position": { "x": 900, "y": 100 }
   },
   {
     "id": "social-graph",
-    "label": "Social Graph Service",
+    "label": "ソーシャルグラフサービス",
     "type": "database",
-    "description": "Manages the follower/following relationships — the core social graph with billions of edges.",
-    "techStack": "FlockDB (custom graph DB), MySQL shards",
-    "role": "Stores and queries follow relationships. Answers 'who follows X?' queries needed by the fanout service to determine timeline delivery targets.",
-    "whyChosen": "The social graph requires specialized adjacency list operations (fan-out queries) at extreme scale. FlockDB was built for exactly this access pattern.",
+    "description": "フォロー/被フォローといったユーザー間の強固な関係性を一元管理し、巨大なソーシャルリンクを高速クエリするグラフデータベースシステム。",
+    "techStack": "FlockDB (内製グラフDB), MySQLシャードクラスタ",
+    "role": "関係性リンクのエッジ情報を保持。「あるユーザーをフォローしているのは誰か（ファンアウト先リスト）」を調べるための隣接リストクエリを、数ミリ秒レベルで解決してファンアウトサービスへ返却する。",
+    "whyChosen": "数十億におよぶフォロー関係の追加・削除や、フォロワーリストの探索は、通常のRDBではインデックス設計上、極めて処理が重くなるため。独自の隣接リストエンジン（FlockDB）を構築し、グラフデータ特有のファンアウト取得をミリ秒で実行できるようにした。",
     "tradeoffs": {
-      "pros": ["Optimized for adjacency queries at billion-edge scale", "Efficient follower list pagination"],
-      "cons": ["Limited query flexibility vs general-purpose graph DB", "Sharding complexity for hot users"]
+      "pros": ["数十億エッジ規模でのフォロワー/フォロー中の隣接リストクエリに完全特化された極限の読込性能", "数百万に及ぶフォロワーIDリストを高速にページング取得可能"],
+      "cons": ["関係性の保持と高速取得に特化しているため、一般的なRDBやグラフDBのような複雑な他属性の結合クエリは不可能", "数千万人がフォローする超人気アカウントのデータ（巨大ホットノード）に対する、データベースパーティションシャードの偏り対策の難しさ"]
     },
     "alternatives": [
-      { "name": "Neo4j", "context": "Full-featured graph database" },
-      { "name": "Amazon Neptune", "context": "Managed graph database" },
-      { "name": "TigerGraph", "context": "High-performance graph analytics" }
+      { "name": "Neo4j", "context": "グラフ構造の可視化や複雑なパス探索、ACIDトランザクションを標準サポートする最もポピュラーなグラフDB" },
+      { "name": "Amazon Neptune", "context": "W3C標準(RDF)やProperty Graphをサポートし、無限にスケールするフルマネージドなクラウド専用グラフDB" }
     ],
     "position": { "x": 500, "y": 500 }
   },
   {
     "id": "kafka",
-    "label": "Event Bus (Kafka)",
+    "label": "イベントバス (Kafka)",
     "type": "queue",
-    "description": "Distributed event streaming platform connecting all services through asynchronous event pipelines.",
-    "techStack": "Apache Kafka, custom event schemas",
-    "role": "Carries tweet creation events to the fanout service, user activity events to analytics, and engagement signals to the trending topics pipeline.",
-    "whyChosen": "Kafka's durable log provides replay capability essential for rebuilding timelines after failures and feeding multiple consumers from the same event stream.",
+    "description": "サービス間を非同期で結合し、大規模なリアルタイムイベントストリームを高耐久に処理する分散メッセージ基盤。",
+    "techStack": "Apache Kafka, カスタムシリアライズスキーマ",
+    "role": "ツイートの作成イベントをファンアウトサービスへ伝送し、ユーザーのアクティビティを分析プラットフォームへ送信、さらにハッシュタグなどのエンゲージメントシグナルをトレンドトピック生成パイプラインへ流し込む中枢神経。",
+    "whyChosen": "Kafkaのパーティション設計とディスクへのログ書き込みは、毎秒数十万件のイベントを絶対にロストせず、かつ同じイベントストリームをタイムライン用、検索インデックス用、分析用の複数の異なるコンシューマーが独立して『任意の再生地点から再読み込み（リプレイ）』できる強固な耐障害性を提供するため。",
     "tradeoffs": {
-      "pros": ["Durable event log with replay", "Multiple consumers per topic", "High throughput for event streaming"],
-      "cons": ["Operational complexity at scale", "Partition ordering constraints", "Consumer lag monitoring required"]
+      "pros": ["順序性が担保された耐久性の高いイベントログと、障害復旧時に極めて有利な再再生（リプレイ）機能", "1つのイベントトピックに対して多数のコンシューマーが完全に独立した位置情報（Offset）を持って並行消費可能", "毎秒数百万イベントの連続的な流入に耐えうる優れたスループット"],
+      "cons": ["超大規模Kafkaクラスタを安定的に運用・保守するためのインフラチームにかかる運用の重さ", "同一トピック内の厳密な順序保証がパーティションキー（ユーザーID等）の設計に縛られる制約", "メッセージコンシューマーの処理遅延（Lag）に対するリアルタイムで緻密な監視が必要不可欠な点"]
     },
     "alternatives": [
-      { "name": "Amazon Kinesis", "context": "Managed streaming on AWS" },
-      { "name": "Google Pub/Sub", "context": "Managed messaging on GCP" },
-      { "name": "Apache Pulsar", "context": "Multi-tenant, tiered storage" }
+      { "name": "AWS Kinesis Data Streams", "context": "インフラ運用の手前を排除し、AWSのデータ処理サービスと相性の良いスケーラブルなストリーム" },
+      { "name": "Google Cloud Pub/Sub", "context": "真のサーバーレスであり、非常にフラットにスケーリングする高い柔軟性を持った世界規模メッセージング" }
     ],
     "position": { "x": 300, "y": 100 }
   }

@@ -1,19 +1,19 @@
 [
   {
     "id": "client",
-    "label": "Client (Web/Mobile)",
+    "label": "クライアント (Web/モバイル)",
     "type": "client",
-    "description": "Web browsers and mobile apps through which customers browse, search, and purchase products.",
-    "techStack": "React (Web), Native Apps (iOS/Android), A/B Testing Framework",
-    "role": "Renders the storefront, product pages, and checkout flow. Each page is optimized for conversion through continuous experimentation.",
-    "whyChosen": "React enables rapid iteration on the web storefront. Native mobile apps provide smoother shopping experiences with push notification and offline catalog support.",
+    "description": "顧客が商品の閲覧、検索、購入を行うためのWebブラウザおよびモバイルアプリ。",
+    "techStack": "React (Web), Native Apps (iOS/Android), A/Bテストフレームワーク",
+    "role": "ストアフロント、商品詳細ページ、および決済（チェックアウト）フローのレンダリングを担う。継続的なA/Bテストを通じてコンバージョン率が極限まで最適化されている。",
+    "whyChosen": "WebフロントエンドではReactを採用し迅速なUIイテレーションを実現。モバイルアプリはネイティブ実装することで、プッシュ通知やオフラインカタログ、滑らかな操作感といった高品質な購入体験を提供する。",
     "tradeoffs": {
-      "pros": ["Platform-optimized UX", "Rich experimentation framework", "Progressive loading for fast Time-to-Interactive"],
-      "cons": ["Multiple codebases increase maintenance", "Feature parity across platforms is challenging"]
+      "pros": ["各プラットフォームに最適化されたユーザーエクスペリエンス(UX)", "高度な実験（A/Bテスト）フレームワークによるデータ駆動の改善", "段階的ローディングによる初回表示(Time-to-Interactive)の高速化"],
+      "cons": ["複数コードベースの並行保守に伴う運用開発コストの増加", "各プラットフォーム間での完全な機能同一性（パリティ）の維持難度"]
     },
     "alternatives": [
-      { "name": "Next.js SSR", "context": "Server-rendered React for faster initial loads" },
-      { "name": "Flutter", "context": "Single codebase for mobile platforms" }
+      { "name": "Next.js SSR", "context": "サーバーサイドレンダリングによる初回ロードとSEOの最大化" },
+      { "name": "Flutter", "context": "単一のコードベースによるモバイルアプリ開発の効率化" }
     ],
     "position": { "x": 100, "y": 300 }
   },
@@ -21,89 +21,89 @@
     "id": "elb",
     "label": "Elastic Load Balancer",
     "type": "gateway",
-    "description": "AWS-native load balancer distributing incoming traffic across multiple availability zones.",
+    "description": "複数のアベイラビリティゾーン（AZ）に跨って流入トラフィックを分散する、AWSのマネージドロードバランサー。",
     "techStack": "AWS ALB/NLB, Auto Scaling Groups",
-    "role": "Distributes millions of requests per second across healthy service instances, performs SSL termination, and integrates with AWS auto-scaling for elastic capacity.",
-    "whyChosen": "As the creators of AWS, Amazon leverages their own infrastructure. ALB provides L7 routing, sticky sessions, and seamless integration with ECS/EKS.",
+    "role": "毎秒数百万におよぶリクエストを健全なサービスインスタンスに効率良く分散し、SSL/TLSの終端処理を実行。AWSのオートスケーリングと連携してトラフィックの急増にも自動追従する。",
+    "whyChosen": "AWSのパイオニアとして、Amazonは自社の極めて堅牢なインフラを最大限活用する。ALBはL7ルーティング、スティッキーセッション、およびコンテナ環境（ECS/EKS）との親和性が非常に高いため採用。",
     "tradeoffs": {
-      "pros": ["Fully managed, zero operational overhead", "Deep AWS integration", "Automatic cross-AZ failover"],
-      "cons": ["AWS lock-in", "Cost at extreme scale", "Less customizable than software load balancers"]
+      "pros": ["フルマネージドで自社インフラ管理の運用オーバーヘッドがほぼゼロ", "AWSエコシステム各種リソースとの強力かつシームレスな統合", "アベイラビリティゾーンの障害にも自動追従するAZ間フェイルオーバー"],
+      "cons": ["AWS環境への強固なベンダーロックイン", "超大規模トラフィックにおけるデータ処理量の課金コスト", "独自のソフトウェアロードバランサー（Nginx等）に比べて低レイヤーのカスタマイズが制限される"]
     },
     "alternatives": [
-      { "name": "nginx / HAProxy", "context": "Self-managed, highly configurable" },
-      { "name": "Envoy Proxy", "context": "Service mesh L7 proxy" }
+      { "name": "Nginx / HAProxy", "context": "自社で完全に管理し、極めて高度なカスタムルーティングを設定可能" },
+      { "name": "Envoy Proxy", "context": "サービスメッシュ構築に適した高性能・拡張性の高いL7プロキシ" }
     ],
     "position": { "x": 300, "y": 300 }
   },
   {
     "id": "api-gateway",
-    "label": "API Gateway Services",
+    "label": "API ゲートウェイサービス",
     "type": "gateway",
-    "description": "Microservice gateway handling authentication, rate limiting, and request routing to hundreds of backend services.",
-    "techStack": "Custom Java services, AWS API Gateway",
-    "role": "Authenticates requests, applies rate limits, transforms payloads, and routes to the correct domain services. Handles versioning and backward compatibility.",
-    "whyChosen": "Amazon's scale requires custom gateway logic for complex routing rules (marketplace vs retail, regional regulations, seller APIs).",
+    "description": "セキュリティ認証、流量制限、および数百のバックエンドマイクロサービスへのリクエストルーティングを統合処理するサービスゲートウェイ。",
+    "techStack": "自社カスタムJavaサービス, AWS API Gateway",
+    "role": "受け取ったリクエストの認証・認可、過度なアクセスを防ぐレート制限の適用、データ構造の変換、および適切な各ドメインサービスへの安全なルーティングを実行。APIのバージョン管理や下位互換性も担保する。",
+    "whyChosen": "Amazonの運用規模においては、一般顧客向けショッピング、外部マーケットプレイス、各国の法的規制、およびパートナーセラー向けAPIなど、非常に複雑なカスタムルーティングルールを処理するために独自のゲートウェイロジックが必要とされるため。",
     "tradeoffs": {
-      "pros": ["Custom routing for complex multi-tenant scenarios", "Per-service rate limiting and throttling"],
-      "cons": ["Custom solution requires dedicated team", "Single point of failure risk without proper redundancy"]
+      "pros": ["複雑なマルチテナントおよびビジネス要件に完全合致するカスタムルーティング", "サービスごと、APIキーごとの詳細なアクセス流量制御・スロットリングの適用"],
+      "cons": ["独自のカスタムゲートウェイの構築・維持に専任の開発運用チームが必要なこと", "十分な冗長構成がない場合、システム全体の単一障害点（SPOF）となるリスク"]
     },
     "alternatives": [
-      { "name": "Kong", "context": "Open-source API gateway with plugin ecosystem" },
-      { "name": "Apigee", "context": "Google Cloud managed API platform" }
+      { "name": "Kong", "context": "プラグインアーキテクチャを持ち、Luaベースで拡張性の高い人気OSSゲートウェイ" },
+      { "name": "Google Cloud Apigee", "context": "高度な分析機能や開発者ポータルを提供する企業向けマネージドAPIプラットフォーム" }
     ],
     "position": { "x": 500, "y": 300 }
   },
   {
     "id": "product-service",
-    "label": "Product Catalog Service",
+    "label": "商品カタログサービス",
     "type": "service",
-    "description": "Manages the catalog of hundreds of millions of products with real-time pricing, availability, and attribute data.",
-    "techStack": "Java/Kotlin microservices, gRPC",
-    "role": "Central source of truth for product information. Serves product details, pricing, and inventory status to all consumer-facing and internal services.",
-    "whyChosen": "A dedicated product service allows independent scaling and data model evolution for the massive catalog without impacting other services.",
+    "description": "億単位の商品情報に対して、リアルタイムの価格、詳細属性、在庫情報、仕様を一元管理する中核マイクロサービス。",
+    "techStack": "Java/Kotlin マイクロサービス, gRPC",
+    "role": "商品カタログ情報における『信頼できる唯一の情報源（Source of Truth）』。検索、レコメンデーション、注文など、商品情報を必要とするあらゆる他のサービスに対して最新データを高速提供する。",
+    "whyChosen": "商品カタログを独立したマイクロサービスとして切り出すことで、決済やアカウントなどの他機能に影響を与えることなく、巨大なカタログデータベースのスケールや属性追加といったモデル構造の変更を独立して行えるようにするため。",
     "tradeoffs": {
-      "pros": ["Independent scaling for catalog workloads", "Consistent product data across all channels"],
-      "cons": ["Must handle extreme read throughput", "Cross-region consistency for global catalog"]
+      "pros": ["カタログアクセス特有の大規模な読込ワークロードに対する独立したスケーリングの容易さ", "Web、モバイル、外部アプリなど全販売チャネルでの完全に一貫した商品データ保証"],
+      "cons": ["セール時などスパイクアクセス下における極限の読み込みスループットへの対応負荷", "世界中でのグローバル展開におけるマルチリージョン間データレプリケーションの一貫性確保"]
     },
     "alternatives": [
-      { "name": "Commercetools", "context": "Headless commerce platform" },
-      { "name": "Shopify Plus Backend", "context": "Managed e-commerce platform" }
+      { "name": "commercetools", "context": "APIファーストでクラウドネイティブなヘッドレスコマース（SaaS）の活用" },
+      { "name": "Shopify Plus Backend", "context": "中〜大規模小売向けに最適化されたフルマネージドコマースエンジンの利用" }
     ],
     "position": { "x": 700, "y": 150 }
   },
   {
     "id": "order-service",
-    "label": "Order Processing Service",
+    "label": "注文処理サービス",
     "type": "service",
-    "description": "Manages the order lifecycle from cart to delivery, orchestrating payment, inventory, and fulfillment workflows.",
-    "techStack": "Java, Step Functions, SQS",
-    "role": "Coordinates the complex multi-step purchase flow: inventory reservation, payment processing, fraud detection, and fulfillment routing.",
-    "whyChosen": "Order processing requires strong consistency guarantees and saga-pattern orchestration across multiple bounded contexts (payment, inventory, shipping).",
+    "description": "ショッピングカートから最終的な配送指示まで、注文のライフサイクル全体を管理し、決済・在庫・出荷フローを制御するオーケストレーションサービス。",
+    "techStack": "Java, AWS Step Functions, AWS SQS",
+    "role": "在庫の仮押さえ、決済代行の実行、不正購入検知、および配送システムへのルーティングなど、複数のサブシステムに跨る複雑な購入トランザクションを確実に調整する。",
+    "whyChosen": "注文処理は、決済・在庫・配送など異なる境界づけられたコンテキスト（Bounded Context）間での分散トランザクション（Sagaパターン）を強固な一貫性をもって制御する必要があるため。Step Functionsによるワークフロー管理でこれを実現した。",
     "tradeoffs": {
-      "pros": ["Reliable saga orchestration for distributed transactions", "Idempotent operations prevent double-charges"],
-      "cons": ["Complex compensating transactions on failure", "High operational criticality — downtime = lost revenue"]
+      "pros": ["視覚的で堅牢なStep Functions等による分散Sagaパターンの確実な実装", "二重課金や重複処理を防止する厳密な冪等性（Idempotency）制御"],
+      "cons": ["決済失敗時などのロールバック処理（補償トランザクション）の設計が非常に複雑", "システム全体で最も停止が許されない中核層であり、ダウンタイムが直接売上損失に直結する"]
     },
     "alternatives": [
-      { "name": "Temporal", "context": "Open-source durable workflow engine" },
-      { "name": "Camunda", "context": "BPMN-based process orchestration" }
+      { "name": "Temporal", "context": "コードファーストで記述でき、状態保持と耐障害性に優れたオープンソースの耐久ワークフローエンジン" },
+      { "name": "Camunda", "context": "BPMN(ビジネスプロセスモデリング表記法)に基づく、エンタープライズ向けプロセス制御基盤" }
     ],
     "position": { "x": 700, "y": 450 }
   },
   {
     "id": "search",
-    "label": "Search Engine",
+    "label": "検索エンジン",
     "type": "service",
-    "description": "Powers product search across hundreds of millions of listings with sub-second response times.",
-    "techStack": "Custom search (A9), OpenSearch/Elasticsearch, ML Ranking",
-    "role": "Processes search queries, applies ML-based ranking, handles typo correction, synonyms, and personalized result ordering based on purchase history.",
-    "whyChosen": "Amazon's A9 search is a competitive differentiator. Custom search allows integration of purchase intent signals and advertiser-bid ranking that generic engines can't provide.",
+    "description": "膨大な商品リスティングの中から、ユーザーが求める商品を1秒未満の応答速度で検索・表示する検索エンジンシステム。",
+    "techStack": "自社カスタム検索 (A9), OpenSearch/Elasticsearch, MLベース検索ランキング",
+    "role": "入力されたクエリを解析し、スペルミス修正、シノニム（同義語）展開、およびユーザーの過去の購買データや好みを反映した小売り特化のMLパーソナライズランキングを適用する。",
+    "whyChosen": "Amazon独自の「A9」検索アルゴリズムは、単なるテキスト検索を超え、「購買意図」や「広告入札状況」を複雑に加味して最適な商品を上位表示する商業的に極めて強力なシステムであり、競合との最大の差別化要因のため独自構築している。",
     "tradeoffs": {
-      "pros": ["Purchase-intent-optimized ranking", "Real-time index updates for price/availability changes", "Sponsored product integration"],
-      "cons": ["Massive index size requires sharding", "Balancing organic vs paid results transparency"]
+      "pros": ["購買行動の最大化（コンバージョン）に完全最適化された独自のランキングアルゴリズム", "価格や在庫の変動を瞬時に反映するリアルタイムインデックス更新", "スポンサー付き広告商品のシームレスな統合"],
+      "cons": ["極めて巨大なインデックスを管理するための高度な分散シャーディングとサーバーコスト", "広告の露出とオーガニックな検索精度との商業的なバランス調整の難しさ"]
     },
     "alternatives": [
-      { "name": "Elasticsearch / OpenSearch", "context": "Open-source full-text search" },
-      { "name": "Algolia", "context": "Managed search-as-a-service" }
+      { "name": "Elasticsearch / OpenSearch", "context": "非常に強力で広く使われているオープンソースの分散型全文検索エンジン" },
+      { "name": "Algolia", "context": "API経由で超高速な検索機能とUIテンプレートを即座に導入できるマネージドSaaS" }
     ],
     "position": { "x": 500, "y": 100 }
   },
@@ -111,18 +111,18 @@
     "id": "dynamodb",
     "label": "DynamoDB",
     "type": "database",
-    "description": "Fully managed NoSQL database providing single-digit millisecond performance at any scale.",
-    "techStack": "Amazon DynamoDB, Global Tables, DAX Cache",
-    "role": "Primary database for high-throughput workloads: shopping carts, session state, user preferences. Global Tables provide multi-region active-active replication.",
-    "whyChosen": "Born from Amazon's Dynamo paper. Provides predictable performance with automatic scaling — critical for Black Friday-scale traffic spikes.",
+    "description": "いかなるデータ規模やトラフィック下でも予測可能な一桁ミリ秒台の高速応答を維持する、AWS完全マネージドNoSQLデータベース。",
+    "techStack": "Amazon DynamoDB, Global Tables, DAXキャッシュ",
+    "role": "ショッピングカートのデータ、アクティブなセッション、ユーザーの各種設定など、超高頻度の書き込み・読み込みが発生し、極めて予測可能なレイテンシが要求されるデータの永続化を担う。",
+    "whyChosen": "Amazon自身が実証した伝説の『Dynamo』分散キーバリューストア論文から生まれた本家。自動スケーリングによって大規模セール時の瞬間的なトラフィック爆発にもパフォーマンス劣化なく追従可能な唯一無二の選択肢として採用。",
     "tradeoffs": {
-      "pros": ["Predictable single-digit ms latency", "Fully managed with auto-scaling", "Global tables for multi-region"],
-      "cons": ["Limited query patterns (must design for access patterns)", "Cost can spike with high throughput", "25-item transaction limit"]
+      "pros": ["あらゆるスケールでレイテンシが1桁ミリ秒台でフラットに安定", "運用のオーバーヘッドが一切ない完全マネージド構成と高い耐障害性", "リージョン間マルチマスター（Global Tables）による世界的な超可用性"],
+      "cons": ["アクセスパターンを事前に完全に想定したキー設計が必須（アドホックな集計やクエリは不可）", "高スループットを維持した場合のインフラコストの大幅な増加リスク", "1つのトランザクション処理で操作可能なアイテム数が25個までに制限される制約"]
     },
     "alternatives": [
-      { "name": "Cassandra", "context": "Open-source, avoid vendor lock-in" },
-      { "name": "MongoDB Atlas", "context": "Document DB with flexible queries" },
-      { "name": "CockroachDB", "context": "Distributed SQL with strong consistency" }
+      { "name": "Apache Cassandra", "context": "自社運用によりクラウドベンダーへのロックインを排除するオープンソースの分散NoSQL" },
+      { "name": "MongoDB Atlas", "context": "柔軟なドキュメントモデルを持ち、リッチなクエリやインデックスをサポートするマネージドNoSQL" },
+      { "name": "CockroachDB", "context": "分散型で水平スケールしながら、完全なACIDトランザクション（SQL）を提供する最先端DB" }
     ],
     "position": { "x": 900, "y": 300 }
   },
@@ -130,17 +130,17 @@
     "id": "sqs-sns",
     "label": "SQS / SNS / EventBridge",
     "type": "queue",
-    "description": "Managed messaging services for asynchronous event-driven communication between microservices.",
-    "techStack": "Amazon SQS, SNS, EventBridge",
-    "role": "Decouples services through message queues (SQS) and pub/sub topics (SNS). EventBridge provides event routing with content-based filtering for complex workflows.",
-    "whyChosen": "Managed messaging eliminates the operational overhead of running Kafka/RabbitMQ clusters while providing at-least-once delivery guarantees.",
+    "description": "AWS標準のマネージドメッセージキューおよびイベントルーティングサービス群。マイクロサービス間の非同期連携を支える。",
+    "techStack": "Amazon SQS, AWS SNS, AWS EventBridge",
+    "role": "SQSメッセージキューを用いた点対点の非同期処理や、SNSトピックを介した一対多のイベント通知（Pub/Sub）によってサービスを疎結合化。EventBridgeにより内容に基づく詳細なフィルタリングを実行する。",
+    "whyChosen": "自社で大規模なメッセージクラスタ（KafkaやRabbitMQ）を稼働させるための莫大なインフラ運用保守コストを排除し、AWS標準の強固なAt-least-once（最低1回）配信保証とサーバーレススケーリングを優先したため。",
     "tradeoffs": {
-      "pros": ["Fully managed, zero ops", "SQS provides dead-letter queues for error handling", "EventBridge enables event-driven architectures"],
-      "cons": ["Higher per-message cost than self-hosted Kafka", "SQS max message size 256KB", "Less control over partitioning and ordering"]
+      "pros": ["完全サーバーレスで構築・運用の工数が一切不要", "エラー発生時のリトライやデッドレターキュー（DLQ）による堅牢なエラー処理", "EventBridgeによる柔軟なスキーマ管理とイベント駆動アーキテクチャの容易な構築"],
+      "cons": ["自社運用のKafkaと比較して、大量メッセージ送信時の通信コスト（1メッセージ単価）が割高", "SQSの1メッセージの最大ペイロードが256KBに制限されていること", "分散キューのためメッセージの厳密な順序制御や詳細なパーティショニング設定が限定的"]
     },
     "alternatives": [
-      { "name": "Apache Kafka (MSK)", "context": "Event streaming with replay capability" },
-      { "name": "RabbitMQ", "context": "Feature-rich message broker" }
+      { "name": "AWS MSK (Managed Kafka)", "context": "イベント順序保証やデータストリームの再再生機能を持つ本格的なマネージドKafka" },
+      { "name": "RabbitMQ", "context": "複雑なルーティングキーや柔軟な配信経路を標準でサポートする高性能メッセージング" }
     ],
     "position": { "x": 700, "y": 300 }
   },
@@ -148,35 +148,35 @@
     "id": "elasticache",
     "label": "ElastiCache (Redis)",
     "type": "cache",
-    "description": "In-memory caching layer providing microsecond read latency for frequently accessed data.",
-    "techStack": "Amazon ElastiCache for Redis, cluster mode",
-    "role": "Caches product details, session state, and search results. Reduces database load and speeds up page rendering for high-traffic product pages.",
-    "whyChosen": "Redis provides rich data structures (sorted sets for rankings, hashes for session data) beyond simple key-value caching, with managed cluster mode for scaling.",
+    "description": "頻繁に参照されるデータを物理メモリ上に保持し、マイクロ秒レベルの極めて高速な応答を可能にするインメモリキャッシュ層。",
+    "techStack": "Amazon ElastiCache for Redis, クラスターモード",
+    "role": "売れ筋商品の詳細属性、アクティブなセッション状態、頻出検索クエリの結果をキャッシュする。データベースの不要な読み取りを減らし、小売りページの表示時間（Time-to-Interactive）を劇的に短縮する。",
+    "whyChosen": "Redisの提供する豊富なデータ構造（ランキング用のソート済みセット、セッション用のハッシュなど）を利用しつつ、AWSのフルマネージドクラスタによって高可用性と自動スケーリングを容易にするため。",
     "tradeoffs": {
-      "pros": ["Sub-millisecond read latency", "Rich data structures", "Managed with automatic failover"],
-      "cons": ["Memory-bound (expensive at scale)", "Cache invalidation complexity", "Data loss risk on node failure without persistence"]
+      "pros": ["マイクロ秒（ミリ秒未満）レベルの超低読込遅延", "キャッシュに留まらないRedisの高度なデータ構造の適用", "自動フェイルオーバーやレプリケーションを伴う高い可用性"],
+      "cons": ["すべてインメモリで維持するためデータ量に比例してインフラコストが高価", "キャッシュデータの無効化（インバリデーション）の複雑さ", "永続化を行わない設定の場合、ノード障害時に一時的にキャッシュデータが失われるリスク"]
     },
     "alternatives": [
-      { "name": "Memcached", "context": "Simpler, multi-threaded for pure caching" },
-      { "name": "Momento", "context": "Serverless caching, pay-per-request" }
+      { "name": "Memcached", "context": "シンプルなKey-Valueのみを扱い、マルチスレッドにより純粋なキャッシュ性能を追求する場合の選択肢" },
+      { "name": "Momento", "context": "サーバーやコネクション管理が不要で、リクエスト単位課金の真のサーバーレスキャッシュSaaS" }
     ],
     "position": { "x": 500, "y": 500 }
   },
   {
     "id": "recommendation",
-    "label": "Recommendation Engine",
+    "label": "レコメンデーションエンジン",
     "type": "ml",
-    "description": "ML-powered personalization engine generating 'Customers who bought...' and personalized homepage recommendations.",
-    "techStack": "Custom ML, SageMaker, Collaborative Filtering, Deep Learning",
-    "role": "Analyzes purchase history, browsing behavior, and contextual signals to generate real-time product recommendations that drive 35%+ of revenue.",
-    "whyChosen": "Personalized recommendations are a massive revenue driver. Custom models allow optimization for conversion and basket size rather than generic engagement metrics.",
+    "description": "「この商品を買った人はこんな商品も買っています」やパーソナライズされたホーム画面を生成する、機械学習ベースの小売り特化型推薦システム。",
+    "techStack": "自社カスタムMLモデル, Amazon SageMaker, 協調フィルタリング, ディープラーニング",
+    "role": "購買データ、閲覧履歴、および検索動向などのシグナルをリアルタイムに分析し、小売り売上の約35%以上を創出する高度な製品推薦を生成する。",
+    "whyChosen": "パーソナライズ推薦は小売りビジネスにおける最重要の成長エンジンであるため。汎用の推薦システムでは不可能な、コンバージョン率や同時購入点数（バスケットサイズ）の直接的な最大化を目指して、独自のディープラーニングモデルを適用している。",
     "tradeoffs": {
-      "pros": ["Drives 35%+ of total revenue", "Real-time personalization based on session behavior", "Continuously improving with more data"],
-      "cons": ["Cold start for new users/products", "Massive compute for training at catalog scale", "Bias amplification risk"]
+      "pros": ["総売上の35%以上を直接牽引する高い商業的価値", "現在のセッション中の行動を即座に反映する超リアルタイム推薦", "蓄積される膨大な購買データによるMLモデルの継続的自己進化"],
+      "cons": ["履歴のない新規ユーザーや新着商品に対する初期推薦の難しさ（コールドスタート）", "カタログ規模が極めて大きいため、モデルの再学習に要する計算リソースが莫大", "過去の売れ筋に推奨が偏ることで新商品が露出しにくくなるバイアスの自己増幅リスク"]
     },
     "alternatives": [
-      { "name": "Amazon Personalize", "context": "Managed version of their own tech" },
-      { "name": "Google Recommendations AI", "context": "GCP managed recommendations" }
+      { "name": "Amazon Personalize", "context": "自社の小売り推薦システムをベースにAWSサービスとして一般提供されているフルマネージドML" },
+      { "name": "Google Cloud Recommendations AI", "context": "GCP上で提供される、小売業やメディアに特化したGoogleの高性能推薦API" }
     ],
     "position": { "x": 300, "y": 500 }
   }

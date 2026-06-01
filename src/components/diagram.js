@@ -4,7 +4,7 @@
 
 import cytoscape from 'cytoscape';
 import { loadArchitecture } from '../lib/data-loader.js';
-import { getCytoscapeStyles, toElements, NODE_COLORS, NODE_ICONS } from '../lib/graph-styles.js';
+import { getCytoscapeStyles, toElements, NODE_COLORS, NODE_ICONS, NODE_TYPE_JA } from '../lib/graph-styles.js';
 import { startEdgeAnimations, stopEdgeAnimations } from '../lib/animations.js';
 import { openSidebar, closeSidebar } from './sidebar.js';
 
@@ -27,24 +27,24 @@ export async function createDiagram(container, archId, navigateBack) {
   toolbar.className = 'diagram-toolbar';
   toolbar.innerHTML = `
     <div class="diagram-toolbar__left">
-      <button class="diagram-toolbar__back" id="diagram-back" aria-label="Back to catalog">
+      <button class="diagram-toolbar__back" id="diagram-back" aria-label="カタログに戻る">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M19 12H5M12 19l-7-7 7-7"/>
         </svg>
-        Back
+        戻る
       </button>
       <h1 class="diagram-toolbar__title">
         ${archData.meta.name}
-        <span class="diagram-toolbar__company">System Architecture</span>
+        <span class="diagram-toolbar__company">システムアーキテクチャ</span>
       </h1>
     </div>
     <div class="diagram-toolbar__right">
       <div class="diagram-toolbar__zoom-controls">
-        <button class="diagram-toolbar__zoom-btn" id="zoom-out" aria-label="Zoom out">−</button>
+        <button class="diagram-toolbar__zoom-btn" id="zoom-out" aria-label="ズームアウト">−</button>
         <span class="diagram-toolbar__zoom-level" id="zoom-level">100%</span>
-        <button class="diagram-toolbar__zoom-btn" id="zoom-in" aria-label="Zoom in">+</button>
+        <button class="diagram-toolbar__zoom-btn" id="zoom-in" aria-label="ズームイン">+</button>
       </div>
-      <button class="diagram-toolbar__fit-btn" id="fit-view">Fit View</button>
+      <button class="diagram-toolbar__fit-btn" id="fit-view">全体表示</button>
     </div>
   `;
   page.appendChild(toolbar);
@@ -53,7 +53,7 @@ export async function createDiagram(container, archId, navigateBack) {
   const scenarioBar = document.createElement('div');
   scenarioBar.className = 'scenario-bar';
   scenarioBar.innerHTML = `
-    <span class="scenario-bar__label">Scenario:</span>
+    <span class="scenario-bar__label">シナリオ:</span>
     ${archData.scenarios.map(s => `
       <button
         class="scenario-pill ${s.id === 'global' ? 'scenario-pill--active' : ''}"
@@ -76,12 +76,12 @@ export async function createDiagram(container, archId, navigateBack) {
   const legend = document.createElement('div');
   legend.className = 'diagram-legend glass';
   legend.innerHTML = `
-    <div class="diagram-legend__title">Component Types</div>
+    <div class="diagram-legend__title">コンポーネントの種類</div>
     <div class="diagram-legend__items">
       ${Object.entries(NODE_COLORS).map(([type, color]) => `
         <div class="diagram-legend__item">
           <div class="diagram-legend__dot" style="background: ${color}"></div>
-          <span>${NODE_ICONS[type] || ''} ${type.charAt(0).toUpperCase() + type.slice(1)}</span>
+          <span>${NODE_ICONS[type] || ''} ${NODE_TYPE_JA[type] || type}</span>
         </div>
       `).join('')}
     </div>
@@ -254,7 +254,7 @@ function applyScenario(canvasWrap) {
     stepsEl.className = 'scenario-steps';
     stepsEl.innerHTML = `
       <div class="scenario-steps__card glass">
-        <div class="scenario-steps__title">Data Flow Steps</div>
+        <div class="scenario-steps__title">データフローの手順</div>
         ${scenario.steps.map(step => `
           <div class="scenario-step">
             <div class="scenario-step__number">${step.order}</div>

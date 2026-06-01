@@ -1,15 +1,15 @@
 [
   {
     "id": "global",
-    "name": "🌐 Global View",
-    "description": "Full system overview showing all components and their connections",
+    "name": "🌐 全体概要",
+    "description": "すべてのコンポーネントとその接続を示すシステム全体の概要",
     "highlightNodes": "*",
     "highlightEdges": "*"
   },
   {
     "id": "video-playback",
-    "name": "▶️ Video Playback",
-    "description": "What happens when a user presses Play — from API request to video stream delivery",
+    "name": "▶️ 動画再生フロー",
+    "description": "ユーザーが再生ボタンを押した時の処理 — APIリクエストから動画ストリームの配信まで",
     "highlightNodes": ["client", "zuul", "api-services", "evcache", "cassandra", "cdn", "kafka"],
     "highlightEdges": [
       "client->zuul",
@@ -20,18 +20,18 @@
       "api-services->kafka"
     ],
     "steps": [
-      { "order": 1, "description": "Client sends play request to Zuul Gateway", "nodes": ["client", "zuul"] },
-      { "order": 2, "description": "Zuul routes to API/BFF service for content resolution", "nodes": ["zuul", "api-services"] },
-      { "order": 3, "description": "API service checks EVCache for content metadata and DRM license", "nodes": ["api-services", "evcache"] },
-      { "order": 4, "description": "On cache miss, fetches from Cassandra and populates cache", "nodes": ["api-services", "cassandra"] },
-      { "order": 5, "description": "Play event published to Kafka for analytics and recommendations", "nodes": ["api-services", "kafka"] },
-      { "order": 6, "description": "Client receives stream manifest and begins adaptive bitrate playback via Open Connect CDN", "nodes": ["client", "cdn"] }
+      { "order": 1, "description": "クライアントがZuulゲートウェイに再生リクエストを送信", "nodes": ["client", "zuul"] },
+      { "order": 2, "description": "Zuulがコンテンツ解決のためにAPI/BFFサービスへルーティング", "nodes": ["zuul", "api-services"] },
+      { "order": 3, "description": "APIサービスがEVCacheでコンテンツのメタデータとDRMライセンスをチェック", "nodes": ["api-services", "evcache"] },
+      { "order": 4, "description": "キャッシュミスの場合はCassandraから取得してキャッシュに格納", "nodes": ["api-services", "cassandra"] },
+      { "order": 5, "description": "再生イベントを分析およびレコメンデーションのためにKafkaにパブリッシュ", "nodes": ["api-services", "kafka"] },
+      { "order": 6, "description": "クライアントがストリームマニフェストを受信し、Open Connect CDNを介してアダプティブビットレートでの再生を開始", "nodes": ["client", "cdn"] }
     ]
   },
   {
     "id": "recommendation",
-    "name": "🧠 Recommendation Pipeline",
-    "description": "How Netflix generates personalized content recommendations using ML and real-time event data",
+    "name": "🧠 レコメンデーション・パイプライン",
+    "description": "機械学習とリアルタイムイベントデータを使用した、パーソナライズされたおすすめコンテンツの生成フロー",
     "highlightNodes": ["client", "zuul", "api-services", "kafka", "recommendation", "evcache", "cassandra"],
     "highlightEdges": [
       "client->zuul",
@@ -44,12 +44,12 @@
       "api-services->evcache"
     ],
     "steps": [
-      { "order": 1, "description": "User interactions (views, ratings, browsing) are captured by client apps", "nodes": ["client"] },
-      { "order": 2, "description": "Events flow through Zuul and API services to Kafka", "nodes": ["zuul", "api-services", "kafka"] },
-      { "order": 3, "description": "Recommendation engine consumes event streams from Kafka in real-time", "nodes": ["kafka", "recommendation"] },
-      { "order": 4, "description": "ML models read user profiles and viewing history from Cassandra", "nodes": ["recommendation", "cassandra"] },
-      { "order": 5, "description": "Generated recommendations are cached in EVCache for fast retrieval", "nodes": ["recommendation", "evcache"] },
-      { "order": 6, "description": "When user opens the app, API services fetch personalized rankings from cache", "nodes": ["api-services", "evcache"] }
+      { "order": 1, "description": "ユーザーのインタラクション（閲覧、評価、ブラウジング）がクライアントアプリによってキャプチャされる", "nodes": ["client"] },
+      { "order": 2, "description": "イベントがZuulおよびAPIサービスを介してKafkaに流れる", "nodes": ["zuul", "api-services", "kafka"] },
+      { "order": 3, "description": "レコメンデーションエンジンがKafkaからイベントストリームをリアルタイムに消費", "nodes": ["kafka", "recommendation"] },
+      { "order": 4, "description": "機械学習モデルがCassandraからユーザープロファイルと視聴履歴を読み取る", "nodes": ["recommendation", "cassandra"] },
+      { "order": 5, "description": "生成されたレコメンデーションは、高速な取得のためにEVCacheにキャッシュされる", "nodes": ["recommendation", "evcache"] },
+      { "order": 6, "description": "ユーザーがアプリを開く際、APIサービスがキャッシュからパーソナライズされたランキングを取得する", "nodes": ["api-services", "evcache"] }
     ]
   }
 ]

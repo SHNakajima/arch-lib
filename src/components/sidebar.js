@@ -2,7 +2,7 @@
  * sidebar.js — Detail panel (slide-in) for node information
  */
 
-import { NODE_COLORS, NODE_ICONS } from '../lib/graph-styles.js';
+import { NODE_COLORS, NODE_ICONS, NODE_TYPE_JA } from '../lib/graph-styles.js';
 
 let sidebarEl = null;
 let overlayEl = null;
@@ -30,7 +30,7 @@ export function initSidebar() {
         <h2 class="sidebar__title" id="sidebar-title"></h2>
         <div class="sidebar__tech-stack" id="sidebar-tech"></div>
       </div>
-      <button class="sidebar__close" id="sidebar-close" aria-label="Close panel">✕</button>
+      <button class="sidebar__close" id="sidebar-close" aria-label="パネルを閉じる">✕</button>
     </div>
     <div class="sidebar__content" id="sidebar-content"></div>
   `;
@@ -55,7 +55,7 @@ export function openSidebar(nodeData) {
 
   // Badge
   const badge = sidebarEl.querySelector('#sidebar-badge');
-  badge.textContent = `${icon} ${nodeData.type}`;
+  badge.textContent = `${icon} ${NODE_TYPE_JA[nodeData.type] || nodeData.type}`;
   badge.style.background = color.replace(')', ', 0.15)').replace('hsl', 'hsla');
   badge.style.color = color;
 
@@ -66,15 +66,15 @@ export function openSidebar(nodeData) {
   // Content
   const content = sidebarEl.querySelector('#sidebar-content');
   content.innerHTML = `
-    ${buildSection('📋', 'Overview', `<p class="sidebar__text">${nodeData.description}</p>`)}
+    ${buildSection('📋', '概要', `<p class="sidebar__text">${nodeData.description}</p>`)}
 
-    ${buildSection('🎯', 'Role & Responsibility', `<p class="sidebar__text">${nodeData.role}</p>`)}
+    ${buildSection('🎯', '役割と責任', `<p class="sidebar__text">${nodeData.role}</p>`)}
 
-    ${nodeData.whyChosen ? buildSection('💡', 'Why This Was Chosen', `<p class="sidebar__text">${nodeData.whyChosen}</p>`) : ''}
+    ${nodeData.whyChosen ? buildSection('💡', '選定理由', `<p class="sidebar__text">${nodeData.whyChosen}</p>`) : ''}
 
-    ${nodeData.tradeoffs ? buildSection('⚖️', 'Trade-offs', buildTradeoffs(nodeData.tradeoffs)) : ''}
+    ${nodeData.tradeoffs ? buildSection('⚖️', 'トレードオフ', buildTradeoffs(nodeData.tradeoffs)) : ''}
 
-    ${nodeData.alternatives?.length ? buildSection('🔄', 'Alternatives', buildAlternatives(nodeData.alternatives)) : ''}
+    ${nodeData.alternatives?.length ? buildSection('🔄', '代替案', buildAlternatives(nodeData.alternatives)) : ''}
   `;
 
   // Show

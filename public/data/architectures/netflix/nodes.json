@@ -1,19 +1,19 @@
 [
   {
     "id": "client",
-    "label": "Client Apps",
+    "label": "クライアントアプリ",
     "type": "client",
-    "description": "Netflix apps on Smart TVs, mobile devices, web browsers, and gaming consoles.",
+    "description": "Smart TV、モバイル端末、ウェブブラウザ、ゲーム機などの様々なデバイス上で動作するNetflixアプリ。",
     "techStack": "React (Web), Native SDKs (iOS/Android/TV)",
-    "role": "The user-facing interface that requests content, displays personalized recommendations, and handles video playback via adaptive bitrate streaming.",
-    "whyChosen": "Platform-specific native apps deliver optimal playback performance and device integration, while the web app leverages React for rapid iteration.",
+    "role": "ユーザーが操作するインターフェース。コンテンツのリクエスト、パーソナライズされたレコメンデーションの表示、およびアダプティブビットレートストリーミングによる動画再生制御を担う。",
+    "whyChosen": "プラットフォームごとのネイティブアプリにより、最適な再生パフォーマンスとデバイス統合を実現。Web版は迅速なイテレーションのためにReactを採用。",
     "tradeoffs": {
-      "pros": ["Optimal performance per platform", "Deep device integration (DRM, hardware decoding)"],
-      "cons": ["Multiple codebases to maintain", "Slower feature parity across platforms"]
+      "pros": ["各プラットフォームで最適な再生パフォーマンスを発揮", "深いデバイス統合（DRMやハードウェアデコード）"],
+      "cons": ["管理・保守すべきコードベースが複数存在する", "プラットフォーム間での機能差（パリティ）の解消に時間がかかる"]
     },
     "alternatives": [
-      { "name": "Flutter", "context": "Cross-platform with single codebase" },
-      { "name": "React Native", "context": "Shared code between mobile platforms" }
+      { "name": "Flutter", "context": "単一のコードベースによるクロスプラットフォーム開発" },
+      { "name": "React Native", "context": "モバイルプラットフォーム間でのコード共有" }
     ],
     "position": { "x": 100, "y": 300 }
   },
@@ -21,17 +21,17 @@
     "id": "cdn",
     "label": "Open Connect CDN",
     "type": "cdn",
-    "description": "Netflix's custom Content Delivery Network with appliances embedded in ISP networks worldwide.",
+    "description": "世界中のインターネットサービスプロバイダ（ISP）のネットワーク内に直接組み込まれた、Netflix独自のコンテンツ配信ネットワーク（CDN）。",
     "techStack": "Open Connect Appliances (OCA), FreeBSD, nginx",
-    "role": "Caches and delivers video content from the network edge, minimizing latency and backbone bandwidth usage. Handles 100% of video streaming traffic.",
-    "whyChosen": "Third-party CDNs couldn't deliver the required quality at Netflix's scale. Building their own CDN allowed fine-grained control over caching, routing, and peering relationships.",
+    "role": "ユーザーに物理的に最も近いエッジサーバーから動画コンテンツをキャッシュして配信し、ネットワーク遅延とコアバックボーン回線の帯域幅コストを最小限に抑える。動画配信トラフィックの100%を処理する。",
+    "whyChosen": "サードパーティの汎用CDNでは、Netflixの配信規模において要求される再生品質とコスト要件を満たしきれなかったため。独自CDNにより、キャッシュ、ルーティング、ピアリング関係を自社で極めて細かく制御することが可能となった。",
     "tradeoffs": {
-      "pros": ["Full control over delivery quality", "Reduced bandwidth costs at scale", "Closer to end users via ISP partnerships"],
-      "cons": ["Massive capital and operational investment", "Requires ISP partnership negotiations globally"]
+      "pros": ["ストリーミング品質の完全な自社コントロール", "大規模配信における帯域幅コストの劇的な削減", "ISPとの提携パートナーシップによるユーザーへの最短距離からの配信"],
+      "cons": ["莫大な初期設備投資と継続的な運用管理コスト", "グローバルで多数のISPとのパートナーシップ交渉・維持が必要"]
     },
     "alternatives": [
-      { "name": "Akamai / CloudFront", "context": "Managed CDN, lower upfront cost" },
-      { "name": "Cloudflare Stream", "context": "Integrated video delivery platform" }
+      { "name": "Akamai / AWS CloudFront", "context": "初期投資を低く抑えられるマネージドCDNサービス" },
+      { "name": "Cloudflare Stream", "context": "動画配信機能が統合されたネットワークプラットフォーム" }
     ],
     "position": { "x": 100, "y": 500 }
   },
@@ -39,18 +39,18 @@
     "id": "zuul",
     "label": "Zuul API Gateway",
     "type": "gateway",
-    "description": "Edge gateway that serves as the front door for all API requests entering the Netflix ecosystem.",
-    "techStack": "Zuul 2 (Netty-based, non-blocking)",
-    "role": "Handles dynamic routing, authentication, rate limiting, load shedding, and security filtering. Provides a single entry point for all backend microservices.",
-    "whyChosen": "Netflix needed a highly programmable, async gateway capable of handling millions of concurrent connections with custom filter chains for canary testing and traffic shaping.",
+    "description": "Netflixのバックエンドエコシステムに流入するすべてのAPIリクエストの玄関口となるエッジゲートウェイ。",
+    "techStack": "Zuul 2 (Nettyベース, ノンブロッキング)",
+    "role": "動的ルーティング、認証、レート制限、負荷制限（ロードシェディング）、およびセキュリティフィルタリングを処理。すべてのバックエンドマイクロサービスへの単一のエントリポイントを提供する。",
+    "whyChosen": "カナリアデプロイメントやトラフィックシェーピングなどの動的なフィルタ処理を容易に行え、非同期処理によって数百万の同時接続を処理可能な、プログラム性の高いゲートウェイを必要としていたため。",
     "tradeoffs": {
-      "pros": ["Programmable filter pipeline for dynamic behavior", "Non-blocking I/O for extreme throughput", "Enables canary deployments and A/B testing at the edge"],
-      "cons": ["Complex custom solution requiring deep expertise", "Higher operational burden than managed alternatives"]
+      "pros": ["動的なルーティングや制御をコードで記述できる柔軟なフィルタパイプライン", "圧倒的なスループットを実現する非同期・ノンブロッキングI/O", "エッジ側でのカナリアリリースやA/Bテストの実施を容易にする"],
+      "cons": ["高度な専門知識が必要な複雑な独自ソリューションであること", "クラウドベンダーのマネージドAPI Gatewayに比べて運用保守コストが高い"]
     },
     "alternatives": [
-      { "name": "AWS API Gateway", "context": "Fully managed, serverless" },
-      { "name": "Kong", "context": "Open-source, plugin-based gateway" },
-      { "name": "Envoy Proxy", "context": "High-performance L7 proxy, CNCF project" }
+      { "name": "AWS API Gateway", "context": "フルマネージドでスケーラブルなサーバーレスAPIゲートウェイ" },
+      { "name": "Kong", "context": "プラグインエコシステムが豊富なOSSベースのAPIゲートウェイ" },
+      { "name": "Envoy Proxy", "context": "CNCFの高性能L7プロキシ・サービスメッシュエッジ" }
     ],
     "position": { "x": 350, "y": 300 }
   },
@@ -58,36 +58,36 @@
     "id": "eureka",
     "label": "Eureka Service Discovery",
     "type": "service",
-    "description": "Client-side service discovery registry enabling microservices to find and communicate with each other.",
+    "description": "マイクロサービス同士が互いを発見し、通信経路を確立するためのクライアントサイドのサービス登録・ディスカバリシステム。",
     "techStack": "Eureka (Netflix OSS)",
-    "role": "Maintains a real-time registry of all service instances, their locations, and health status. Services register themselves on startup and query Eureka to find dependencies.",
-    "whyChosen": "In a cloud environment where instances are ephemeral, hardcoded addresses are impossible. Eureka provides AP (Available, Partition-tolerant) semantics ideal for Netflix's scale.",
+    "role": "稼働しているすべてのサービスインスタンスの位置情報（IPアドレスやポート）とヘルス状態のリアルタイムなレジストリを維持する。各マイクロサービスは起動時にEurekaへ自己登録し、依存先サービスの呼び出し時にEurekaへ問い合わせを行う。",
+    "whyChosen": "インスタンスが頻繁に破棄・作成されるクラウド環境において、静的なアドレス指定は不可能なため。CAP定理におけるAP（可用性と分断耐性）を最優先にし、一時的な登録ズレがあってもサービスが停止しないよう設計されたため。",
     "tradeoffs": {
-      "pros": ["High availability over strict consistency (AP system)", "Client-side load balancing", "Self-healing with heartbeat-based eviction"],
-      "cons": ["Eventually consistent — stale data possible", "Requires client-side integration in every service"]
+      "pros": ["ネットワーク分断時にも動作を維持する高い可用性（AP特性）", "クライアントサイドでの動的な負荷分散", "ハートビート監視による一時的な障害インスタンスの自動除外（自己修復）"],
+      "cons": ["結果整合性モデルであるため、一時的に古い接続先情報を参照する可能性がある", "全サービスにEurekaのクライアントライブラリを統合する設計負荷"]
     },
     "alternatives": [
-      { "name": "Consul", "context": "HashiCorp, supports health checking + KV store" },
-      { "name": "AWS Cloud Map", "context": "Managed service discovery on AWS" },
-      { "name": "Kubernetes Service Discovery", "context": "Built-in with K8s DNS" }
+      { "name": "Consul", "context": "HashiCorp製。ヘルスチェックとKVストア機能を備え、強い一貫性（CP特性）をサポート" },
+      { "name": "AWS Cloud Map", "context": "AWSのマネージドなクラウドサービス登録・検出リソース" },
+      { "name": "Kubernetes Service Discovery", "context": "K8s標準のDNSおよび環境変数ベースのDiscovery機構" }
     ],
     "position": { "x": 350, "y": 100 }
   },
   {
     "id": "api-services",
-    "label": "API / BFF Services",
+    "label": "API / BFF サービス",
     "type": "service",
-    "description": "Backend-for-Frontend services that aggregate data from multiple microservices into client-optimized responses.",
+    "description": "複数のマイクロサービスから必要なデータを取得・統合し、クライアントデバイスごとに最適化されたレスポンスを返すBackend-for-Frontend (BFF) サービス。",
     "techStack": "Java, Spring Boot, gRPC",
-    "role": "Orchestrate calls to downstream domain services, transform and aggregate data, and return tailored payloads for different client types (TV, mobile, web).",
-    "whyChosen": "Decoupling client needs from domain service APIs allows independent evolution. Different clients have different data needs that a single API cannot efficiently serve.",
+    "role": "下流にあるドメインサービス（ユーザー情報、再生履歴など）への呼び出しをオーケストレートし、データを結合・加工して、TV、スマートフォン、Webブラウザなどの各クライアント専用の最適なデータ構造で返却する。",
+    "whyChosen": "フロントエンド側の表示要件と、ドメインサービスのデータ境界を分離して独立して進化できるようにするため。また、デバイスの画面サイズや通信環境に応じた最適化が不可欠なため。",
     "tradeoffs": {
-      "pros": ["Client-optimized responses reduce over-fetching", "Isolates client changes from domain services"],
-      "cons": ["Additional layer of complexity", "Risk of becoming a monolithic aggregation layer"]
+      "pros": ["デバイスに最適化された最小限のレスポンスにより、不要な通信量（オーバーフェッチ）を削減", "フロントエンド側の要件変更をドメインマイクロサービスから隠蔽できる"],
+      "cons": ["アーキテクチャが1層増えることによる通信オーバーヘッドと開発の複雑性", "ドメインロジックが漏れ出すことで、単なる巨大なモノリシック集約層になりやすいリスク"]
     },
     "alternatives": [
-      { "name": "GraphQL Gateway", "context": "Client-driven queries, flexible data fetching" },
-      { "name": "Direct microservice calls", "context": "Simpler but couples clients to internals" }
+      { "name": "GraphQL Gateway", "context": "クライアントが必要なデータ構造をクエリ側で柔軟に指定・取得するアプローチ" },
+      { "name": "各サービスへの直接呼び出し", "context": "シンプルだが、クライアント側がバックエンド内部構造と密結合になる" }
     ],
     "position": { "x": 600, "y": 300 }
   },
@@ -95,17 +95,17 @@
     "id": "evcache",
     "label": "EVCache",
     "type": "cache",
-    "description": "Netflix's distributed caching solution built on Memcached, optimized for high availability and low latency.",
-    "techStack": "EVCache (Memcached-based), cross-region replication",
-    "role": "Provides sub-millisecond access to frequently requested data (user profiles, viewing history, session data). Reduces load on backend databases by orders of magnitude.",
-    "whyChosen": "Standard Memcached lacked cross-region replication and Netflix-scale operational tooling. EVCache adds automatic failover, zone-aware routing, and data replication.",
+    "description": "Memcachedをベースに構築され、高可用性と超低レイテンシに最適化されたNetflix独自の分散型インメモリキャッシュソリューション。",
+    "techStack": "EVCache (Memcachedベース), リージョン間同期",
+    "role": "頻繁にアクセスされるデータ（ユーザープロファイル、視聴状況、一時的なセッションなど）に対して、ミリ秒未満の極めて高速な読み込みアクセスを提供し、バックエンドデータベース（Cassandra）の負荷を大幅に削減する。",
+    "whyChosen": "標準のMemcachedには、Netflixが必要とするAWSマルチリージョン間でのキャッシュデータの自動同期機能や独自のトポロジー管理が備わっていなかったため、自社でラッパーとレプリケーション機構を拡張した。",
     "tradeoffs": {
-      "pros": ["Sub-millisecond latency", "Cross-region replication for global availability", "Handles millions of ops/sec"],
-      "cons": ["Cache invalidation complexity", "Memory-intensive infrastructure cost", "Data consistency challenges across regions"]
+      "pros": ["ミリ秒未満の圧倒的に低い読込レイテンシ", "グローバルなサービス展開を支えるマルチリージョンアクティブ-アクティブ同期", "毎秒数百万クエリを安定して処理可能"],
+      "cons": ["キャッシュの無効化（インバリデーション）漏れによるデータ不整合の複雑さ", "すべてをインメモリで維持することによる膨大なサーバーメモリコスト", "リージョン間レプリケーションにおける整合性の保証難度"]
     },
     "alternatives": [
-      { "name": "Redis / ElastiCache", "context": "Rich data structures, pub/sub support" },
-      { "name": "Hazelcast", "context": "In-memory data grid with compute" }
+      { "name": "Redis / AWS ElastiCache", "context": "豊富なデータ構造、永続化、Pub/Subなどを標準でサポートするマネージドキャッシュ" },
+      { "name": "Hazelcast", "context": "インメモリデータグリッドであり、分散コンピューティング機能も備える" }
     ],
     "position": { "x": 600, "y": 100 }
   },
@@ -113,18 +113,18 @@
     "id": "cassandra",
     "label": "Cassandra",
     "type": "database",
-    "description": "Distributed NoSQL database providing linear scalability and high availability with no single point of failure.",
-    "techStack": "Apache Cassandra, multi-region clusters",
-    "role": "Primary persistent storage for user data, viewing history, and content metadata. Chosen for workloads requiring massive write throughput and global replication.",
-    "whyChosen": "Netflix requires a database that scales horizontally across regions with tunable consistency. Cassandra's masterless architecture eliminates single points of failure.",
+    "description": "単一障害点（SPOF）を持たないアーキテクチャで設計され、リニアな水平スケーラビリティと圧倒的な書き込み耐性を誇る分散NoSQLデータベース。",
+    "techStack": "Apache Cassandra, マルチリージョンクラスタ",
+    "role": "ユーザーアカウント情報、視聴履歴、コンテンツのメタデータなど、Netflixの中核データを格納するメインの永続ストレージ。大規模な書き込みトランザクションと、世界規模のレプリケーションが必要なシステムにおいて採用される。",
+    "whyChosen": "アクティブ-アクティブ方式でリージョンを跨いでスケールし、さらにネットワーク分断時にも停止しない可用性を備えたデータベースが必要だったため。Cassandraのマスタレスなピアツーピア設計は、これらを満たす上で最適だった。",
     "tradeoffs": {
-      "pros": ["Linear horizontal scalability", "Multi-region active-active replication", "Tunable consistency per query"],
-      "cons": ["Complex data modeling (denormalization required)", "No ACID transactions across partitions", "Operational complexity at scale"]
+      "pros": ["ノードを追加するだけで書き込み・読み込み性能がリニアにスケール", "グローバル規模でのマルチリージョン・アクティブ-アクティブ構成", "クエリごとに整合性の強さをチューニング可能"],
+      "cons": ["非正規化を前提とした特殊なデータ設計が必要（Join不可）", "複数パーティションに跨る強一貫性（ACIDトランザクション）をサポートしない", "大規模クラスタのメンテナンスやチューニングの難しさ"]
     },
     "alternatives": [
-      { "name": "DynamoDB", "context": "Managed NoSQL with auto-scaling on AWS" },
-      { "name": "ScyllaDB", "context": "C++ Cassandra-compatible, higher throughput" },
-      { "name": "CockroachDB", "context": "Distributed SQL with strong consistency" }
+      { "name": "AWS DynamoDB", "context": "フルマネージドで自動スケーリングが可能なNoSQLデータベース" },
+      { "name": "ScyllaDB", "context": "C++で再実装されたCassandra互換データベース。より少ないリソースで高スループットを実現" },
+      { "name": "CockroachDB", "context": "水平スケーラビリティと強い一貫性（ACIDトランザクション）を両立する分散SQLデータベース" }
     ],
     "position": { "x": 850, "y": 200 }
   },
@@ -132,54 +132,54 @@
     "id": "kafka",
     "label": "Apache Kafka",
     "type": "queue",
-    "description": "Distributed event streaming platform acting as the central nervous system for real-time data pipelines.",
-    "techStack": "Apache Kafka, 700+ billion messages/day",
-    "role": "Enables asynchronous communication between services, powers real-time analytics pipelines, and feeds the recommendation engine with viewing events and user interactions.",
-    "whyChosen": "Netflix processes hundreds of billions of events daily. Kafka's log-based architecture provides durable, ordered, replayable event streams — essential for both real-time processing and batch analytics.",
+    "description": "Netflix全体のリアルタイムデータ処理と分析系システムを結びつける、高スループットな分散イベントストリーミングプラットフォーム。",
+    "techStack": "Apache Kafka, 日次7,000億メッセージ以上を処理",
+    "role": "サービス間の非同期通信を実現し、アプリ内でのユーザー操作イベント（クリック、視聴停止、検索など）を収集して、レコメンデーションエンジンやデータ分析基盤にリアルタイムで流し込む役割を担う。",
+    "whyChosen": "日次で数千億件発生する大規模イベントデータをロストすることなく、極めて低い遅延で収集・処理するため。Kafkaのパーティション構造とファイル永続化方式は、耐久性とスループットを両立する上で不可欠だった。",
     "tradeoffs": {
-      "pros": ["Massive throughput with durability", "Decouples producers from consumers", "Event replay capability for debugging and reprocessing"],
-      "cons": ["Operational complexity of large Kafka clusters", "Message ordering only within partitions", "Storage costs for long-retention topics"]
+      "pros": ["耐久性を担保しつつ、毎秒数百万イベントを処理できる圧倒的な性能", "送信側（プロデューサー）と受信側（コンシューマー）の完全な疎結合化", "データをディスクに一定期間保持するため、過去のイベントを再再生（リプレイ）可能"],
+      "cons": ["ZooKeeper/KRaft等を含む大規模Kafkaクラスターの運用管理の高さ", "メッセージの厳密な順序保証はパーティション単位に限られること", "高頻度かつ長期間データを保持するためのインフラストレージコスト"]
     },
     "alternatives": [
-      { "name": "Amazon Kinesis", "context": "Managed streaming, tighter AWS integration" },
-      { "name": "Apache Pulsar", "context": "Multi-tenancy, tiered storage" },
-      { "name": "RabbitMQ", "context": "Simpler message broker for lower-scale needs" }
+      { "name": "AWS Kinesis Data Streams", "context": "インフラ構築不要でAWS他サービスと親和性の高いマネージドストリーミング" },
+      { "name": "Apache Pulsar", "context": "マルチテナント機能や階層型ストレージを標準搭載した近代的なイベントログ基盤" },
+      { "name": "RabbitMQ", "context": "メッセージルーティング機能が豊富で、比較的低〜中規模の通信に適したメッセージブローカー" }
     ],
     "position": { "x": 850, "y": 400 }
   },
   {
     "id": "recommendation",
-    "label": "Recommendation Engine",
+    "label": "レコメンデーションエンジン",
     "type": "ml",
-    "description": "ML pipeline that personalizes the entire Netflix experience — from homepage rows to artwork selection.",
-    "techStack": "Custom ML models, TensorFlow, Spark, Flink",
-    "role": "Analyzes viewing history, ratings, and contextual signals to generate personalized content rankings. Powers the 'Top Picks', genre rows, and even which artwork is shown per title.",
-    "whyChosen": "Personalization is Netflix's core competitive advantage. 80% of content watched is driven by recommendations. Custom models allow optimization for engagement and satisfaction.",
+    "description": "ホーム画面の作品リストから、各ユーザーに表示する作品のアートワーク選定に至るまで、アプリ内体験のほぼすべてを高度にパーソナライズする機械学習プラットフォーム。",
+    "techStack": "自社カスタムMLモデル, TensorFlow, Apache Spark, Flink",
+    "role": "視聴履歴、評価データ、時間帯やデバイスなどのコンテキスト情報を分析し、リアルタイムおよびバッチ処理でユーザー固有の推薦ランキングを生成する。",
+    "whyChosen": "Netflixの視聴コンテンツの80%以上が推薦システムを起点としており、パーソナライゼーションは最大のコアバリューであるため。ユーザーの離脱を防ぎエンゲージメントを最大化するために、独自に開発したモデル群を用いている。",
     "tradeoffs": {
-      "pros": ["Drives 80%+ of content discovery", "Continuously learns from user behavior", "Personalizes beyond just content (artwork, UI layout)"],
-      "cons": ["Filter bubble risk", "Massive compute costs for training and inference", "Cold start problem for new users"]
+      "pros": ["視聴発見の80%以上を促進し、ユーザーの離脱を大幅に削減", "リアルタイムの行動データを学習モデルへ反映し、精度の継続的なアップデートを実現", "作品本文だけでなくUIレイアウトや表示アートワークまで個別にパーソナライズ"],
+      "cons": ["ユーザーの視野が狭まり新しいジャンルに出会いにくくなる『フィルターバブル』の懸念", "大規模なモデルの学習およびリアルタイム推論に伴う莫大なクラウドサーバーコスト", "履歴の存在しない新規ユーザーに対して適切な推薦ができない『コールドスタート問題』"]
     },
     "alternatives": [
-      { "name": "Amazon Personalize", "context": "Managed recommendation service" },
-      { "name": "Google Recommendations AI", "context": "GCP managed ML recommendations" }
+      { "name": "AWS Personalize", "context": "Amazonの推薦アルゴリズムを容易に組み込めるフルマネージドレコメンデーション" },
+      { "name": "Google Recommendations AI", "context": "GCP上で提供される、小売やメディア向けの高性能ML推薦API" }
     ],
     "position": { "x": 600, "y": 500 }
   },
   {
     "id": "titus",
-    "label": "Titus (Container Platform)",
+    "label": "Titusコンテナプラットフォーム",
     "type": "service",
-    "description": "Netflix's container management platform running hundreds of thousands of containers on AWS.",
-    "techStack": "Titus (custom), runs on AWS EC2",
-    "role": "Manages the lifecycle of all microservice containers — scheduling, scaling, resource isolation, and integration with Netflix's deployment tooling (Spinnaker).",
-    "whyChosen": "Netflix needed deeper integration with their existing AWS infrastructure and custom scheduling policies that Kubernetes didn't provide at the time of development.",
+    "description": "AWS上で毎日数十万個のコンテナをスケジュール・実行する、Netflix独自のコンテナオーケストレーションシステム。",
+    "techStack": "Titus (独自拡張版), AWS EC2上に構築",
+    "role": "Netflixで動作するほぼすべてのコンテナ（マイクロサービスやバッチ処理）のライフサイクルを管理し、デプロイツール（Spinnaker）やAWSのネットワーキング、セキュリティリソースと連携してコンテナを実行する。",
+    "whyChosen": "開発当時、Kubernetesは初期の段階であり、AWS上のネットワーク（ENI）とのシームレスな結合や、バッチ処理と常時起動サービスを混在させて効率良くスケジューリングするNetflix専用の要件を満たせなかったため独自開発した。",
     "tradeoffs": {
-      "pros": ["Deep AWS integration", "Custom scheduling for Netflix workloads", "Unified platform for batch and service workloads"],
-      "cons": ["Proprietary — not open-source community-driven", "Migration cost if moving away from AWS"]
+      "pros": ["AWS VPCやセキュリティグループとコンテナを直接結合できる深いインフラ統合", "バッチとサービスの双方を詰め込んでコスト効率を最適化する高度な専用スケジューラ", "Netflixの運用ツール群と完璧に統合"],
+      "cons": ["自社専用で非オープンソースのため、OSSコミュニティの最新エコシステムを利用できない", "Kubernetesがデファクトスタンダードとなった現代における、技術スタックの孤立と将来的な移行コスト"]
     },
     "alternatives": [
-      { "name": "Kubernetes (EKS)", "context": "Industry standard container orchestration" },
-      { "name": "AWS ECS", "context": "Managed container service, simpler than K8s" }
+      { "name": "Kubernetes (AWS EKS)", "context": "業界標準のコンテナオーケストレーションサービス。圧倒的なエコシステムを持つ" },
+      { "name": "AWS ECS", "context": "AWS専用のシンプルなコンテナマネージドサービス。構築が容易" }
     ],
     "position": { "x": 350, "y": 500 }
   }
