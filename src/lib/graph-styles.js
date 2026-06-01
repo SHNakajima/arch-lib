@@ -284,16 +284,33 @@ export function getCytoscapeStyles() {
   ];
 }
 
+/** High-resolution brand logo URLs for the 8 companies */
+export const COMPANY_LOGOS = {
+  netflix: 'https://cdn.simpleicons.org/netflix',
+  amazon: 'https://cdn.simpleicons.org/amazon',
+  twitter: 'https://cdn.simpleicons.org/x/ffffff',
+  spotify: 'https://cdn.simpleicons.org/spotify',
+  uber: 'https://cdn.simpleicons.org/uber/ffffff',
+  youtube: 'https://cdn.simpleicons.org/youtube',
+  airbnb: 'https://cdn.simpleicons.org/airbnb',
+  instagram: 'https://cdn.simpleicons.org/instagram'
+};
+
 /**
  * Convert architecture data to Cytoscape elements
  */
-export function toElements(nodes, edges) {
+export function toElements(nodes, edges, archId) {
   const cyNodes = nodes.map(node => {
     const icon = NODE_ICONS[node.type] || '⚙️';
     const typeJa = NODE_TYPE_JA[node.type] || node.type;
-    // Format: "Zuul API Gateway\n[APIゲートウェイ]" (Icon is now displayed as a graphic logo!)
-    const displayLabel = `${node.label}\n[${typeJa}]`;
-    const bgImage = TECH_LOGOS[node.id] || '';
+    // Format: "🚪 Zuul API Gateway\n[APIゲートウェイ]" (Emoji acts as a solid fallback if background image fails!)
+    const displayLabel = `${icon} ${node.label}\n[${typeJa}]`;
+    
+    // Assign service brand logo for client nodes, or fallback to generic tech stack logo
+    let bgImage = TECH_LOGOS[node.id] || '';
+    if (node.id === 'client' && COMPANY_LOGOS[archId]) {
+      bgImage = COMPANY_LOGOS[archId];
+    }
 
     return {
       data: {

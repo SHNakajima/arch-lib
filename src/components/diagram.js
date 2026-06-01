@@ -132,7 +132,7 @@ export async function createDiagram(container, archId, navigateBack) {
  * Initialize Cytoscape instance
  */
 function initCytoscape(containerEl) {
-  const elements = toElements(archData.nodes, archData.edges);
+  const elements = toElements(archData.nodes, archData.edges, archData.meta.id);
 
   cy = cytoscape({
     container: containerEl,

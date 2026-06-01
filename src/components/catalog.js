@@ -3,6 +3,7 @@
  */
 
 import { loadArchitectureList, getAllTags } from '../lib/data-loader.js';
+import { COMPANY_LOGOS } from '../lib/graph-styles.js';
 
 let currentFilter = '';
 let activeTag = '';
@@ -137,8 +138,15 @@ function renderCards(grid, items, navigateTo) {
       aria-label="${item.name}のアーキテクチャを表示"
     >
       <div class="catalog-card__header">
-        <div class="catalog-card__icon" style="background: ${item.accentGradient}">
-          ${item.name.charAt(0)}
+        <div class="catalog-card__icon" style="background: ${item.accentGradient}; display: flex; align-items: center; justify-content: center; padding: 10px;">
+          ${COMPANY_LOGOS[item.id] ? `
+            <img src="${COMPANY_LOGOS[item.id]}" 
+                 alt="${item.name} logo" 
+                 style="width: 24px; height: 24px; object-fit: contain; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.2));" 
+                 onerror="this.style.display='none'; this.nextElementSibling.style.display='block';"
+            />
+            <span style="display: none;">${item.name.charAt(0)}</span>
+          ` : item.name.charAt(0)}
         </div>
         <div>
           <h2 class="catalog-card__title">${item.name}</h2>
