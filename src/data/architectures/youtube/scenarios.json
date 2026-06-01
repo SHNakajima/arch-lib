@@ -1,0 +1,53 @@
+[
+  {
+    "id": "global",
+    "name": "🌐 全体概要",
+    "description": "すべてのコンポーネントとその接続を示す動画配信プラットフォーム全体の概要",
+    "highlightNodes": "*",
+    "highlightEdges": "*"
+  },
+  {
+    "id": "video-upload",
+    "name": "📤 動画アップロード & 変換フロー",
+    "description": "クリエイターが動画を投稿してから、全解像度への自動エンコードおよび保存が行われるまで",
+    "highlightNodes": ["yt-client", "yt-gateway", "yt-transcoder", "yt-vitess", "yt-blob-storage"],
+    "highlightEdges": [
+      "yt-client->yt-gateway",
+      "yt-gateway->yt-transcoder",
+      "yt-gateway->yt-vitess",
+      "yt-transcoder->yt-blob-storage"
+    ],
+    "steps": [
+      { "order": 1, "description": "ユーザーが動画ファイルを投稿すると、クライアントアプリがAPIゲートウェイを介して分割アップロードを開始します", "nodes": ["yt-client", "yt-gateway"] },
+      { "order": 2, "description": "ゲートウェイは、アップロードされたメタデータ（動画タイトル、説明、投稿者）を分散MySQLデータベースのVitessに永続保存します", "nodes": ["yt-gateway", "yt-vitess"] },
+      { "order": 3, "description": "動画ファイルのアップロードが完了すると、ゲートウェイは動画トランスコーダー（非同期エンコードサービス）へ通知を送ります", "nodes": ["yt-gateway", "yt-transcoder"] },
+      { "order": 4, "description": "トランスコーダーは巨大な生動画を並列処理用に秒単位の小さなセグメントに分割します", "nodes": ["yt-transcoder"] },
+      { "order": 5, "description": "数千台のサーバーが並列で働き、MPEG-DASH規格に準拠した1080p, 720p, 360pなどの各解像度およびVP9/AV1コーデックへと同時に高速エンコードを実行します", "nodes": ["yt-transcoder"] },
+      { "order": 6, "description": "トランスコーディングが完了した全形式・全画質の動画ファイル群は、ペタバイト級 of 分散オブジェクトストレージ（Blob Storage）に確実に永続保存されます", "nodes": ["yt-transcoder", "yt-blob-storage"] }
+    ]
+  },
+  {
+    "id": "video-streaming",
+    "name": "📺 動画再生・ストリーミングフロー",
+    "description": "視聴者が動画を再生したときの処理 — メタデータのキャッシュ読込からエッジCDN配信まで",
+    "highlightNodes": ["yt-client", "yt-gateway", "yt-memcached", "yt-vitess", "yt-cdn", "yt-blob-storage", "yt-recommendation"],
+    "highlightEdges": [
+      "yt-client->yt-gateway",
+      "yt-gateway->yt-memcached",
+      "yt-gateway->yt-vitess",
+      "yt-vitess->yt-memcached",
+      "yt-client->yt-cdn",
+      "yt-cdn->yt-blob-storage",
+      "yt-gateway->yt-recommendation",
+      "yt-recommendation->yt-vitess"
+    ],
+    "steps": [
+      { "order": 1, "description": "ユーザーが動画をクリックすると、クライアントはまずAPIゲートウェイに動画のメタデータと『次のおすすめ動画』をリクエストします", "nodes": ["yt-client", "yt-gateway"] },
+      { "order": 2, "description": "ゲートウェイは、動画のタイトルや再生カウント数などの情報を、超高速インメモリキャッシュであるMemcachedから秒読みで取得します", "nodes": ["yt-gateway", "yt-memcached"] },
+      { "order": 3, "description": "キャッシュにない場合はVitess（データベース）からメタデータを取得してMemcachedに保存し、同時にレコメンデーションエンジンに『関連動画』を問い合わせます", "nodes": ["yt-gateway", "yt-vitess", "yt-recommendation", "yt-memcached"] },
+      { "order": 4, "description": "レコメンデーションエンジンは、視聴者の過去の履歴や傾向をVitessから読み込み、ディープラーニングモデルによって最適な「関連動画リスト」を算出して返却します", "nodes": ["yt-recommendation", "yt-vitess"] },
+      { "order": 5, "description": "クライアントは動画の再生用記述子（マニフェスト）を受け取り、Google Global Cache（自社エッジCDN）から音声・映像データの読み込みを開始します", "nodes": ["yt-client", "yt-cdn"] },
+      { "order": 6, "description": "エッジCDNにデータがないセグメントは、大容量動画Blobストレージから高速取得し、エッジにキャッシュを格納したうえで、ユーザーの画面へ滑らかにストリーミング配信されます", "nodes": ["yt-cdn", "yt-blob-storage"] }
+    ]
+  }
+]

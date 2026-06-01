@@ -1,0 +1,51 @@
+[
+  {
+    "id": "global",
+    "name": "🌐 全体概要",
+    "description": "すべてのコンポーネントとその接続を示す画像SNSプラットフォーム全体の概要",
+    "highlightNodes": "*",
+    "highlightEdges": "*"
+  },
+  {
+    "id": "media-posting",
+    "name": "📸 写真の投稿フロー",
+    "description": "ユーザーが写真を撮影し、フィルターを適用してタイムラインに流れるまで",
+    "highlightNodes": ["ig-client", "ig-gateway", "ig-media-service", "ig-media-storage", "ig-postgresql", "ig-redis"],
+    "highlightEdges": [
+      "ig-client->ig-gateway",
+      "ig-gateway->ig-media-service",
+      "ig-gateway->ig-postgresql",
+      "ig-media-service->ig-media-storage",
+      "ig-postgresql->ig-redis"
+    ],
+    "steps": [
+      { "order": 1, "description": "ユーザーが写真を撮影しフィルターを適用して『シェア』を押すと、生の画像データがゲートウェイを介して送信されます", "nodes": ["ig-client", "ig-gateway"] },
+      { "order": 2, "description": "ゲートウェイは、投稿内容のメタデータ（キャプション、位置タグ、投稿日時）をシャード化PostgreSQLに即時書き込みます", "nodes": ["ig-gateway", "ig-postgresql"] },
+      { "order": 3, "description": "同時に、重い画像変換処理を担うメディア処理サービスへ非同期タスクとして画像データが転送されます", "nodes": ["ig-gateway", "ig-media-service"] },
+      { "order": 4, "description": "メディア処理サービスはWebP/HEIC形式への圧縮、リサイズを施し、サムネイルと共に耐久オブジェクトストレージ（S3）へ保存します", "nodes": ["ig-media-service", "ig-media-storage"] },
+      { "order": 5, "description": "バックエンドシステムは、投稿ユーザーのフォロワーリストをPostgreSQLから取得し、フォロワーそれぞれのRedisキャッシュに最新の写真IDを非同期でプッシュ（書き込み）します", "nodes": ["ig-postgresql", "ig-redis"] }
+    ]
+  },
+  {
+    "id": "feed-delivery",
+    "name": "📱 フィードの表示フロー",
+    "description": "アプリ起動時の高速なホームタイムライン表示と、画像のCDN経由エッジストリーミング",
+    "highlightNodes": ["ig-client", "ig-gateway", "ig-feed-service", "ig-redis", "ig-postgresql", "ig-cdn", "ig-media-storage"],
+    "highlightEdges": [
+      "ig-client->ig-gateway",
+      "ig-gateway->ig-feed-service",
+      "ig-feed-service->ig-redis",
+      "ig-feed-service->ig-postgresql",
+      "ig-client->ig-cdn",
+      "ig-cdn->ig-media-storage"
+    ],
+    "steps": [
+      { "order": 1, "description": "ユーザーがアプリを開くと、ホーム画面に表示すべきフィード情報がAPIゲートウェイにリクエストされます", "nodes": ["ig-client", "ig-gateway"] },
+      { "order": 2, "description": "ゲートウェイからフィード構築サービスへ中継され、ユーザー専用のフィード構築処理が開始されます", "nodes": ["ig-gateway", "ig-feed-service"] },
+      { "order": 3, "description": "フィードサービスは、インメモリキャッシュであるRedisを呼び出し、事前にタイムスタンプ順で整理された最新の写真IDリストを取得します", "nodes": ["ig-feed-service", "ig-redis"] },
+      { "order": 4, "description": "万が一Redisにない（ミスした）場合、または一部データ欠損の際は、PostgreSQLから直接フォロワー関係と最新投稿をマージしてフィードを組み立てます", "nodes": ["ig-feed-service", "ig-postgresql"] },
+      { "order": 5, "description": "クライアントはフィード情報（写真のメタデータとS3の画像URL）を受け取り、最寄りのグローバル配信CDN（Akamai等）から画像をダウンロードします", "nodes": ["ig-client", "ig-cdn"] },
+      { "order": 6, "description": "CDNはS3（メディアストレージ）から取得した画像を瞬時にメモリに保持し、滑らかな無限スクロールを可能にする超高速画像ストリーミングを提供します", "nodes": ["ig-cdn", "ig-media-storage"] }
+    ]
+  }
+]

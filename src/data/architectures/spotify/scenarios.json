@@ -1,0 +1,54 @@
+[
+  {
+    "id": "global",
+    "name": "🌐 全体概要",
+    "description": "すべてのコンポーネントとその接続を示すシステム全体の概要",
+    "highlightNodes": "*",
+    "highlightEdges": "*"
+  },
+  {
+    "id": "audio-streaming",
+    "name": "🎧 音楽の再生フロー",
+    "description": "ユーザーが曲を再生したときの処理 — キャッシュ確認から音源ストリーム配信まで",
+    "highlightNodes": ["spotify-client", "spotify-gateway", "spotify-playlist", "spotify-memcached", "spotify-cassandra", "spotify-cdn", "spotify-audio-storage"],
+    "highlightEdges": [
+      "spotify-client->spotify-gateway",
+      "spotify-gateway->spotify-playlist",
+      "spotify-playlist->spotify-memcached",
+      "spotify-playlist->spotify-cassandra",
+      "spotify-client->spotify-cdn",
+      "spotify-cdn->spotify-audio-storage"
+    ],
+    "steps": [
+      { "order": 1, "description": "ユーザーが再生ボタンを押すと、クライアントアプリがアクセスゲートウェイ経由で再生対象の楽曲情報をリクエストします", "nodes": ["spotify-client", "spotify-gateway"] },
+      { "order": 2, "description": "ゲートウェイはプレイリストサービスへgRPCで中継し、対象曲が含まれるメタデータの取得を開始します", "nodes": ["spotify-gateway", "spotify-playlist"] },
+      { "order": 3, "description": "プレイリストサービスは、まず超高速なインメモリキャッシュであるMemcachedからデータをロードしようと試みます", "nodes": ["spotify-playlist", "spotify-memcached"] },
+      { "order": 4, "description": "キャッシュにデータがない（ミスした）場合、分散NoSQLのCassandraから楽曲詳細をロードし、キャッシュを更新します", "nodes": ["spotify-playlist", "spotify-cassandra"] },
+      { "order": 5, "description": "クライアントは楽曲のメタデータと再生キー（暗号化解除キー）を受け取り、グローバルCDN（Fastly等）から暗号化音声ストリームの読み込みを開始します", "nodes": ["spotify-client", "spotify-cdn"] },
+      { "order": 6, "description": "CDNにデータがない音声セグメントは、オリジンであるGoogle Cloud Storage（GCS）からフェッチしてエッジへキャッシュし、ユーザーへシームレスに届けられます", "nodes": ["spotify-cdn", "spotify-audio-storage"] }
+    ]
+  },
+  {
+    "id": "discover-weekly",
+    "name": "📅 Discover Weekly の生成フロー",
+    "description": "再生履歴ログの収集から機械学習によるおすすめバッチの生成、プレイリストのキャッシュ化まで",
+    "highlightNodes": ["spotify-client", "spotify-gateway", "spotify-playlist", "spotify-kafka", "spotify-recommendation", "spotify-cassandra", "spotify-memcached"],
+    "highlightEdges": [
+      "spotify-client->spotify-gateway",
+      "spotify-gateway->spotify-playlist",
+      "spotify-playlist->spotify-kafka",
+      "spotify-playlist->spotify-memcached",
+      "spotify-playlist->spotify-cassandra",
+      "spotify-kafka->spotify-recommendation",
+      "spotify-recommendation->spotify-cassandra"
+    ],
+    "steps": [
+      { "order": 1, "description": "ユーザーが曲を聴くと、クライアントから再生情報や途中でスキップしたなどの詳細な履歴がゲートウェイへ送信されます", "nodes": ["spotify-client", "spotify-gateway"] },
+      { "order": 2, "description": "プレイリストサービスが再生ログイベントを受け取り、非同期イベントバスであるApache Kafkaへ毎秒数百万件のメッセージとして安全に書き込みます", "nodes": ["spotify-playlist", "spotify-kafka"] },
+      { "order": 3, "description": "レコメンデーションパイプライン（Spark/TensorFlowベースのバッチ）が、Kafka上の膨大なユーザーログとプレイリスト構造を吸い上げます", "nodes": ["spotify-kafka", "spotify-recommendation"] },
+      { "order": 4, "description": "機械学習エンジンは、ユーザーの好みと数億のプレイリスト情報を「協調フィルタリング」モデルで掛け合わせ、パーソナライズされた『Discover Weekly』の選曲を生成します", "nodes": ["spotify-recommendation"] },
+      { "order": 5, "description": "算出された最新の推薦楽曲リストは、NoSQLデータベースであるCassandraへバッチ処理で高速に永続化されます", "nodes": ["spotify-recommendation", "spotify-cassandra"] },
+      { "order": 6, "description": "月曜日にユーザーがアプリを開くと、プレイリストサービスがCassandraからこの推薦リストをロードし、Memcachedにキャッシュして一瞬でタイムラインへ描画します", "nodes": ["spotify-playlist", "spotify-memcached"] }
+    ]
+  }
+]

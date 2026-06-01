@@ -1,0 +1,9 @@
+{
+  "id": "spotify",
+  "name": "Spotify",
+  "description": "8億以上の楽曲を抱える世界最大の音楽ストリーミングサービス。超低レイテンシのオーディオ再生と、Discover Weeklyなどのパーソナライズ機能を支える分散アーキテクチャ。",
+  "category": "エンターテインメント・ストリーミング",
+  "tags": ["audio-streaming", "cdn", "distributed-cache", "ml-pipeline", "event-streaming", "nosql"],
+  "color": "#1DB954",
+  "accentGradient": "linear-gradient(135deg, #1DB954, #191414)"
+}

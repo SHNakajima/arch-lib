@@ -21,7 +21,7 @@ async function fetchJSON(url) {
 export async function loadArchitectureList() {
   if (cache.has('__list__')) return cache.get('__list__');
 
-  const ids = ['netflix', 'amazon', 'twitter'];
+  const ids = ['netflix', 'amazon', 'twitter', 'spotify', 'uber', 'youtube', 'airbnb', 'instagram'];
   const metas = await Promise.all(
     ids.map((id) =>
       fetchJSON(`${import.meta.env.BASE_URL}data/architectures/${id}/meta.json`)

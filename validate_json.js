@@ -4,7 +4,7 @@ const path = require('path');
 const baseDir = path.join(__dirname, 'src/data/architectures');
 console.log('Validating JSON files in:', baseDir);
 
-const companies = ['netflix', 'amazon', 'twitter'];
+const companies = ['netflix', 'amazon', 'twitter', 'spotify', 'uber', 'youtube', 'airbnb', 'instagram'];
 const files = ['meta.json', 'nodes.json', 'edges.json', 'scenarios.json'];
 
 let hasError = false;

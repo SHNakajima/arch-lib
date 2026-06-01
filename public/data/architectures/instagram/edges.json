@@ -1,0 +1,12 @@
+[
+  { "source": "ig-client", "target": "ig-gateway", "label": "写真投稿 / フィードリクエスト", "type": "sync", "scenarios": ["media-posting", "feed-delivery", "global"] },
+  { "source": "ig-gateway", "target": "ig-media-service", "label": "画像加工リクエスト (非同期)", "type": "async", "scenarios": ["media-posting", "global"] },
+  { "source": "ig-gateway", "target": "ig-postgresql", "label": "メタデータ/フォローデータ読込・書込", "type": "sync", "scenarios": ["media-posting", "feed-delivery", "global"] },
+  { "source": "ig-media-service", "target": "ig-media-storage", "label": "WebP変換済画像の保存", "type": "async", "scenarios": ["media-posting", "global"] },
+  { "source": "ig-gateway", "target": "ig-feed-service", "label": "ホーム画面表示中継", "type": "sync", "scenarios": ["feed-delivery", "global"] },
+  { "source": "ig-feed-service", "target": "ig-redis", "label": "フィードキャッシュ読込", "type": "sync", "scenarios": ["feed-delivery", "global"] },
+  { "source": "ig-feed-service", "target": "ig-postgresql", "label": "フォロワー/新規投稿チェック (キャッシュミス時)", "type": "sync", "scenarios": ["feed-delivery", "global"] },
+  { "source": "ig-client", "target": "ig-cdn", "label": "画像データロード (HTTPS)", "type": "streaming", "scenarios": ["feed-delivery", "global"] },
+  { "source": "ig-cdn", "target": "ig-media-storage", "label": "メディアフェッチ (キャッシュミス時)", "type": "sync", "scenarios": ["feed-delivery", "global"] },
+  { "source": "ig-postgresql", "target": "ig-redis", "label": "タイムライン事前集計書き込み (非同期)", "type": "async", "scenarios": ["media-posting", "global"] }
+]

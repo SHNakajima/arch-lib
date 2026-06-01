@@ -1,0 +1,9 @@
+{
+  "id": "uber",
+  "name": "Uber",
+  "description": "世界中で毎日数百万件の配車を行うリアルタイムモビリティプラットフォーム。GPS位置情報の高頻度追跡、空間インデックス、動的価格予測、およびリアルタイムディスパッチエンジン。",
+  "category": "オンデマンド・モビリティ",
+  "tags": ["real-time", "geospatial", "matching", "dynamic-pricing", "event-driven", "distributed-database"],
+  "color": "#000000",
+  "accentGradient": "linear-gradient(135deg, #000000, #333333)"
+}

@@ -1,0 +1,55 @@
+[
+  {
+    "id": "global",
+    "name": "🌐 全体概要",
+    "description": "すべてのコンポーネントと接続を示す配車プラットフォーム全体の概要",
+    "highlightNodes": "*",
+    "highlightEdges": "*"
+  },
+  {
+    "id": "ride-matching",
+    "name": "🚗 配車マッチングフロー",
+    "description": "乗客の配車要請に対して、位置情報の検索と最適アルゴリズムによる割り当てが行われる仕組み",
+    "highlightNodes": ["uber-passenger", "uber-driver", "uber-gateway", "uber-location", "uber-redis", "uber-matching", "uber-schemaless"],
+    "highlightEdges": [
+      "uber-driver->uber-gateway",
+      "uber-gateway->uber-location",
+      "uber-location->uber-redis",
+      "uber-passenger->uber-gateway",
+      "uber-gateway->uber-matching",
+      "uber-matching->uber-redis",
+      "uber-matching->uber-schemaless"
+    ],
+    "steps": [
+      { "order": 1, "description": "稼働中のドライバーアプリから、4秒に1回の頻度で高精度なGPS位置座標がアクセスゲートウェイへ送信されます", "nodes": ["uber-driver", "uber-gateway"] },
+      { "order": 2, "description": "ゲートウェイを経由して位置情報サービスが座標を受信し、異常値クレンジングやマップ吸着を実行します", "nodes": ["uber-gateway", "uber-location"] },
+      { "order": 3, "description": "処理された最新座標は、地球を六角形に分割するH3インデックス構造で、Redisメモリキャッシュに高速保存されます", "nodes": ["uber-location", "uber-redis"] },
+      { "order": 4, "description": "乗客がアプリで「配車要請」ボタンをクリックすると、リクエストがゲートウェイ経由でDISCOマッチングエンジンに到達します", "nodes": ["uber-passenger", "uber-gateway", "uber-matching"] },
+      { "order": 5, "description": "DISCOエンジンは乗客の現在地セルを中心に周辺空き車両をRedisから検索し、予測道路網を反映した到着予想時間（ETA）を結合します", "nodes": ["uber-matching", "uber-redis"] },
+      { "order": 6, "description": "都市全体の効率を最大化する組み合わせを算出して配車ペアを決定し、トリップ情報をドキュメントDB（Schemaless）に確実に保存します", "nodes": ["uber-matching", "uber-schemaless"] }
+    ]
+  },
+  {
+    "id": "surge-pricing",
+    "name": "⚡ サージ価格予測フロー",
+    "description": "局所的な需要急増をリアルタイムに検知し、料金を倍率調整して供給を誘導する仕組み",
+    "highlightNodes": ["uber-passenger", "uber-driver", "uber-gateway", "uber-location", "uber-kafka", "uber-surge", "uber-matching"],
+    "highlightEdges": [
+      "uber-driver->uber-gateway",
+      "uber-passenger->uber-gateway",
+      "uber-gateway->uber-location",
+      "uber-location->uber-kafka",
+      "uber-location->uber-kafka",
+      "uber-kafka->uber-surge",
+      "uber-surge->uber-matching"
+    ],
+    "steps": [
+      { "order": 1, "description": "乗客によるアプリでの「料金検索・画面閲覧（需要）」と、ドライバーの「GPS位置送信（供給）」がゲートウェイへ絶えず流入します", "nodes": ["uber-passenger", "uber-driver", "uber-gateway"] },
+      { "order": 2, "description": "位置情報サービスとフロントゲートウェイは、これらの需給生ストリームログを中継し、Apache Kafkaイベントバスへ非同期でパブリッシュします", "nodes": ["uber-gateway", "uber-location", "uber-kafka"] },
+      { "order": 3, "description": "サージ予測エンジン（Flinkストリーム処理プラットフォーム）が、Kafkaから需給ログデータを六角形セル（H3）ごとにミリ秒単位で集計します", "nodes": ["uber-kafka", "uber-surge"] },
+      { "order": 4, "description": "特定セル内で「需要 ＞＞ 供給（空き車両）」の逼迫が発生した際、機械学習ロジックが料金倍率を動的に計算（例：1.8倍）してサージ領域を作成します", "nodes": ["uber-surge"] },
+      { "order": 5, "description": "算出されたサージ料金倍率は、即座にDISCOマッチングエンジンおよび料金提示システムへ適用され、乗客の見積もりに反映されます", "nodes": ["uber-surge", "uber-matching"] },
+      { "order": 6, "description": "乗車料金が上昇したことを知った周辺ドライバーが不足エリアへ自律移動を開始し、エリア内の需給バランスが自然に自己修復されます", "nodes": ["uber-driver"] }
+    ]
+  }
+]

@@ -1,0 +1,50 @@
+[
+  {
+    "id": "global",
+    "name": "🌐 全体概要",
+    "description": "すべてのコンポーネントとその接続を示す予約プラットフォーム全体の概要",
+    "highlightNodes": "*",
+    "highlightEdges": "*"
+  },
+  {
+    "id": "stay-search",
+    "name": "🔍 宿泊先の検索フロー",
+    "description": "ゲストが希望の日付や地域を指定し、空室のある宿泊施設をリアルタイムで検索する仕組み",
+    "highlightNodes": ["ab-client", "ab-gateway", "ab-search-service", "ab-elasticsearch", "ab-redis"],
+    "highlightEdges": [
+      "ab-client->ab-gateway",
+      "ab-gateway->ab-search-service",
+      "ab-search-service->ab-elasticsearch",
+      "ab-search-service->ab-redis"
+    ],
+    "steps": [
+      { "order": 1, "description": "ゲストが目的地、旅行日程（日付）、およびアメニティフィルターを入力し検索ボタンを押します", "nodes": ["ab-client", "ab-gateway"] },
+      { "order": 2, "description": "APIゲートウェイはリクエストを検知し、認証を実行したうえで検索マイクロサービスへ中継します", "nodes": ["ab-gateway", "ab-search-service"] },
+      { "order": 3, "description": "検索サービスは、ゲストの目的地と地図上の表示範囲から、対応する物件インデックスをElasticsearchで地理的範囲検索（Geo-Queries）します", "nodes": ["ab-search-service", "ab-elasticsearch"] },
+      { "order": 4, "description": "Elasticsearchは宿のタイトル、設備（プール等）、価格帯、およびレビュー評価点のあいまい一致から候補物件のリストをミリ秒で返します", "nodes": ["ab-elasticsearch"] },
+      { "order": 5, "description": "検索サービスは次に、超高速インメモリキャッシュであるRedisを呼び出し、候補物件の指定日の『空きカレンダー（ビットマップ）』を取得します", "nodes": ["ab-search-service", "ab-redis"] },
+      { "order": 6, "description": "指定の日付が『空室（1）』になっている物件のみをフィルタリングし、地図上のピンと価格が正確に一致した最終的な検索結果リストを返却します", "nodes": ["ab-search-service", "ab-client"] }
+    ]
+  },
+  {
+    "id": "booking-workflow",
+    "name": "📅 宿泊予約フロー",
+    "description": "空室仮押さえから決済の実行、予約確定までをSagaパターンで安全に調整するフロー",
+    "highlightNodes": ["ab-client", "ab-gateway", "ab-booking-service", "ab-redis", "ab-mysql", "ab-payment-gateway"],
+    "highlightEdges": [
+      "ab-client->ab-gateway",
+      "ab-gateway->ab-booking-service",
+      "ab-booking-service->ab-redis",
+      "ab-booking-service->ab-mysql",
+      "ab-booking-service->ab-payment-gateway"
+    ],
+    "steps": [
+      { "order": 1, "description": "ゲストが希望の宿を選び、『予約する』をクリックすると、リクエストがゲートウェイ経由で予約処理サービスへ送信されます", "nodes": ["ab-client", "ab-gateway", "ab-booking-service"] },
+      { "order": 2, "description": "予約サービスはRedisカレンダーを『Redlock分散ロック』し、二重仮押さえが絶対に起きない状態で、対象の日付を『仮予約中』へとビット書き換えします", "nodes": ["ab-booking-service", "ab-redis"] },
+      { "order": 3, "description": "日付の仮ブロックが成功すると、予約サービスはメインデータベースのMySQLへ、ステータスを『仮仮（Pending）』として予約レコードを仮保存します", "nodes": ["ab-booking-service", "ab-mysql"] },
+      { "order": 4, "description": "予約サービスは決済ゲートウェイを呼び出し、ゲストのクレジットカードに対してStripe API経由で安全に課金処理（決済確認）を実行します", "nodes": ["ab-booking-service", "ab-payment-gateway"] },
+      { "order": 5, "description": "決済が成功すると、予約サービスはMySQLのトランザクションを確定し、予約レコードのステータスを『予約確定（Confirmed）』へ更新します", "nodes": ["ab-booking-service", "ab-mysql"] },
+      { "order": 6, "description": "【例外・補償処理】もし決済が残高不足などで失敗した場合、SagaパターンによりRedisのカレンダー仮押さえが自動解放され、MySQLのレコードも『キャンセル』へロールバックされます", "nodes": ["ab-booking-service", "ab-redis", "ab-mysql"] }
+    ]
+  }
+]

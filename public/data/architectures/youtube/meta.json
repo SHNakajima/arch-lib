@@ -1,0 +1,9 @@
+{
+  "id": "youtube",
+  "name": "YouTube",
+  "description": "毎分500時間以上の動画が投稿される世界最大の動画共有プラットフォーム。動画エンコード・トランスコーディングパイプライン、Googleエッジ配信網（GGC）、および大量データMySQLシャード管理（Vitess）。",
+  "category": "エンターテインメント・ストリーミング",
+  "tags": ["video-streaming", "cdn", "transcoding", "sharded-database", "distributed-cache", "ml-pipeline"],
+  "color": "#FF0000",
+  "accentGradient": "linear-gradient(135deg, #FF0000, #282828)"
+}

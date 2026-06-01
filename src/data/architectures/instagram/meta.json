@@ -1,0 +1,9 @@
+{
+  "id": "instagram",
+  "name": "Instagram",
+  "description": "世界中で数十億人が利用する画像・動画共有ソーシャルメディア。高可用性フィード（タイムライン）配信、画像の非同期変換・クラウド保存、およびシャーディングされたPostgreSQLリレーショナルDB。",
+  "category": "ソーシャルメディア",
+  "tags": ["real-time", "media-storage", "cdn", "sharded-database", "distributed-cache"],
+  "color": "#E1306C",
+  "accentGradient": "linear-gradient(135deg, #833AB4, #E1306C, #FCAF45)"
+}

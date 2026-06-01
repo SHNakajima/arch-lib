@@ -1,0 +1,11 @@
+[
+  { "source": "spotify-client", "target": "spotify-cdn", "label": "音声ストリーミング (HTTPS)", "type": "streaming", "scenarios": ["audio-streaming", "global"] },
+  { "source": "spotify-client", "target": "spotify-gateway", "label": "API リクエスト (HTTPS)", "type": "sync", "scenarios": ["audio-streaming", "discover-weekly", "global"] },
+  { "source": "spotify-gateway", "target": "spotify-playlist", "label": "プレイリスト呼出 (gRPC)", "type": "sync", "scenarios": ["audio-streaming", "discover-weekly", "global"] },
+  { "source": "spotify-playlist", "target": "spotify-memcached", "label": "キャッシュ読込", "type": "sync", "scenarios": ["audio-streaming", "discover-weekly", "global"] },
+  { "source": "spotify-playlist", "target": "spotify-cassandra", "label": "データ読込/永続化", "type": "sync", "scenarios": ["audio-streaming", "discover-weekly", "global"] },
+  { "source": "spotify-playlist", "target": "spotify-kafka", "label": "再生開始イベント発行 (非同期)", "type": "async", "scenarios": ["discover-weekly", "global"] },
+  { "source": "spotify-kafka", "target": "spotify-recommendation", "label": "ログイベント吸い上げ", "type": "async", "scenarios": ["discover-weekly", "global"] },
+  { "source": "spotify-recommendation", "target": "spotify-cassandra", "label": "推薦曲バッチ書込", "type": "async", "scenarios": ["discover-weekly", "global"] },
+  { "source": "spotify-cdn", "target": "spotify-audio-storage", "label": "音源データフェッチ (キャッシュミス時)", "type": "sync", "scenarios": ["audio-streaming", "global"] }
+]

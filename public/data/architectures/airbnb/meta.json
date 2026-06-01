@@ -1,0 +1,9 @@
+{
+  "id": "airbnb",
+  "name": "Airbnb",
+  "description": "世界中の宿泊施設を予約できる代表的な旅行マーケットプレイス。多様な宿泊要件に対応する全文検索エンジン（Elasticsearch）と、カレンダー同期および分散予約Sagaトランザクション。",
+  "category": "Eコマース・旅行",
+  "tags": ["search", "booking", "distributed-transactions", "distributed-cache", "nosql", "relational-database"],
+  "color": "#FF5A5F",
+  "accentGradient": "linear-gradient(135deg, #FF5A5F, #D93900)"
+}

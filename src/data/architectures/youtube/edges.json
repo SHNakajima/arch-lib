@@ -1,0 +1,12 @@
+[
+  { "source": "yt-client", "target": "yt-gateway", "label": "動画アップロード / APIリクエスト", "type": "sync", "scenarios": ["video-upload", "video-streaming", "global"] },
+  { "source": "yt-gateway", "target": "yt-transcoder", "label": "アップロード完了通知 (非同期)", "type": "async", "scenarios": ["video-upload", "global"] },
+  { "source": "yt-gateway", "target": "yt-vitess", "label": "メタデータ書き込み/読込", "type": "sync", "scenarios": ["video-upload", "video-streaming", "global"] },
+  { "source": "yt-transcoder", "target": "yt-blob-storage", "label": "変換済動画の保存", "type": "async", "scenarios": ["video-upload", "global"] },
+  { "source": "yt-vitess", "target": "yt-memcached", "label": "メタデータのキャッシュ保存", "type": "sync", "scenarios": ["video-streaming", "global"] },
+  { "source": "yt-gateway", "target": "yt-memcached", "label": "キャッシュ読込", "type": "sync", "scenarios": ["video-streaming", "global"] },
+  { "source": "yt-client", "target": "yt-cdn", "label": "動画ストリーミング (HTTPS)", "type": "streaming", "scenarios": ["video-streaming", "global"] },
+  { "source": "yt-cdn", "target": "yt-blob-storage", "label": "動画データフェッチ (キャッシュミス時)", "type": "sync", "scenarios": ["video-streaming", "global"] },
+  { "source": "yt-gateway", "target": "yt-recommendation", "label": "関連動画取得リクエスト", "type": "sync", "scenarios": ["video-streaming", "global"] },
+  { "source": "yt-recommendation", "target": "yt-vitess", "label": "ユーザー履歴・メタデータ読込", "type": "sync", "scenarios": ["video-streaming", "global"] }
+]

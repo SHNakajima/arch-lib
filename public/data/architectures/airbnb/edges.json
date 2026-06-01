@@ -1,0 +1,11 @@
+[
+  { "source": "ab-client", "target": "ab-gateway", "label": "宿泊検索 / 予約要請 (HTTPS)", "type": "sync", "scenarios": ["stay-search", "booking-workflow", "global"] },
+  { "source": "ab-gateway", "target": "ab-search-service", "label": "検索クエリ転送 (gRPC)", "type": "sync", "scenarios": ["stay-search", "global"] },
+  { "source": "ab-search-service", "target": "ab-elasticsearch", "label": "宿情報・位置情報の複合検索", "type": "sync", "scenarios": ["stay-search", "global"] },
+  { "source": "ab-search-service", "target": "ab-redis", "label": "空室カレンダー情報の取得", "type": "sync", "scenarios": ["stay-search", "global"] },
+  { "source": "ab-gateway", "target": "ab-booking-service", "label": "予約処理リクエスト (gRPC)", "type": "sync", "scenarios": ["booking-workflow", "global"] },
+  { "source": "ab-booking-service", "target": "ab-redis", "label": "指定日のカレンダーブロック・ロック", "type": "sync", "scenarios": ["booking-workflow", "global"] },
+  { "source": "ab-booking-service", "target": "ab-mysql", "label": "予約台帳への仮書き込み", "type": "sync", "scenarios": ["booking-workflow", "global"] },
+  { "source": "ab-booking-service", "target": "ab-payment-gateway", "label": "クレジットカード決済の実行 (HTTPS)", "type": "sync", "scenarios": ["booking-workflow", "global"] },
+  { "source": "ab-booking-service", "target": "ab-mysql", "label": "予約確定ステータスの更新", "type": "sync", "scenarios": ["booking-workflow", "global"] }
+]

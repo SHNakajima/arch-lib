@@ -1,0 +1,12 @@
+[
+  { "source": "uber-passenger", "target": "uber-gateway", "label": "配車要請 / 双方向通信 (WebSockets)", "type": "sync", "scenarios": ["ride-matching", "surge-pricing", "global"] },
+  { "source": "uber-driver", "target": "uber-gateway", "label": "GPS現在地送信 (4秒に1回)", "type": "sync", "scenarios": ["ride-matching", "surge-pricing", "global"] },
+  { "source": "uber-gateway", "target": "uber-location", "label": "座標データ転送 (gRPC)", "type": "sync", "scenarios": ["ride-matching", "surge-pricing", "global"] },
+  { "source": "uber-location", "target": "uber-redis", "label": "地理空間座標の高速保存", "type": "sync", "scenarios": ["ride-matching", "global"] },
+  { "source": "uber-location", "target": "uber-kafka", "label": "位置更新イベントストリーム", "type": "async", "scenarios": ["surge-pricing", "global"] },
+  { "source": "uber-gateway", "target": "uber-matching", "label": "配車リクエスト中継", "type": "sync", "scenarios": ["ride-matching", "global"] },
+  { "source": "uber-matching", "target": "uber-redis", "label": "周辺の空き車両の範囲検索", "type": "sync", "scenarios": ["ride-matching", "global"] },
+  { "source": "uber-matching", "target": "uber-schemaless", "label": "トリップデータ永続化 (トランザクション)", "type": "sync", "scenarios": ["ride-matching", "global"] },
+  { "source": "uber-kafka", "target": "uber-surge", "label": "需給ログのリアルタイム流入", "type": "async", "scenarios": ["surge-pricing", "global"] },
+  { "source": "uber-surge", "target": "uber-matching", "label": "価格補正倍率の適用", "type": "sync", "scenarios": ["surge-pricing", "global"] }
+]
